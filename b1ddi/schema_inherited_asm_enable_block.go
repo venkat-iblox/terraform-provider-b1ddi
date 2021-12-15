@@ -4,18 +4,19 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// InheritanceInheritedString InheritedString
+// IpamsvcInheritedAsmEnableBlock InheritedAsmEnableBlock
 //
-// The inheritance configuration for a field of type _String_.
+// The inheritance block for ASM fields: _enable_, _enable_notification_, _reenable_date_.
 //
-// swagger:model inheritanceInheritedString
-func dataSourceInheritanceInheritedString() *schema.Resource {
+// swagger:model ipamsvcInheritedAsmEnableBlock
+func schemaIpamsvcInheritedAsmEnableBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
-			// The inheritance setting for a field.
+			// The inheritance setting.
 			//
 			// Valid values are:
 			// * _inherit_: Use the inherited value.
@@ -25,7 +26,7 @@ func dataSourceInheritanceInheritedString() *schema.Resource {
 			"action": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "The inheritance setting for a field.\n\nValid values are:\n* _inherit_: Use the inherited value.\n* _override_: Use the value set in the object.\n\nDefaults to _inherit_.",
+				Description: "The inheritance setting.\n\nValid values are:\n* _inherit_: Use the inherited value.\n* _override_: Use the value set in the object.\n\nDefaults to _inherit_.",
 			},
 
 			// The human-readable display name for the object referred to by _source_.
@@ -46,10 +47,26 @@ func dataSourceInheritanceInheritedString() *schema.Resource {
 			// The inherited value.
 			// Read Only: true
 			"value": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcAsmEnableBlock(),
 				Computed:    true,
 				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedAsmEnableBlock(r *models.IpamsvcInheritedAsmEnableBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = flattenIpamsvcAsmEnableBlock(r.Value)
+
+	return []interface{}{res}
 }

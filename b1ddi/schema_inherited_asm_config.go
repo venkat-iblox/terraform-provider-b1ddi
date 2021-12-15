@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcInheritedASMConfig InheritedASMConfig
@@ -11,14 +12,14 @@ import (
 // The inheritance configuration for the __ASMConfig__ object.
 //
 // swagger:model ipamsvcInheritedASMConfig
-func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
+func schemaIpamsvcInheritedASMConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
 			// The block of ASM fields: _enable_, _enable_notification_, _reenable_date_.
 			"asm_enable_block": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcInheritedAsmEnableBlock(),
+				Elem:        schemaIpamsvcInheritedAsmEnableBlock(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The block of ASM fields: _enable_, _enable_notification_, _reenable_date_.",
@@ -27,7 +28,7 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// The block of ASM fields: _growth_factor_, _growth_type_.
 			"asm_growth_block": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcInheritedAsmGrowthBlock(),
+				Elem:        schemaIpamsvcInheritedAsmGrowthBlock(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The block of ASM fields: _growth_factor_, _growth_type_.",
@@ -36,7 +37,7 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// ASM shows the number of addresses forecast to be used _forecast_period_ days in the future, if it is greater than _asm_threshold_percent_ * _dhcp_total_ (see _dhcp_utilization_) then the subnet is flagged.
 			"asm_threshold": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "ASM shows the number of addresses forecast to be used _forecast_period_ days in the future, if it is greater than _asm_threshold_percent_ * _dhcp_total_ (see _dhcp_utilization_) then the subnet is flagged.",
@@ -45,7 +46,7 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// The forecast period in days.
 			"forecast_period": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The forecast period in days.",
@@ -54,7 +55,7 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// The minimum amount of history needed before ASM can run on this subnet.
 			"history": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The minimum amount of history needed before ASM can run on this subnet.",
@@ -63,7 +64,7 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// The minimum size of range needed for ASM to run on this subnet.
 			"min_total": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The minimum size of range needed for ASM to run on this subnet.",
@@ -72,11 +73,29 @@ func dataSourceIpamsvcInheritedASMConfig() *schema.Resource {
 			// The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change.
 			"min_unused": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedASMConfig(r *models.IpamsvcInheritedASMConfig) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["asm_enable_block"] = flattenIpamsvcInheritedAsmEnableBlock(r.AsmEnableBlock)
+	res["asm_growth_block"] = flattenIpamsvcInheritedAsmGrowthBlock(r.AsmGrowthBlock)
+	res["asm_threshold"] = flattenInheritanceInheritedUInt32(r.AsmThreshold)
+	res["forecast_period"] = flattenInheritanceInheritedUInt32(r.ForecastPeriod)
+	res["history"] = flattenInheritanceInheritedUInt32(r.History)
+	res["min_total"] = flattenInheritanceInheritedUInt32(r.MinTotal)
+	res["min_unused"] = flattenInheritanceInheritedUInt32(r.MinUnused)
+
+	return []interface{}{res}
 }

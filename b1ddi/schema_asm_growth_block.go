@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcAsmGrowthBlock AsmGrowthBlock
@@ -11,7 +12,7 @@ import (
 // ASM growth group of fields.
 //
 // swagger:model ipamsvcAsmGrowthBlock
-func dataSourceIpamsvcAsmGrowthBlock() *schema.Resource {
+func schemaIpamsvcAsmGrowthBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -30,4 +31,17 @@ func dataSourceIpamsvcAsmGrowthBlock() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcAsmGrowthBlock(r *models.IpamsvcAsmGrowthBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["growth_factor"] = r.GrowthFactor
+	res["growth_type"] = r.GrowthType
+
+	return []interface{}{res}
 }

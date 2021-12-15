@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcUtilizationThreshold UtilizationThreshold
@@ -11,7 +12,7 @@ import (
 // A __UtilizationThreshold__ object represents IP address utilization threshold settings.
 //
 // swagger:model ipamsvcUtilizationThreshold
-func dataSourceIpamsvcUtilizationThreshold() *schema.Resource {
+func schemaIpamsvcUtilizationThreshold() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -42,4 +43,18 @@ func dataSourceIpamsvcUtilizationThreshold() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcUtilizationThreshold(r *models.IpamsvcUtilizationThreshold) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["enabled"] = r.Enabled
+	res["high"] = r.High
+	res["low"] = r.Low
+
+	return []interface{}{res}
 }

@@ -4,14 +4,15 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// IpamsvcInheritedAsmEnableBlock InheritedAsmEnableBlock
+// IpamsvcInheritedHostnameRewriteBlock InheritedHostnameRewriteBlock
 //
-// The inheritance block for ASM fields: _enable_, _enable_notification_, _reenable_date_.
+// The inheritance block for fields: _hostname_rewrite_enabled_, _hostname_rewrite_regex_, _hostname_rewrite_char_.
 //
-// swagger:model ipamsvcInheritedAsmEnableBlock
-func dataSourceIpamsvcInheritedAsmEnableBlock() *schema.Resource {
+// swagger:model ipamsvcInheritedHostnameRewriteBlock
+func schemaIpamsvcInheritedHostnameRewriteBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -47,10 +48,25 @@ func dataSourceIpamsvcInheritedAsmEnableBlock() *schema.Resource {
 			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcAsmEnableBlock(),
+				Elem:        schemaIpamsvcHostnameRewriteBlock(),
 				Computed:    true,
 				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedHostnameRewriteBlock(r *models.IpamsvcInheritedHostnameRewriteBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = flattenIpamsvcHostnameRewriteBlock(r.Value)
+
+	return []interface{}{res}
 }

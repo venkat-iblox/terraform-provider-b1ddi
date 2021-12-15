@@ -3,8 +3,10 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcASMConfig ASMConfig
@@ -12,7 +14,7 @@ import (
 // The __ASMConfig__ object represents Automated Scope Management configuration.
 //
 // swagger:model ipamsvcASMConfig
-func dataSourceIpamsvcASMConfig() *schema.Resource {
+func schemaIpamsvcASMConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -20,6 +22,7 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"asm_threshold": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "ASM shows the number of addresses forecast to be used _forecast_period_ days in the future, if it is greater than _asm_threshold_ percent * _dhcp_total_ (see _dhcp_utilization_) then the subnet is flagged.",
 			},
 
@@ -27,6 +30,7 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"enable": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Indicates if Automated Scope Management is enabled.",
 			},
 
@@ -34,20 +38,24 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"enable_notification": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Indicates if ASM should send notifications to the user.",
 			},
 
 			// The forecast period in days.
 			"forecast_period": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				Description: "The forecast period in days.",
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.IntBetween(7, 14),
+				Description:  "The forecast period in days.",
 			},
 
 			// Indicates the growth in the number or percentage of IP addresses.
 			"growth_factor": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Indicates the growth in the number or percentage of IP addresses.",
 			},
 
@@ -55,6 +63,7 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"growth_type": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The type of factor to use: _percent_ or _count_.",
 			},
 
@@ -62,6 +71,7 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"history": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "The minimum amount of history needed before ASM can run on this subnet.",
 			},
 
@@ -69,6 +79,7 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"min_total": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "The minimum size of range needed for ASM to run on this subnet.",
 			},
 
@@ -77,16 +88,61 @@ func dataSourceIpamsvcASMConfig() *schema.Resource {
 			"min_unused": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses\nwhen making a suggested change..",
 			},
 
 			// reenable date
 			// Format: date-time
 			"reenable_date": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.IsRFC3339Time,
 			},
 		},
+	}
+}
+
+func flattenIpamsvcASMConfig(r *models.IpamsvcASMConfig) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := map[string]interface{}{
+		"asm_threshold":       r.AsmThreshold,
+		"enable":              r.Enable,
+		"enable_notification": r.EnableNotification,
+		"forecast_period":     r.ForecastPeriod,
+		"growth_factor":       r.GrowthFactor,
+		"growth_type":         r.GrowthType,
+		"history":             r.History,
+		"min_total":           r.MinTotal,
+		"min_unused":          r.MinUnused,
+		"reenable_date":       r.ReenableDate.String(),
+	}
+
+	return []interface{}{res}
+}
+
+func expandIpamsvcASMConfig(d []interface{}) *models.IpamsvcASMConfig {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+
+	reenable_date, _ := strfmt.ParseDateTime(in["reenable_date"].(string))
+
+	return &models.IpamsvcASMConfig{
+		AsmThreshold:       int64(in["asm_threshold"].(int)),
+		Enable:             in["enable"].(bool),
+		EnableNotification: in["enable_notification"].(bool),
+		ForecastPeriod:     int64(in["forecast_period"].(int)),
+		GrowthFactor:       int64(in["growth_factor"].(int)),
+		GrowthType:         in["growth_type"].(string),
+		History:            int64(in["history"].(int)),
+		MinTotal:           int64(in["min_total"].(int)),
+		MinUnused:          int64(in["min_unused"].(int)),
+		ReenableDate:       reenable_date,
 	}
 }

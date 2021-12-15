@@ -35,7 +35,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The Automated Scope Management configuration for the subnet.
 			"asm_config": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcASMConfig(),
+				Elem:        schemaIpamsvcASMConfig(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The Automated Scope Management configuration for the subnet.",
@@ -151,7 +151,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The DHCP configuration of the subnet that controls how leases are issued.
 			"dhcp_config": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcDHCPConfig(),
+				Elem:        schemaIpamsvcDHCPConfig(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The DHCP configuration of the subnet that controls how leases are issued.",
@@ -167,7 +167,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The DHCP options of the subnet. This can either be a specific option or a group of options.
 			"dhcp_options": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcOptionItem(),
+				Elem:        schemaIpamsvcOptionItem(),
 				Optional:    true,
 				Description: "The DHCP options of the subnet. This can either be a specific option or a group of options.",
 			},
@@ -177,7 +177,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// ToDo add dhcp_utilization
 			//"dhcp_utilization": {
 			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceIpamsvcDHCPUtilization(),
+			//	Elem:        schemaIpamsvcDHCPUtilization(),
 			//	Computed:    true,
 			//	Description: "The utilization of IP addresses within the DHCP ranges of the subnet.",
 			//},
@@ -239,7 +239,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// ToDo add inheritance_assigned_hosts
 			//"inheritance_assigned_hosts": {
 			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceInheritanceAssignedHost(),
+			//	Elem:        schemaInheritanceAssignedHost(),
 			//	Computed:    true,
 			//	Description: "The list of the inheritance assigned hosts of the object.",
 			//},
@@ -254,7 +254,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The DHCP inheritance configuration for the subnet.
 			"inheritance_sources": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcDHCPInheritance(),
+				Elem:        schemaIpamsvcDHCPInheritance(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The DHCP inheritance configuration for the subnet.",
@@ -300,7 +300,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The IP address utilization threshold settings for the subnet.
 			"threshold": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcUtilizationThreshold(),
+				Elem:        schemaIpamsvcUtilizationThreshold(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The IP address utilization threshold settings for the subnet.",
@@ -320,7 +320,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// ToDo Add utilization
 			//"utilization": {
 			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceIpamsvcUtilization(),
+			//	Elem:        schemaIpamsvcUtilization(),
 			//	Computed:    true,
 			//	Description: "The IP address utilization statistics of the subnet.",
 			//},

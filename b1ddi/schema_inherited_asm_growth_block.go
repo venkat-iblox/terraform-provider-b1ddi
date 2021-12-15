@@ -4,14 +4,15 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// IpamsvcInheritedDDNSUpdateBlock InheritedDDNSUpdateBlock
+// IpamsvcInheritedAsmGrowthBlock InheritedAsmGrowthBlock
 //
-// The inheritance configuration for ddns_domain and ddns_send_updates.
+// The inheritance block for ASM fields: _growth_factor_ and _growth_type_.
 //
-// swagger:model ipamsvcInheritedDDNSUpdateBlock
-func dataSourceIpamsvcInheritedDDNSUpdateBlock() *schema.Resource {
+// swagger:model ipamsvcInheritedAsmGrowthBlock
+func schemaIpamsvcInheritedAsmGrowthBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -47,10 +48,25 @@ func dataSourceIpamsvcInheritedDDNSUpdateBlock() *schema.Resource {
 			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcDDNSUpdateBlock(),
+				Elem:        schemaIpamsvcAsmGrowthBlock(),
 				Computed:    true,
 				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedAsmGrowthBlock(r *models.IpamsvcInheritedAsmGrowthBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = flattenIpamsvcAsmGrowthBlock(r.Value)
+
+	return []interface{}{res}
 }

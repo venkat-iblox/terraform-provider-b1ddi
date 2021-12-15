@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcHostnameRewriteBlock HostnameRewriteBlock
@@ -11,7 +12,7 @@ import (
 // Hostname Rewrite grouping fields.
 //
 // swagger:model ipamsvcHostnameRewriteBlock
-func dataSourceIpamsvcHostnameRewriteBlock() *schema.Resource {
+func schemaIpamsvcHostnameRewriteBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -37,4 +38,18 @@ func dataSourceIpamsvcHostnameRewriteBlock() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcHostnameRewriteBlock(r *models.IpamsvcHostnameRewriteBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["hostname_rewrite_char"] = r.HostnameRewriteChar
+	res["hostname_rewrite_enabled"] = r.HostnameRewriteEnabled
+	res["hostname_rewrite_regex"] = r.HostnameRewriteRegex
+
+	return []interface{}{res}
 }

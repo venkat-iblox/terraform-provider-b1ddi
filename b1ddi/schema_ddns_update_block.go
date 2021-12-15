@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcDDNSUpdateBlock DDNSBlock
@@ -11,7 +12,7 @@ import (
 // The dynamic DNS configurations, ddns_domain and ddns_send_updates.
 //
 // swagger:model ipamsvcDDNSUpdateBlock
-func dataSourceIpamsvcDDNSUpdateBlock() *schema.Resource {
+func schemaIpamsvcDDNSUpdateBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -30,4 +31,18 @@ func dataSourceIpamsvcDDNSUpdateBlock() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcDDNSUpdateBlock(r *models.IpamsvcDDNSUpdateBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["ddns_domain"] = r.DdnsDomain
+	res["ddns_send_updates"] = r.DdnsSendUpdates
+
+	return []interface{}{res}
+
 }

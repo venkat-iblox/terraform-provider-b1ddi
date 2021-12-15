@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcInheritedDHCPOptionList InheritedDHCPOptionList
@@ -11,7 +12,7 @@ import (
 // The inheritance configuration for a field that contains list of _OptionItem_.
 //
 // swagger:model ipamsvcInheritedDHCPOptionList
-func dataSourceIpamsvcInheritedDHCPOptionList() *schema.Resource {
+func schemaIpamsvcInheritedDHCPOptionList() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -31,10 +32,28 @@ func dataSourceIpamsvcInheritedDHCPOptionList() *schema.Resource {
 			// The inherited DHCP option values.
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcInheritedDHCPOption(),
+				Elem:        schemaIpamsvcInheritedDHCPOption(),
 				Optional:    true,
 				Description: "The inherited DHCP option values.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedDHCPOptionList(r *models.IpamsvcInheritedDHCPOptionList) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+
+	values := make([]interface{}, 0, len(r.Value))
+	for _, value := range r.Value {
+		values = append(values, flattenIpamsvcInheritedDHCPOption(value))
+	}
+	res["value"] = values
+
+	return []interface{}{res}
 }

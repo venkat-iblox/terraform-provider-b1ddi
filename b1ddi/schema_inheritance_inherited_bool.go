@@ -4,14 +4,15 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// InheritanceInheritedIdentifier InheritedIdentifier
+// InheritanceInheritedBool InheritedBool
 //
-// The inheritance configuration for a field of type _Identifier_.
+// The inheritance configuration for a field of type _Bool_.
 //
-// swagger:model inheritanceInheritedIdentifier
-func dataSourceInheritanceInheritedIdentifier() *schema.Resource {
+// swagger:model inheritanceInheritedBool
+func schemaInheritanceInheritedBool() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -43,12 +44,28 @@ func dataSourceInheritanceInheritedIdentifier() *schema.Resource {
 				Description: "The resource identifier.",
 			},
 
-			// The resource identifier.
+			// The inherited value.
+			// Read Only: true
 			"value": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "The resource identifier.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenInheritanceInheritedBool(r *models.InheritanceInheritedBool) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = r.Value
+
+	return []interface{}{res}
 }

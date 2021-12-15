@@ -3,7 +3,9 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcIgnoreItem IgnoreItem
@@ -11,7 +13,7 @@ import (
 // An Ignore Item object (_dhcp/ignore_item_) represents an item in a DHCP ignore list.
 //
 // swagger:model ipamsvcIgnoreItem
-func dataSourceIpamsvcIgnoreItem() *schema.Resource {
+func schemaIpamsvcIgnoreItem() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -34,5 +36,29 @@ func dataSourceIpamsvcIgnoreItem() *schema.Resource {
 				Description: "Value to match.",
 			},
 		},
+	}
+}
+
+func flattenIpamsvcIgnoreItem(r *models.IpamsvcIgnoreItem) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+	res["type"] = r.Type
+	res["value"] = r.Value
+
+	return []interface{}{res}
+}
+
+func expandIpamsvcIgnoreItem(d []interface{}) *models.IpamsvcIgnoreItem {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+
+	return &models.IpamsvcIgnoreItem{
+		Type:  swag.String(in["type"].(string)),
+		Value: swag.String(in["value"].(string)),
 	}
 }

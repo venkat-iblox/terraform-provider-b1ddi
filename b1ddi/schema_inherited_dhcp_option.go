@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcInheritedDHCPOption InheritedDHCPOption
@@ -11,7 +12,7 @@ import (
 // The inheritance configuration for a field of type of _OptionItem_.
 //
 // swagger:model ipamsvcInheritedDHCPOption
-func dataSourceIpamsvcInheritedDHCPOption() *schema.Resource {
+func schemaIpamsvcInheritedDHCPOption() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -47,10 +48,25 @@ func dataSourceIpamsvcInheritedDHCPOption() *schema.Resource {
 			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcOptionItem(),
+				Elem:        schemaIpamsvcOptionItem(),
 				Computed:    true,
 				Description: "The inherited value for the DHCP option.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedDHCPOption(r *models.IpamsvcInheritedDHCPOption) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = flattenIpamsvcOptionItem(r.Value)
+
+	return []interface{}{res}
 }

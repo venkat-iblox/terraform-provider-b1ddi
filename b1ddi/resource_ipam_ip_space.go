@@ -2,8 +2,10 @@ package b1ddi
 
 import (
 	"context"
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/ip_space"
 	b1models "github.com/infobloxopen/b1ddi-go-client/models"
@@ -25,9 +27,10 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			// The Automated Scope Management configuration for the IP space.
 			"asm_config": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcASMConfig(),
+				Elem:        schemaIpamsvcASMConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The Automated Scope Management configuration for the IP space.",
 			},
 
@@ -68,7 +71,12 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_client_update": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Controls who does the DDNS updates.\n\nValid values are:\n* _client_: DHCP server updates DNS if requested by client.\n* _server_: DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _ignore_: DHCP server always updates DNS, even if the client says not to.\n* _over_client_update_: Same as _server_. DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _over_no_update_: DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it.\n\nDefaults to _client_.",
+				ValidateFunc: validation.StringInSlice(
+					[]string{"client", "server", "ignore", "over_client_update", "over_no_update"},
+					false,
+				),
 			},
 
 			// The domain suffix for DDNS updates. FQDN, may be empty.
@@ -77,6 +85,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_domain": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The domain suffix for DDNS updates. FQDN, may be empty.\n\nDefaults to empty.",
 			},
 
@@ -86,6 +95,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_generate_name": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Indicates if DDNS needs to generate a hostname when not supplied by the client.\n\nDefaults to _false_.",
 			},
 
@@ -98,6 +108,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_generated_prefix": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The prefix used in the generation of an FQDN.\n\nWhen generating a name, DHCP server will construct the name in the format: [ddns-generated-prefix]-[address-text].[ddns-qualifying-suffix].\nwhere address-text is simply the lease IP address converted to a hyphenated string.\n\nDefaults to \"myhost\".",
 			},
 
@@ -106,6 +117,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_send_updates": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     true,
 				Description: "Determines if DDNS updates are enabled at the IP space level.\nDefaults to _true_.",
 			},
 
@@ -115,6 +127,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_update_on_renew": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Instructs the DHCP server to always update the DNS information when a lease is renewed even if its DNS information has not changed.\n\nDefaults to _false_.",
 			},
 
@@ -126,22 +139,24 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 			"ddns_use_conflict_resolution": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     true,
 				Description: "When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.\n\nWhen false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients.\n\nDefaults to _true_.",
 			},
 
 			// The shared DHCP configuration for the IP space that controls how leases are issued.
 			"dhcp_config": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcDHCPConfig(),
+				Elem:        schemaIpamsvcDHCPConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The shared DHCP configuration for the IP space that controls how leases are issued.",
 			},
 
 			// The list of DHCP options for the IP space. May be either a specific option or a group of options.
 			"dhcp_options": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcOptionItem(),
+				Elem:        schemaIpamsvcOptionItem(),
 				Optional:    true,
 				Description: "The list of DHCP options for the IP space. May be either a specific option or a group of options.",
 			},
@@ -176,6 +191,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The character to replace non-matching characters with, when hostname rewrite is enabled.\n\nAny single ASCII character.\n\nDefaults to \"_\".",
+				Default:     "_",
 			},
 
 			// Indicates if client supplied hostnames will be rewritten prior to DDNS update by replacing every character that does not match _hostname_rewrite_regex_ by _hostname_rewrite_char_.
@@ -196,12 +212,13 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The regex bracket expression to match valid characters.\n\nMust begin with \"[\" and end with \"]\" and be a compilable POSIX regex.\n\nDefaults to \"[^a-zA-Z0-9_.]\".",
+				Default:     "[^a-zA-Z0-9_.]",
 			},
 
 			// The inheritance configuration.
 			"inheritance_sources": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcIPSpaceInheritance(),
+				Elem:        schemaIpamsvcIPSpaceInheritance(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration.",
@@ -224,12 +241,12 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 
 			// The utilization threshold settings for the IP space.
 			// Read Only: true
-			//"threshold": {
-			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceIpamsvcUtilizationThreshold(),
-			//	Computed:    true,
-			//	Description: "The utilization threshold settings for the IP space.",
-			//},
+			"threshold": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcUtilizationThreshold(),
+				Computed:    true,
+				Description: "The utilization threshold settings for the IP space.",
+			},
 
 			// Time when the object has been updated. Equals to _created_at_ if not updated after creation.
 			// Read Only: true
@@ -242,12 +259,12 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 
 			// The utilization of IP addresses in the IP space.
 			// Read Only: true
-			//"utilization": {
-			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceIpamsvcUtilization(),
-			//	Computed:    true,
-			//	Description: "The utilization of IP addresses in the IP space.",
-			//},
+			"utilization": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcUtilization(),
+				Computed:    true,
+				Description: "The utilization of IP addresses in the IP space.",
+			},
 
 			// The resource identifier.
 			"vendor_specific_option_option_space": {
@@ -264,10 +281,25 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 
 	var diags diag.Diagnostics
 
-	name := d.Get("name").(string)
+	dhcpOptions := make([]*b1models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.([]interface{})))
+	}
+
 	s := &b1models.IpamsvcIPSpace{
-		Name:    &name,
-		Comment: d.Get("comment").(string),
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpOptions:               dhcpOptions,
+		Name:                      swag.String(d.Get("name").(string)),
+		Comment:                   d.Get("comment").(string),
+		Tags:                      d.Get("tags"),
 	}
 
 	resp, err := c.IPSpace.IPSpaceCreate(&ip_space.IPSpaceCreateParams{Body: s, Context: ctx}, nil)
@@ -298,29 +330,138 @@ func resourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("asm_scope_flag", s.Payload.Result.AsmScopeFlag)
+	err = d.Set("asm_config", flattenIpamsvcASMConfig(s.Payload.Result.AsmConfig))
 	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
-	err = d.Set("name", s.Payload.Result.Name)
+	err = d.Set("asm_scope_flag", s.Payload.Result.AsmScopeFlag)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	err = d.Set("comment", s.Payload.Result.Comment)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	err = d.Set("created_at", s.Payload.Result.CreatedAt.String())
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_client_update", s.Payload.Result.DdnsClientUpdate)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_domain", s.Payload.Result.DdnsDomain)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_generate_name", s.Payload.Result.DdnsGenerateName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_generated_prefix", s.Payload.Result.DdnsGeneratedPrefix)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_send_updates", s.Payload.Result.DdnsSendUpdates)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_update_on_renew", s.Payload.Result.DdnsUpdateOnRenew)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("ddns_use_conflict_resolution", s.Payload.Result.DdnsUseConflictResolution)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("dhcp_config", flattenIpamsvcDHCPConfig(s.Payload.Result.DhcpConfig))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	dhcpOptions := make([]interface{}, len(s.Payload.Result.DhcpOptions))
+	for _, dhcpOption := range s.Payload.Result.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
+	}
+	err = d.Set("dhcp_options", dhcpOptions)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("header_option_filename", s.Payload.Result.HeaderOptionFilename)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("header_option_server_address", s.Payload.Result.HeaderOptionServerAddress)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("header_option_server_name", s.Payload.Result.HeaderOptionServerName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("hostname_rewrite_char", s.Payload.Result.HostnameRewriteChar)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("hostname_rewrite_enabled", s.Payload.Result.HostnameRewriteEnabled)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("hostname_rewrite_regex", s.Payload.Result.HostnameRewriteRegex)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("inheritance_sources", flattenIpamsvcIPSpaceInheritance(s.Payload.Result.InheritanceSources))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("name", s.Payload.Result.Name)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("tags", s.Payload.Result.Tags)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("threshold", flattenIpamsvcUtilizationThreshold(s.Payload.Result.Threshold))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	err = d.Set("updated_at", s.Payload.Result.UpdatedAt.String())
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("utilization", flattenIpamsvcUtilization(s.Payload.Result.Utilization))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("vendor_specific_option_option_space", s.Payload.Result.VendorSpecificOptionOptionSpace)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	return diags
@@ -331,16 +472,19 @@ func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	var diags diag.Diagnostics
 
-	if d.HasChange("comment") {
-		name := d.Get("name").(string)
-		instance := b1models.IpamsvcIPSpace{
-			Name:    &name,
-			Comment: d.Get("comment").(string),
+	if d.HasChanges("asm_config", "comment") {
+		body := &b1models.IpamsvcIPSpace{
+			AsmConfig: expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+			Name:      swag.String(d.Get("name").(string)),
+			Comment:   d.Get("comment").(string),
 		}
 
-		resp, err := c.IPSpace.IPSpaceUpdate(&ip_space.IPSpaceUpdateParams{ID: d.Id(), Body: &instance, Context: ctx}, nil)
+		resp, err := c.IPSpace.IPSpaceUpdate(
+			&ip_space.IPSpaceUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+			nil,
+		)
 		if err != nil {
-			diag.FromErr(err)
+			return diag.FromErr(err)
 		}
 
 		d.SetId(resp.Payload.Result.ID)

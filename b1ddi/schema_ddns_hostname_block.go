@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcDDNSHostnameBlock DDNSHostnameBlock
@@ -11,7 +12,7 @@ import (
 // The dynamic DNS Hostname configuration.
 //
 // swagger:model ipamsvcDDNSHostnameBlock
-func resourceIpamsvcDDNSHostnameBlock() *schema.Resource {
+func schemaIpamsvcDDNSHostnameBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -30,4 +31,17 @@ func resourceIpamsvcDDNSHostnameBlock() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcDDNSHostnameBlock(r *models.IpamsvcDDNSHostnameBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["ddns_generate_name"] = r.DdnsGenerateName
+	res["ddns_generated_prefix"] = r.DdnsGeneratedPrefix
+
+	return []interface{}{res}
 }

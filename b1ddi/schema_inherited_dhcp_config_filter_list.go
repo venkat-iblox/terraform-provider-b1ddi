@@ -4,14 +4,15 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// IpamsvcInheritedHostnameRewriteBlock InheritedHostnameRewriteBlock
+// InheritedDHCPConfigFilterList FilterList
 //
-// The inheritance block for fields: _hostname_rewrite_enabled_, _hostname_rewrite_regex_, _hostname_rewrite_char_.
+// The inheritance configuration for a field of type list of identifier that represent list of filter attached to _DHCPConfig_.
 //
-// swagger:model ipamsvcInheritedHostnameRewriteBlock
-func dataSourceIpamsvcInheritedHostnameRewriteBlock() *schema.Resource {
+// swagger:model InheritedDHCPConfigFilterList
+func schemaInheritedDHCPConfigFilterList() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -43,15 +44,30 @@ func dataSourceIpamsvcInheritedHostnameRewriteBlock() *schema.Resource {
 				Description: "The resource identifier.",
 			},
 
-			// The inherited value.
-			// Read Only: true
+			// The resource identifier.
 			"value": {
-				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcHostnameRewriteBlock(),
-				Computed:    true,
-				Description: "The inherited value.",
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "The resource identifier.",
 			},
 		},
 	}
 }
 
+func flattenInheritedDHCPConfigFilterList(r *models.InheritedDHCPConfigFilterList) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = r.Value
+
+	return []interface{}{res}
+}

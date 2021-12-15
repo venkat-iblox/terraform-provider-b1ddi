@@ -51,7 +51,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 			// The list of DHCP options. May be either a specific option or a group of options.
 			"dhcp_options": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcOptionItem(),
+				Elem:        schemaIpamsvcOptionItem(),
 				Optional:    true,
 				Description: "The list of DHCP options. May be either a specific option or a group of options.",
 			},
@@ -89,7 +89,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 			// ToDo add inheritance_assigned_hosts
 			//"inheritance_assigned_hosts": {
 			//	Type:        schema.TypeList,
-			//	Elem:        dataSourceInheritanceAssignedHost(),
+			//	Elem:        schemaInheritanceAssignedHost(),
 			//	Computed:    true,
 			//	Description: "The list of the inheritance assigned hosts of the object.",
 			//},
@@ -104,7 +104,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 			// The inheritance configuration.
 			"inheritance_sources": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcFixedAddressInheritance(),
+				Elem:        schemaIpamsvcFixedAddressInheritance(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration.",

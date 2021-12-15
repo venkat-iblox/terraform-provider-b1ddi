@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcUtilization Utilization
@@ -11,7 +12,7 @@ import (
 // The __Utilization__ object represents IP address usage statistics for an object.
 //
 // swagger:model ipamsvcUtilization
-func dataSourceIpamsvcUtilization() *schema.Resource {
+func schemaIpamsvcUtilization() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -82,4 +83,23 @@ func dataSourceIpamsvcUtilization() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcUtilization(r *models.IpamsvcUtilization) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["abandon_utilization"] = r.AbandonUtilization
+	res["abandoned"] = r.Abandoned
+	res["dynamic"] = r.Dynamic
+	res["free"] = r.Free
+	res["static"] = r.Static
+	res["total"] = r.Total
+	res["used"] = r.Used
+	res["utilization"] = r.Utilization
+
+	return []interface{}{res}
 }

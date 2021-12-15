@@ -11,7 +11,7 @@ import (
 // The __DHCPUtilization__ object represents DHCP utilization statistics for an object.
 //
 // swagger:model ipamsvcDHCPUtilization
-func dataSourceIpamsvcDHCPUtilization() *schema.Resource {
+func schemaIpamsvcDHCPUtilization() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 

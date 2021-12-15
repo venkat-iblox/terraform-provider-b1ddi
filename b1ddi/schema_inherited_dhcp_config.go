@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcInheritedDHCPConfig InheritedDHCPConfig
@@ -11,14 +12,14 @@ import (
 // The inheritance configuration for a field of type _DHCPConfig_.
 //
 // swagger:model ipamsvcInheritedDHCPConfig
-func dataSourceIpamsvcInheritedDHCPConfig() *schema.Resource {
+func schemaIpamsvcInheritedDHCPConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
 			// The inheritance configuration for _allow_unknown_ field from _DHCPConfig_ object.
 			"allow_unknown": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedBool(),
+				Elem:        schemaInheritanceInheritedBool(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _allow_unknown_ field from _DHCPConfig_ object.",
@@ -27,7 +28,7 @@ func dataSourceIpamsvcInheritedDHCPConfig() *schema.Resource {
 			// The inheritance configuration for filters field from _DHCPConfig_ object.
 			"filters": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritedDHCPConfigFilterList(),
+				Elem:        schemaInheritedDHCPConfigFilterList(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for filters field from _DHCPConfig_ object.",
@@ -36,7 +37,7 @@ func dataSourceIpamsvcInheritedDHCPConfig() *schema.Resource {
 			// The inheritance configuration for _ignore_list_ field from _DHCPConfig_ object.
 			"ignore_list": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritedDHCPConfigIgnoreItemList(),
+				Elem:        schemaInheritedDHCPConfigIgnoreItemList(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _ignore_list_ field from _DHCPConfig_ object.",
@@ -45,11 +46,26 @@ func dataSourceIpamsvcInheritedDHCPConfig() *schema.Resource {
 			// The inheritance configuration for _lease_time_ field from _DHCPConfig_ object.
 			"lease_time": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedUInt32(),
+				Elem:        schemaInheritanceInheritedUInt32(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _lease_time_ field from _DHCPConfig_ object.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedDHCPConfig(r *models.IpamsvcInheritedDHCPConfig) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["allow_unknown"] = flattenInheritanceInheritedBool(r.AllowUnknown)
+	res["filters"] = flattenInheritedDHCPConfigFilterList(r.Filters)
+	res["ignore_list"] = flattenInheritedDHCPConfigIgnoreItemList(r.IgnoreList)
+	res["lease_time"] = flattenInheritanceInheritedUInt32(r.LeaseTime)
+
+	return []interface{}{res}
 }

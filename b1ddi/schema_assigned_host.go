@@ -15,7 +15,7 @@ import (
 //  * Authoritative Zone (_dns/auth_zone_)
 //
 // swagger:model inheritanceAssignedHost
-func dataSourceInheritanceAssignedHost() *schema.Resource {
+func schemaInheritanceAssignedHost() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 

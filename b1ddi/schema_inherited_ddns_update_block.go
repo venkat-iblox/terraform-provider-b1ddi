@@ -4,14 +4,15 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
-// InheritedDHCPConfigFilterList FilterList
+// IpamsvcInheritedDDNSUpdateBlock InheritedDDNSUpdateBlock
 //
-// The inheritance configuration for a field of type list of identifier that represent list of filter attached to _DHCPConfig_.
+// The inheritance configuration for ddns_domain and ddns_send_updates.
 //
-// swagger:model InheritedDHCPConfigFilterList
-func dataSourceInheritedDHCPConfigFilterList() *schema.Resource {
+// swagger:model ipamsvcInheritedDDNSUpdateBlock
+func schemaIpamsvcInheritedDDNSUpdateBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -43,13 +44,29 @@ func dataSourceInheritedDHCPConfigFilterList() *schema.Resource {
 				Description: "The resource identifier.",
 			},
 
-			// The resource identifier.
+			// The inherited value.
+			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        schema.TypeString,
-				Optional:    true,
-				Description: "The resource identifier.",
+				Elem:        schemaIpamsvcDDNSUpdateBlock(),
+				Computed:    true,
+				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenIpamsvcInheritedDDNSUpdateBlock(r *models.IpamsvcInheritedDDNSUpdateBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+	res["value"] = flattenIpamsvcDDNSUpdateBlock(r.Value)
+
+	return []interface{}{res}
 }

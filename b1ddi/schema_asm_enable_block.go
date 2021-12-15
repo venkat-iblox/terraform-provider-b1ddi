@@ -5,6 +5,7 @@ package b1ddi
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcAsmEnableBlock AsmEnableBlock
@@ -12,7 +13,7 @@ import (
 // ASM enable group of fields.
 //
 // swagger:model ipamsvcAsmEnableBlock
-func dataSourceIpamsvcAsmEnableBlock() *schema.Resource {
+func schemaIpamsvcAsmEnableBlock() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -40,4 +41,18 @@ func dataSourceIpamsvcAsmEnableBlock() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcAsmEnableBlock(r *models.IpamsvcAsmEnableBlock) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["enable"] = r.Enable
+	res["enable_notification"] = r.EnableNotification
+	res["reenable_date"] = r.ReenableDate
+
+	return []interface{}{res}
 }

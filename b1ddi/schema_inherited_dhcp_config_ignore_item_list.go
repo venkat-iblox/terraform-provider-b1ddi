@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // InheritedDHCPConfigIgnoreItemList IgnoreItemList
@@ -11,7 +12,7 @@ import (
 // The inheritance configuration for a field that contains a list of _IgnoreItem_ objects
 //
 // swagger:model InheritedDHCPConfigIgnoreItemList
-func dataSourceInheritedDHCPConfigIgnoreItemList() *schema.Resource {
+func schemaInheritedDHCPConfigIgnoreItemList() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
@@ -47,10 +48,30 @@ func dataSourceInheritedDHCPConfigIgnoreItemList() *schema.Resource {
 			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcIgnoreItem(),
+				Elem:        schemaIpamsvcIgnoreItem(),
 				Computed:    true,
 				Description: "The inherited value.",
 			},
 		},
 	}
+}
+
+func flattenInheritedDHCPConfigIgnoreItemList(r *models.InheritedDHCPConfigIgnoreItemList) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+
+	res := make(map[string]interface{})
+
+	res["action"] = r.Action
+	res["display_name"] = r.DisplayName
+	res["source"] = r.Source
+
+	values := make([]interface{}, 0, len(r.Value))
+	for _, value := range r.Value {
+		values = append(values, flattenIpamsvcIgnoreItem(value))
+	}
+	res["value"] = values
+
+	return []interface{}{res}
 }

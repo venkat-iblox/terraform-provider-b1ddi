@@ -14,14 +14,14 @@ import (
 // The __FixedAddressInheritance__ object specifies how and which fields _FixedAddress_ object inherits from the parent.
 //
 // swagger:model ipamsvcFixedAddressInheritance
-func dataSourceIpamsvcFixedAddressInheritance() *schema.Resource {
+func schemaIpamsvcFixedAddressInheritance() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 
 			// The inheritance configuration for _dhcp_options_ field.
 			"dhcp_options": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceIpamsvcInheritedDHCPOptionList(),
+				Elem:        schemaIpamsvcInheritedDHCPOptionList(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _dhcp_options_ field.",
@@ -30,7 +30,7 @@ func dataSourceIpamsvcFixedAddressInheritance() *schema.Resource {
 			// The inheritance configuration for _header_option_filename_ field.
 			"header_option_filename": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedString(),
+				Elem:        schemaInheritanceInheritedString(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _header_option_filename_ field.",
@@ -39,7 +39,7 @@ func dataSourceIpamsvcFixedAddressInheritance() *schema.Resource {
 			// The inheritance configuration for _header_option_server_address_ field.
 			"header_option_server_address": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedString(),
+				Elem:        schemaInheritanceInheritedString(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _header_option_server_address_ field.",
@@ -48,7 +48,7 @@ func dataSourceIpamsvcFixedAddressInheritance() *schema.Resource {
 			// The inheritance configuration for _header_option_server_name_ field.
 			"header_option_server_name": {
 				Type:        schema.TypeList,
-				Elem:        dataSourceInheritanceInheritedString(),
+				Elem:        schemaInheritanceInheritedString(),
 				MaxItems:    1,
 				Optional:    true,
 				Description: "The inheritance configuration for _header_option_server_name_ field.",
