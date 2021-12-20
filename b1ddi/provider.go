@@ -31,6 +31,8 @@ func Provider() *schema.Provider {
 			"b1ddi_ip_space":      resourceIpamsvcIPSpace(),
 			"b1ddi_subnet":        resourceIpamsvcSubnet(),
 			"b1ddi_fixed_address": resourceIpamsvcFixedAddress(),
+			"b1ddi_address_block": resourceIpamsvcAddressBlock(),
+			"b1ddi_range":         resourceIpamsvcRange(),
 		},
 		DataSourcesMap:       map[string]*schema.Resource{},
 		ConfigureContextFunc: providerConfigure,
