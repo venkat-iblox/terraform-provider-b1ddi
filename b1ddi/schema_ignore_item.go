@@ -44,11 +44,12 @@ func flattenIpamsvcIgnoreItem(r *models.IpamsvcIgnoreItem) []interface{} {
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
-	res["type"] = r.Type
-	res["value"] = r.Value
-
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"type":  r.Type,
+			"value": r.Value,
+		},
+	}
 }
 
 func expandIpamsvcIgnoreItem(d []interface{}) *models.IpamsvcIgnoreItem {

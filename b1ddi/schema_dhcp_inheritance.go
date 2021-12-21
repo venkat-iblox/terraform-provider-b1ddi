@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcDHCPInheritance DHCPInheritance
@@ -131,6 +132,29 @@ func schemaIpamsvcDHCPInheritance() *schema.Resource {
 				Optional:    true,
 				Description: "The inheritance configuration for _hostname_rewrite_enabled_, _hostname_rewrite_regex_, and _hostname_rewrite_char_ fields.",
 			},
+		},
+	}
+}
+
+func flattenIpamsvcDHCPInheritance(r *models.IpamsvcDHCPInheritance) []interface{} {
+	if r == nil {
+		return nil
+	}
+	return []interface{}{
+		map[string]interface{}{
+			"asm_config":                   flattenIpamsvcInheritedASMConfig(r.AsmConfig),
+			"ddns_client_update":           flattenInheritanceInheritedString(r.DdnsClientUpdate),
+			"ddns_enabled":                 flattenInheritanceInheritedBool(r.DdnsEnabled),
+			"ddns_hostname_block":          flattenIpamsvcInheritedDDNSHostnameBlock(r.DdnsHostnameBlock),
+			"ddns_update_block":            flattenIpamsvcInheritedDDNSUpdateBlock(r.DdnsUpdateBlock),
+			"ddns_update_on_renew":         flattenInheritanceInheritedBool(r.DdnsUpdateOnRenew),
+			"ddns_use_conflict_resolution": flattenInheritanceInheritedBool(r.DdnsUseConflictResolution),
+			"dhcp_config":                  flattenIpamsvcInheritedDHCPConfig(r.DhcpConfig),
+			"dhcp_options":                 flattenIpamsvcInheritedDHCPOptionList(r.DhcpOptions),
+			"header_option_filename":       flattenInheritanceInheritedString(r.HeaderOptionFilename),
+			"header_option_server_address": flattenInheritanceInheritedString(r.HeaderOptionServerAddress),
+			"header_option_server_name":    flattenInheritanceInheritedString(r.HeaderOptionServerName),
+			"hostname_rewrite_block":       flattenIpamsvcInheritedHostnameRewriteBlock(r.HostnameRewriteBlock),
 		},
 	}
 }

@@ -38,11 +38,22 @@ func flattenIpamsvcDDNSUpdateBlock(r *models.IpamsvcDDNSUpdateBlock) []interface
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"ddns_domain":       r.DdnsDomain,
+			"ddns_send_updates": r.DdnsSendUpdates,
+		},
+	}
 
-	res["ddns_domain"] = r.DdnsDomain
-	res["ddns_send_updates"] = r.DdnsSendUpdates
+}
 
-	return []interface{}{res}
-
+func expandIpamsvcDDNSUpdateBlock(d []interface{}) *models.IpamsvcDDNSUpdateBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.IpamsvcDDNSUpdateBlock{
+		DdnsDomain:      in["ddns_domain"].(string),
+		DdnsSendUpdates: in["ddns_send_updates"].(bool),
+	}
 }

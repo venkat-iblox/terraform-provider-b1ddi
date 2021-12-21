@@ -50,11 +50,11 @@ func flattenIpamsvcUtilizationThreshold(r *models.IpamsvcUtilizationThreshold) [
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
-
-	res["enabled"] = r.Enabled
-	res["high"] = r.High
-	res["low"] = r.Low
-
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"enabled": r.Enabled,
+			"high":    r.High,
+			"low":     r.Low,
+		},
+	}
 }

@@ -54,26 +54,25 @@ func flattenIpamsvcOptionItem(r *models.IpamsvcOptionItem) []interface{} {
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
-
-	res["group"] = r.Group
-	res["option_code"] = r.OptionCode
-	res["option_value"] = r.OptionValue
-	res["type"] = r.Type
-
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"group":        r.Group,
+			"option_code":  r.OptionCode,
+			"option_value": r.OptionValue,
+			"type":         r.Type,
+		},
+	}
 }
 
-func expandIpamsvcOptionItem(d []interface{}) *models.IpamsvcOptionItem {
-	if len(d) == 0 || d[0] == nil {
+func expandIpamsvcOptionItem(d map[string]interface{}) *models.IpamsvcOptionItem {
+	if d == nil || len(d) == 0 {
 		return nil
 	}
-	in := d[0].(map[string]interface{})
 
 	return &models.IpamsvcOptionItem{
-		Group:       in["group"].(string),
-		OptionCode:  in["option_code"].(string),
-		OptionValue: in["option_value"].(string),
-		Type:        in["type"].(string),
+		Group:       d["group"].(string),
+		OptionCode:  d["option_code"].(string),
+		OptionValue: d["option_value"].(string),
+		Type:        d["type"].(string),
 	}
 }

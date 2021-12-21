@@ -62,12 +62,25 @@ func flattenInheritedDHCPConfigFilterList(r *models.InheritedDHCPConfigFilterLis
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"action":       r.Action,
+			"display_name": r.DisplayName,
+			"source":       r.Source,
+			"value":        r.Value,
+		},
+	}
+}
 
-	res["action"] = r.Action
-	res["display_name"] = r.DisplayName
-	res["source"] = r.Source
-	res["value"] = r.Value
-
-	return []interface{}{res}
+func expandInheritedDHCPConfigFilterList(d []interface{}) *models.InheritedDHCPConfigFilterList {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.InheritedDHCPConfigFilterList{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       in["value"].([]string),
+	}
 }

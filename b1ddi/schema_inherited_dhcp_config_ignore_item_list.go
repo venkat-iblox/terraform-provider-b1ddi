@@ -61,17 +61,36 @@ func flattenInheritedDHCPConfigIgnoreItemList(r *models.InheritedDHCPConfigIgnor
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
-
-	res["action"] = r.Action
-	res["display_name"] = r.DisplayName
-	res["source"] = r.Source
-
 	values := make([]interface{}, 0, len(r.Value))
 	for _, value := range r.Value {
 		values = append(values, flattenIpamsvcIgnoreItem(value))
 	}
-	res["value"] = values
 
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"action":       r.Action,
+			"display_name": r.DisplayName,
+			"source":       r.Source,
+			"value":        values,
+		},
+	}
+}
+
+func expandInheritedDHCPConfigIgnoreItemList(d []interface{}) *models.InheritedDHCPConfigIgnoreItemList {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+
+	values := make([]*models.IpamsvcIgnoreItem, 0)
+	for _, value := range in["value"].([]interface{}) {
+		values = append(values, expandIpamsvcIgnoreItem(value.([]interface{})))
+	}
+
+	return &models.InheritedDHCPConfigIgnoreItemList{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       values,
+	}
 }

@@ -45,11 +45,24 @@ func flattenIpamsvcHostnameRewriteBlock(r *models.IpamsvcHostnameRewriteBlock) [
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"hostname_rewrite_char":    r.HostnameRewriteChar,
+			"hostname_rewrite_enabled": r.HostnameRewriteEnabled,
+			"hostname_rewrite_regex":   r.HostnameRewriteRegex,
+		},
+	}
+}
 
-	res["hostname_rewrite_char"] = r.HostnameRewriteChar
-	res["hostname_rewrite_enabled"] = r.HostnameRewriteEnabled
-	res["hostname_rewrite_regex"] = r.HostnameRewriteRegex
+func expandIpamsvcHostnameRewriteBlock(d []interface{}) *models.IpamsvcHostnameRewriteBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcHostnameRewriteBlock{
+		HostnameRewriteChar:    in["hostname_rewrite_char"].(string),
+		HostnameRewriteEnabled: in["hostname_rewrite_enabled"].(bool),
+		HostnameRewriteRegex:   in["hostname_rewrite_regex"].(string),
+	}
 }

@@ -90,16 +90,16 @@ func flattenIpamsvcUtilization(r *models.IpamsvcUtilization) []interface{} {
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
-
-	res["abandon_utilization"] = r.AbandonUtilization
-	res["abandoned"] = r.Abandoned
-	res["dynamic"] = r.Dynamic
-	res["free"] = r.Free
-	res["static"] = r.Static
-	res["total"] = r.Total
-	res["used"] = r.Used
-	res["utilization"] = r.Utilization
-
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"abandon_utilization": r.AbandonUtilization,
+			"abandoned":           r.Abandoned,
+			"dynamic":             r.Dynamic,
+			"free":                r.Free,
+			"static":              r.Static,
+			"total":               r.Total,
+			"used":                r.Used,
+			"utilization":         r.Utilization,
+		},
+	}
 }

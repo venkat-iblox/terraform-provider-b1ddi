@@ -170,9 +170,10 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 
 			// The configuration for header option server address field.
 			"header_option_server_address": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "The configuration for header option server address field.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.IsIPAddress,
+				Description:  "The configuration for header option server address field.",
 			},
 
 			// The configuration for header option server name field.
@@ -283,23 +284,33 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 
 	dhcpOptions := make([]*b1models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
-		dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.([]interface{})))
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
 	}
 
 	s := &b1models.IpamsvcIPSpace{
-		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
-		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
-		DdnsDomain:                d.Get("ddns_domain").(string),
-		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
-		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
-		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
-		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
-		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
-		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
-		DhcpOptions:               dhcpOptions,
-		Name:                      swag.String(d.Get("name").(string)),
-		Comment:                   d.Get("comment").(string),
-		Tags:                      d.Get("tags"),
+		AsmConfig:                       expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Comment:                         d.Get("comment").(string),
+		DdnsClientUpdate:                d.Get("ddns_client_update").(string),
+		DdnsDomain:                      d.Get("ddns_domain").(string),
+		DdnsGenerateName:                d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:             d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:                 swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:               d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution:       swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                      expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpOptions:                     dhcpOptions,
+		HeaderOptionFilename:            d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress:       d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:          d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:             d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:          d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:            d.Get("hostname_rewrite_regex").(string),
+		InheritanceSources:              expandIpamsvcIPSpaceInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                            swag.String(d.Get("name").(string)),
+		Tags:                            d.Get("tags"),
+		VendorSpecificOptionOptionSpace: d.Get("vendor_specific_option_option_space").(string),
 	}
 
 	resp, err := c.IPSpace.IPSpaceCreate(&ip_space.IPSpaceCreateParams{Body: s, Context: ctx}, nil)

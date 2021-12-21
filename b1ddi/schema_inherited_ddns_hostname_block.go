@@ -61,12 +61,26 @@ func flattenIpamsvcInheritedDDNSHostnameBlock(r *models.IpamsvcInheritedDDNSHost
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"action":       r.Action,
+			"display_name": r.DisplayName,
+			"source":       r.Source,
+			"value":        flattenIpamsvcDDNSHostnameBlock(r.Value),
+		},
+	}
+}
 
-	res["action"] = r.Action
-	res["display_name"] = r.DisplayName
-	res["source"] = r.Source
-	res["value"] = flattenIpamsvcDDNSHostnameBlock(r.Value)
+func expandIpamsvcInheritedDDNSHostnameBlock(d []interface{}) *models.IpamsvcInheritedDDNSHostnameBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcInheritedDDNSHostnameBlock{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       expandIpamsvcDDNSHostnameBlock(in["value"].([]interface{})),
+	}
 }

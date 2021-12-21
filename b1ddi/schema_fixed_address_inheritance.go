@@ -3,9 +3,6 @@
 package b1ddi
 
 import (
-	"context"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -55,28 +52,4 @@ func schemaIpamsvcFixedAddressInheritance() *schema.Resource {
 			},
 		},
 	}
-}
-
-func resourceIpamsvcFixedAddressInheritanceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressInheritanceCreate function
-	return diags
-}
-
-func resourceIpamsvcFixedAddressInheritanceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressInheritanceRead function
-	return diags
-}
-
-func resourceIpamsvcFixedAddressInheritanceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressInheritanceUpdate function
-	return diags
-}
-
-func resourceIpamsvcFixedAddressInheritanceDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressInheritanceDelete function
-	return diags
 }

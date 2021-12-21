@@ -148,22 +148,46 @@ func flattenIpamsvcIPSpaceInheritance(r *models.IpamsvcIPSpaceInheritance) []int
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"asm_config":                          flattenIpamsvcInheritedASMConfig(r.AsmConfig),
+			"ddns_client_update":                  flattenInheritanceInheritedString(r.DdnsClientUpdate),
+			"ddns_enabled":                        flattenInheritanceInheritedBool(r.DdnsEnabled),
+			"ddns_hostname_block":                 flattenIpamsvcInheritedDDNSHostnameBlock(r.DdnsHostnameBlock),
+			"ddns_update_block":                   flattenIpamsvcInheritedDDNSUpdateBlock(r.DdnsUpdateBlock),
+			"ddns_update_on_renew":                flattenInheritanceInheritedBool(r.DdnsUpdateOnRenew),
+			"ddns_use_conflict_resolution":        flattenInheritanceInheritedBool(r.DdnsUseConflictResolution),
+			"dhcp_config":                         flattenIpamsvcInheritedDHCPConfig(r.DhcpConfig),
+			"dhcp_options":                        flattenIpamsvcInheritedDHCPOptionList(r.DhcpOptions),
+			"header_option_filename":              flattenInheritanceInheritedString(r.HeaderOptionFilename),
+			"header_option_server_address":        flattenInheritanceInheritedString(r.HeaderOptionServerAddress),
+			"header_option_server_name":           flattenInheritanceInheritedString(r.HeaderOptionServerName),
+			"hostname_rewrite_block":              flattenIpamsvcInheritedHostnameRewriteBlock(r.HostnameRewriteBlock),
+			"vendor_specific_option_option_space": flattenInheritanceInheritedIdentifier(r.VendorSpecificOptionOptionSpace),
+		},
+	}
+}
 
-	res["asm_config"] = flattenIpamsvcInheritedASMConfig(r.AsmConfig)
-	res["ddns_client_update"] = flattenInheritanceInheritedString(r.DdnsClientUpdate)
-	res["ddns_enabled"] = flattenInheritanceInheritedBool(r.DdnsEnabled)
-	res["ddns_hostname_block"] = flattenIpamsvcInheritedDDNSHostnameBlock(r.DdnsHostnameBlock)
-	res["ddns_update_block"] = flattenIpamsvcInheritedDDNSUpdateBlock(r.DdnsUpdateBlock)
-	res["ddns_update_on_renew"] = flattenInheritanceInheritedBool(r.DdnsUpdateOnRenew)
-	res["ddns_use_conflict_resolution"] = flattenInheritanceInheritedBool(r.DdnsUseConflictResolution)
-	res["dhcp_config"] = flattenIpamsvcInheritedDHCPConfig(r.DhcpConfig)
-	res["dhcp_options"] = flattenIpamsvcInheritedDHCPOptionList(r.DhcpOptions)
-	res["header_option_filename"] = flattenInheritanceInheritedString(r.HeaderOptionFilename)
-	res["header_option_server_address"] = flattenInheritanceInheritedString(r.HeaderOptionServerAddress)
-	res["header_option_server_name"] = flattenInheritanceInheritedString(r.HeaderOptionServerName)
-	res["hostname_rewrite_block"] = flattenIpamsvcInheritedHostnameRewriteBlock(r.HostnameRewriteBlock)
-	res["vendor_specific_option_option_space"] = flattenInheritanceInheritedIdentifier(r.VendorSpecificOptionOptionSpace)
+func expandIpamsvcIPSpaceInheritance(d []interface{}) *models.IpamsvcIPSpaceInheritance {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcIPSpaceInheritance{
+		AsmConfig:                       expandIpamsvcInheritedASMConfig(in["asm_config"].([]interface{})),
+		DdnsClientUpdate:                expandInheritanceInheritedString(in["ddns_client_update"].([]interface{})),
+		DdnsEnabled:                     expandInheritanceInheritedBool(in["ddns_enabled"].([]interface{})),
+		DdnsHostnameBlock:               expandIpamsvcInheritedDDNSHostnameBlock(in["ddns_hostname_block"].([]interface{})),
+		DdnsUpdateBlock:                 expandIpamsvcInheritedDDNSUpdateBlock(in["ddns_update_block"].([]interface{})),
+		DdnsUpdateOnRenew:               expandInheritanceInheritedBool(in["ddns_update_on_renew"].([]interface{})),
+		DdnsUseConflictResolution:       expandInheritanceInheritedBool(in["ddns_use_conflict_resolution"].([]interface{})),
+		DhcpConfig:                      expandIpamsvcInheritedDHCPConfig(in["dhcp_config"].([]interface{})),
+		DhcpOptions:                     expandIpamsvcInheritedDHCPOptionList(in["dhcp_options"].([]interface{})),
+		HeaderOptionFilename:            expandInheritanceInheritedString(in["header_option_filename"].([]interface{})),
+		HeaderOptionServerAddress:       expandInheritanceInheritedString(in["header_option_server_address"].([]interface{})),
+		HeaderOptionServerName:          expandInheritanceInheritedString(in["header_option_server_name"].([]interface{})),
+		HostnameRewriteBlock:            expandIpamsvcInheritedHostnameRewriteBlock(in["hostname_rewrite_block"].([]interface{})),
+		VendorSpecificOptionOptionSpace: expandInheritanceInheritedIdentifier(in["vendor_specific_option_option_space"].([]interface{})),
+	}
 }

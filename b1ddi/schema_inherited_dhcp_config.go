@@ -60,12 +60,26 @@ func flattenIpamsvcInheritedDHCPConfig(r *models.IpamsvcInheritedDHCPConfig) []i
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"allow_unknown": flattenInheritanceInheritedBool(r.AllowUnknown),
+			"filters":       flattenInheritedDHCPConfigFilterList(r.Filters),
+			"ignore_list":   flattenInheritedDHCPConfigIgnoreItemList(r.IgnoreList),
+			"lease_time":    flattenInheritanceInheritedUInt32(r.LeaseTime),
+		},
+	}
+}
 
-	res["allow_unknown"] = flattenInheritanceInheritedBool(r.AllowUnknown)
-	res["filters"] = flattenInheritedDHCPConfigFilterList(r.Filters)
-	res["ignore_list"] = flattenInheritedDHCPConfigIgnoreItemList(r.IgnoreList)
-	res["lease_time"] = flattenInheritanceInheritedUInt32(r.LeaseTime)
+func expandIpamsvcInheritedDHCPConfig(d []interface{}) *models.IpamsvcInheritedDHCPConfig {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcInheritedDHCPConfig{
+		AllowUnknown: expandInheritanceInheritedBool(in["allow_unknown"].([]interface{})),
+		Filters:      expandInheritedDHCPConfigFilterList(in["filters"].([]interface{})),
+		IgnoreList:   expandInheritedDHCPConfigIgnoreItemList(in["ignore_list"].([]interface{})),
+		LeaseTime:    expandInheritanceInheritedUInt32(in["lease_time"].([]interface{})),
+	}
 }

@@ -38,10 +38,21 @@ func flattenIpamsvcAsmGrowthBlock(r *models.IpamsvcAsmGrowthBlock) []interface{}
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"growth_factor": r.GrowthFactor,
+			"growth_type":   r.GrowthType,
+		},
+	}
+}
 
-	res["growth_factor"] = r.GrowthFactor
-	res["growth_type"] = r.GrowthType
-
-	return []interface{}{res}
+func expandIpamsvcAsmGrowthBlock(d []interface{}) *models.IpamsvcAsmGrowthBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.IpamsvcAsmGrowthBlock{
+		GrowthFactor: int64(in["growth_factor"].(int)),
+		GrowthType:   in["growth_type"].(string),
+	}
 }

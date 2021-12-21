@@ -38,10 +38,22 @@ func flattenIpamsvcDDNSHostnameBlock(r *models.IpamsvcDDNSHostnameBlock) []inter
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"ddns_generate_name":    r.DdnsGenerateName,
+			"ddns_generated_prefix": r.DdnsGeneratedPrefix,
+		},
+	}
+}
 
-	res["ddns_generate_name"] = r.DdnsGenerateName
-	res["ddns_generated_prefix"] = r.DdnsGeneratedPrefix
+func expandIpamsvcDDNSHostnameBlock(d []interface{}) *models.IpamsvcDDNSHostnameBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcDDNSHostnameBlock{
+		DdnsGenerateName:    in["ddns_generate_name"].(bool),
+		DdnsGeneratedPrefix: in["ddns_generated_prefix"].(string),
+	}
 }

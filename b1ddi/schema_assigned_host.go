@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // InheritanceAssignedHost AssignedHost
@@ -41,6 +42,19 @@ func schemaInheritanceAssignedHost() *schema.Resource {
 				Computed:    true,
 				Description: "The on-prem host ID.",
 			},
+		},
+	}
+}
+
+func flattenInheritanceAssignedHost(r *models.InheritanceAssignedHost) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+	return []interface{}{
+		map[string]interface{}{
+			"display_name": r.DisplayName,
+			"host":         r.Host,
+			"ophid":        r.Ophid,
 		},
 	}
 }

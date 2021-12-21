@@ -109,20 +109,20 @@ func flattenIpamsvcASMConfig(r *models.IpamsvcASMConfig) []interface{} {
 		return []interface{}{}
 	}
 
-	res := map[string]interface{}{
-		"asm_threshold":       r.AsmThreshold,
-		"enable":              r.Enable,
-		"enable_notification": r.EnableNotification,
-		"forecast_period":     r.ForecastPeriod,
-		"growth_factor":       r.GrowthFactor,
-		"growth_type":         r.GrowthType,
-		"history":             r.History,
-		"min_total":           r.MinTotal,
-		"min_unused":          r.MinUnused,
-		"reenable_date":       r.ReenableDate.String(),
+	return []interface{}{
+		map[string]interface{}{
+			"asm_threshold":       r.AsmThreshold,
+			"enable":              r.Enable,
+			"enable_notification": r.EnableNotification,
+			"forecast_period":     r.ForecastPeriod,
+			"growth_factor":       r.GrowthFactor,
+			"growth_type":         r.GrowthType,
+			"history":             r.History,
+			"min_total":           r.MinTotal,
+			"min_unused":          r.MinUnused,
+			"reenable_date":       r.ReenableDate.String(),
+		},
 	}
-
-	return []interface{}{res}
 }
 
 func expandIpamsvcASMConfig(d []interface{}) *models.IpamsvcASMConfig {
@@ -131,7 +131,7 @@ func expandIpamsvcASMConfig(d []interface{}) *models.IpamsvcASMConfig {
 	}
 	in := d[0].(map[string]interface{})
 
-	reenable_date, _ := strfmt.ParseDateTime(in["reenable_date"].(string))
+	reenableDate, _ := strfmt.ParseDateTime(in["reenable_date"].(string))
 
 	return &models.IpamsvcASMConfig{
 		AsmThreshold:       int64(in["asm_threshold"].(int)),
@@ -143,6 +143,6 @@ func expandIpamsvcASMConfig(d []interface{}) *models.IpamsvcASMConfig {
 		History:            int64(in["history"].(int)),
 		MinTotal:           int64(in["min_total"].(int)),
 		MinUnused:          int64(in["min_unused"].(int)),
-		ReenableDate:       reenable_date,
+		ReenableDate:       reenableDate,
 	}
 }

@@ -54,23 +54,22 @@ func schemaIpamsvcDHCPConfig() *schema.Resource {
 
 func flattenIpamsvcDHCPConfig(r *models.IpamsvcDHCPConfig) []interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
-
-	res := make(map[string]interface{})
-
-	res["allow_unknown"] = r.AllowUnknown
-	res["filters"] = r.Filters
 
 	ignoreList := make([]interface{}, 0, len(r.IgnoreList))
 	for _, ii := range r.IgnoreList {
 		ignoreList = append(ignoreList, flattenIpamsvcIgnoreItem(ii))
 	}
 
-	res["ignore_list"] = ignoreList
-	res["lease_time"] = r.LeaseTime
-
-	return []interface{}{res}
+	return []interface{}{
+		map[string]interface{}{
+			"allow_unknown": r.AllowUnknown,
+			"filters":       r.Filters,
+			"ignore_list":   ignoreList,
+			"lease_time":    r.LeaseTime,
+		},
+	}
 }
 
 func expandIpamsvcDHCPConfig(d []interface{}) *models.IpamsvcDHCPConfig {

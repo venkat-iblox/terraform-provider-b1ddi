@@ -60,12 +60,25 @@ func flattenInheritanceInheritedUInt32(r *models.InheritanceInheritedUInt32) []i
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"action":       r.Action,
+			"display_name": r.DisplayName,
+			"source":       r.Source,
+			"value":        r.Value,
+		},
+	}
+}
 
-	res["action"] = r.Action
-	res["display_name"] = r.DisplayName
-	res["source"] = r.Source
-	res["value"] = r.Value
-
-	return []interface{}{res}
+func expandInheritanceInheritedUInt32(d []interface{}) *models.InheritanceInheritedUInt32 {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.InheritanceInheritedUInt32{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       int64(in["value"].(int)),
+	}
 }

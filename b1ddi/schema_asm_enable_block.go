@@ -3,6 +3,7 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/infobloxopen/b1ddi-go-client/models"
@@ -48,11 +49,26 @@ func flattenIpamsvcAsmEnableBlock(r *models.IpamsvcAsmEnableBlock) []interface{}
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"enable":              r.Enable,
+			"enable_notification": r.EnableNotification,
+			"reenable_date":       r.ReenableDate,
+		},
+	}
+}
 
-	res["enable"] = r.Enable
-	res["enable_notification"] = r.EnableNotification
-	res["reenable_date"] = r.ReenableDate
+func expandIpamsvcAsmEnableBlock(d []interface{}) *models.IpamsvcAsmEnableBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	reenableDate, _ := strfmt.ParseDateTime(in["reenable_date"].(string))
+
+	return &models.IpamsvcAsmEnableBlock{
+		Enable:             in["enable"].(bool),
+		EnableNotification: in["enable_notification"].(bool),
+		ReenableDate:       reenableDate,
+	}
 }

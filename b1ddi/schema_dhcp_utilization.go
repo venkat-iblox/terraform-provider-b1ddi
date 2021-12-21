@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcDHCPUtilization DHCPUtilization
@@ -49,4 +50,19 @@ func schemaIpamsvcDHCPUtilization() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenIpamsvcDHCPUtilization(r *models.IpamsvcDHCPUtilization) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+	return []interface{}{
+		map[string]interface{}{
+			"dhcp_free":        r.DhcpFree,
+			"dhcp_total":       r.DhcpTotal,
+			"dhcp_used":        r.DhcpUsed,
+			"dhcp_utilization": r.DhcpUtilization,
+		},
+	}
+
 }

@@ -87,15 +87,32 @@ func flattenIpamsvcInheritedASMConfig(r *models.IpamsvcInheritedASMConfig) []int
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"asm_enable_block": flattenIpamsvcInheritedAsmEnableBlock(r.AsmEnableBlock),
+			"asm_growth_block": flattenIpamsvcInheritedAsmGrowthBlock(r.AsmGrowthBlock),
+			"asm_threshold":    flattenInheritanceInheritedUInt32(r.AsmThreshold),
+			"forecast_period":  flattenInheritanceInheritedUInt32(r.ForecastPeriod),
+			"history":          flattenInheritanceInheritedUInt32(r.History),
+			"min_total":        flattenInheritanceInheritedUInt32(r.MinTotal),
+			"min_unused":       flattenInheritanceInheritedUInt32(r.MinUnused),
+		},
+	}
+}
 
-	res["asm_enable_block"] = flattenIpamsvcInheritedAsmEnableBlock(r.AsmEnableBlock)
-	res["asm_growth_block"] = flattenIpamsvcInheritedAsmGrowthBlock(r.AsmGrowthBlock)
-	res["asm_threshold"] = flattenInheritanceInheritedUInt32(r.AsmThreshold)
-	res["forecast_period"] = flattenInheritanceInheritedUInt32(r.ForecastPeriod)
-	res["history"] = flattenInheritanceInheritedUInt32(r.History)
-	res["min_total"] = flattenInheritanceInheritedUInt32(r.MinTotal)
-	res["min_unused"] = flattenInheritanceInheritedUInt32(r.MinUnused)
+func expandIpamsvcInheritedASMConfig(d []interface{}) *models.IpamsvcInheritedASMConfig {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcInheritedASMConfig{
+		AsmEnableBlock: expandIpamsvcInheritedAsmEnableBlock(in["asm_enable_block"].([]interface{})),
+		AsmGrowthBlock: expandIpamsvcInheritedAsmGrowthBlock(in["asm_growth_block"].([]interface{})),
+		AsmThreshold:   expandInheritanceInheritedUInt32(in["asm_threshold"].([]interface{})),
+		ForecastPeriod: expandInheritanceInheritedUInt32(in["forecast_period"].([]interface{})),
+		History:        expandInheritanceInheritedUInt32(in["history"].([]interface{})),
+		MinTotal:       expandInheritanceInheritedUInt32(in["min_total"].([]interface{})),
+		MinUnused:      expandInheritanceInheritedUInt32(in["min_unused"].([]interface{})),
+	}
 }

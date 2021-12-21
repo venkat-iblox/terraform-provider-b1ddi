@@ -61,12 +61,26 @@ func flattenIpamsvcInheritedAsmEnableBlock(r *models.IpamsvcInheritedAsmEnableBl
 		return []interface{}{}
 	}
 
-	res := make(map[string]interface{})
+	return []interface{}{
+		map[string]interface{}{
+			"action":       r.Action,
+			"display_name": r.DisplayName,
+			"source":       r.Source,
+			"value":        flattenIpamsvcAsmEnableBlock(r.Value),
+		},
+	}
+}
 
-	res["action"] = r.Action
-	res["display_name"] = r.DisplayName
-	res["source"] = r.Source
-	res["value"] = flattenIpamsvcAsmEnableBlock(r.Value)
+func expandIpamsvcInheritedAsmEnableBlock(d []interface{}) *models.IpamsvcInheritedAsmEnableBlock {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
 
-	return []interface{}{res}
+	return &models.IpamsvcInheritedAsmEnableBlock{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       expandIpamsvcAsmEnableBlock(in["value"].([]interface{})),
+	}
 }
