@@ -3,12 +3,11 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // IpamsvcSubnet Subnet
@@ -38,6 +37,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 				Elem:        schemaIpamsvcASMConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The Automated Scope Management configuration for the subnet.",
 			},
 
@@ -87,6 +87,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"ddns_client_update": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Controls who does the DDNS updates.\n\nValid values are:\n* _client_: DHCP server updates DNS if requested by client.\n* _server_: DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _ignore_: DHCP server always updates DNS, even if the client says not to.\n* _over_client_update_: Same as _server_. DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _over_no_update_: DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it.\n\nDefaults to _client_.",
 			},
 
@@ -117,6 +118,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"ddns_generated_prefix": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The prefix used in the generation of an FQDN.\n\nWhen generating a name, DHCP server will construct the name in the format: [ddns-generated-prefix]-[address-text].[ddns-qualifying-suffix].\nwhere address-text is simply the lease IP address converted to a hyphenated string.\n\nDefaults to \"myhost\".",
 			},
 
@@ -125,6 +127,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"ddns_send_updates": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     true,
 				Description: "Determines if DDNS updates are enabled at the subnet level.\nDefaults to _true_.",
 			},
 
@@ -145,6 +148,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"ddns_use_conflict_resolution": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     true,
 				Description: "When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.\n\nWhen false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients.\n\nDefaults to _true_.",
 			},
 
@@ -154,6 +158,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 				Elem:        schemaIpamsvcDHCPConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The DHCP configuration of the subnet that controls how leases are issued.",
 			},
 
@@ -174,13 +179,12 @@ func resourceIpamsvcSubnet() *schema.Resource {
 
 			// The utilization of IP addresses within the DHCP ranges of the subnet.
 			// Read Only: true
-			// ToDo add dhcp_utilization
-			//"dhcp_utilization": {
-			//	Type:        schema.TypeList,
-			//	Elem:        schemaIpamsvcDHCPUtilization(),
-			//	Computed:    true,
-			//	Description: "The utilization of IP addresses within the DHCP ranges of the subnet.",
-			//},
+			"dhcp_utilization": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcDHCPUtilization(),
+				Computed:    true,
+				Description: "The utilization of IP addresses within the DHCP ranges of the subnet.",
+			},
 
 			// The configuration for header option filename field.
 			"header_option_filename": {
@@ -211,6 +215,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"hostname_rewrite_char": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The character to replace non-matching characters with, when hostname rewrite is enabled.\n\nAny single ASCII character.\n\nDefaults to \"_\".",
 			},
 
@@ -231,23 +236,23 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"hostname_rewrite_regex": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The regex bracket expression to match valid characters.\n\nMust begin with \"[\" and end with \"]\" and be a compilable POSIX regex.\n\nDefaults to \"[^a-zA-Z0-9_.]\".",
 			},
 
 			// The list of the inheritance assigned hosts of the object.
 			// Read Only: true
-			// ToDo add inheritance_assigned_hosts
-			//"inheritance_assigned_hosts": {
-			//	Type:        schema.TypeList,
-			//	Elem:        schemaInheritanceAssignedHost(),
-			//	Computed:    true,
-			//	Description: "The list of the inheritance assigned hosts of the object.",
-			//},
+			"inheritance_assigned_hosts": {
+				Type:        schema.TypeList,
+				Elem:        schemaInheritanceAssignedHost(),
+				Computed:    true,
+				Description: "The list of the inheritance assigned hosts of the object.",
+			},
 
 			// The resource identifier.
 			"inheritance_parent": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -270,7 +275,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			// The resource identifier.
 			"parent": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -303,6 +308,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 				Elem:        schemaIpamsvcUtilizationThreshold(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The IP address utilization threshold settings for the subnet.",
 			},
 
@@ -317,13 +323,12 @@ func resourceIpamsvcSubnet() *schema.Resource {
 
 			// The IP address utilization statistics of the subnet.
 			// Read Only: true
-			// ToDo Add utilization
-			//"utilization": {
-			//	Type:        schema.TypeList,
-			//	Elem:        schemaIpamsvcUtilization(),
-			//	Computed:    true,
-			//	Description: "The IP address utilization statistics of the subnet.",
-			//},
+			"utilization": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcUtilization(),
+				Computed:    true,
+				Description: "The IP address utilization statistics of the subnet.",
+			},
 		},
 	}
 }
@@ -331,14 +336,42 @@ func resourceIpamsvcSubnet() *schema.Resource {
 func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*ipamsvc.IPAddressManagementAPI)
 
-	var diags diag.Diagnostics
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
 
 	s := &models.IpamsvcSubnet{
-		Address: swag.String(d.Get("address").(string)),
-		Name:    d.Get("name").(string),
-		Cidr:    int64(d.Get("cidr").(int)),
-		Space:   swag.String(d.Get("space").(string)),
-		Comment: d.Get("comment").(string),
+		Address:                   swag.String(d.Get("address").(string)),
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Cidr:                      int64(d.Get("cidr").(int)),
+		Comment:                   d.Get("comment").(string),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpHost:                  d.Get("dhcp_host").(string),
+		DhcpOptions:               dhcpOptions,
+		DhcpUtilization:           expandIpamsvcDHCPUtilization(d.Get("dhcp_utilization").([]interface{})),
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
+		//InheritanceParent:         d.Get("inheritance_parent").(string),
+		InheritanceSources: expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:               d.Get("name").(string),
+		//Parent:                    d.Get("parent").(string),
+		Space:     swag.String(d.Get("space").(string)),
+		Tags:      d.Get("tags"),
+		Threshold: expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
 	resp, err := c.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
@@ -348,9 +381,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 
 	d.SetId(resp.Payload.Result.ID)
 
-	resourceIpamsvcSubnetRead(ctx, d, m)
-
-	return diags
+	return resourceIpamsvcSubnetRead(ctx, d, m)
 }
 
 func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -366,36 +397,151 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 		nil,
 	)
 	if err != nil {
-		diag.FromErr(err)
+		return diag.FromErr(err)
 	}
 
 	err = d.Set("address", *s.Payload.Result.Address)
 	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("asm_config", flattenIpamsvcASMConfig(s.Payload.Result.AsmConfig))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("asm_scope_flag", s.Payload.Result.AsmScopeFlag)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 	err = d.Set("cidr", s.Payload.Result.Cidr)
 	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("protocol", s.Payload.Result.Protocol)
+	err = d.Set("comment", s.Payload.Result.Comment)
 	if err != nil {
-		diag.FromErr(err)
-	}
-	err = d.Set("space", s.Payload.Result.Space)
-	if err != nil {
-		diag.FromErr(err)
-	}
-	err = d.Set("name", s.Payload.Result.Name)
-	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
 	err = d.Set("created_at", s.Payload.Result.CreatedAt.String())
 	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_client_update", s.Payload.Result.DdnsClientUpdate)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_domain", s.Payload.Result.DdnsDomain)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_generate_name", s.Payload.Result.DdnsGenerateName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_generated_prefix", s.Payload.Result.DdnsGeneratedPrefix)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_send_updates", s.Payload.Result.DdnsSendUpdates)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_update_on_renew", s.Payload.Result.DdnsUpdateOnRenew)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_use_conflict_resolution", s.Payload.Result.DdnsUseConflictResolution)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("dhcp_config", flattenIpamsvcDHCPConfig(s.Payload.Result.DhcpConfig))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("dhcp_host", s.Payload.Result.DhcpHost)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	dhcpOptions := make([]interface{}, 0, len(s.Payload.Result.DhcpOptions))
+	for _, dhcpOption := range s.Payload.Result.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
+	}
+	err = d.Set("dhcp_utilization", flattenIpamsvcDHCPUtilization(s.Payload.Result.DhcpUtilization))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_filename", s.Payload.Result.HeaderOptionFilename)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_address", s.Payload.Result.HeaderOptionServerAddress)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_name", s.Payload.Result.HeaderOptionServerName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_char", s.Payload.Result.HostnameRewriteChar)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_enabled", s.Payload.Result.HostnameRewriteEnabled)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_regex", s.Payload.Result.HostnameRewriteRegex)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	inheritanceAssignedHosts := make([]interface{}, 0, len(s.Payload.Result.InheritanceAssignedHosts))
+	for _, inheritanceAssignedHost := range s.Payload.Result.InheritanceAssignedHosts {
+		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
+	}
+	err = d.Set("inheritance_assigned_hosts", inheritanceAssignedHosts)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+
+	err = d.Set("inheritance_parent", s.Payload.Result.InheritanceParent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_sources", flattenIpamsvcDHCPInheritance(s.Payload.Result.InheritanceSources))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("name", s.Payload.Result.Name)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("parent", s.Payload.Result.Parent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("protocol", s.Payload.Result.Protocol)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("space", s.Payload.Result.Space)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("tags", s.Payload.Result.Tags)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("threshold", flattenIpamsvcUtilizationThreshold(s.Payload.Result.Threshold))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 	err = d.Set("updated_at", s.Payload.Result.UpdatedAt.String())
 	if err != nil {
-		diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("utilization", flattenIpamsvcUtilization(s.Payload.Result.Utilization))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	return diags

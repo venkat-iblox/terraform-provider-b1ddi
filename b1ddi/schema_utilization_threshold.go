@@ -3,6 +3,7 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -56,5 +57,17 @@ func flattenIpamsvcUtilizationThreshold(r *models.IpamsvcUtilizationThreshold) [
 			"high":    r.High,
 			"low":     r.Low,
 		},
+	}
+}
+
+func expandIpamsvcUtilizationThreshold(d []interface{}) *models.IpamsvcUtilizationThreshold {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.IpamsvcUtilizationThreshold{
+		Enabled: in["enabled"].(bool),
+		High:    swag.Int64(int64(in["high"].(int))),
+		Low:     swag.Int64(int64(in["low"].(int))),
 	}
 }
