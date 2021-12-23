@@ -86,13 +86,12 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 
 			// The list of the inheritance assigned hosts of the object.
 			// Read Only: true
-			// ToDo add inheritance_assigned_hosts
-			//"inheritance_assigned_hosts": {
-			//	Type:        schema.TypeList,
-			//	Elem:        schemaInheritanceAssignedHost(),
-			//	Computed:    true,
-			//	Description: "The list of the inheritance assigned hosts of the object.",
-			//},
+			"inheritance_assigned_hosts": {
+				Type:        schema.TypeList,
+				Elem:        schemaInheritanceAssignedHost(),
+				Computed:    true,
+				Description: "The list of the inheritance assigned hosts of the object.",
+			},
 
 			// The resource identifier.
 			"inheritance_parent": {
@@ -174,13 +173,29 @@ func resourceIpamsvcFixedAddressCreate(ctx context.Context, d *schema.ResourceDa
 
 	var diags diag.Diagnostics
 
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
 	fa := &models.IpamsvcFixedAddress{
-		Address:    swag.String(d.Get("address").(string)),
-		Name:       d.Get("name").(string),
-		MatchType:  swag.String(d.Get("match_type").(string)),
-		MatchValue: swag.String(d.Get("match_value").(string)),
-		IPSpace:    d.Get("ip_space").(string),
-		Comment:    d.Get("comment").(string),
+		Address:                   swag.String(d.Get("address").(string)),
+		Comment:                   d.Get("comment").(string),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		Hostname:                  d.Get("hostname").(string),
+		InheritanceParent:         d.Get("inheritance_parent").(string),
+		InheritanceSources:        expandIpamsvcFixedAddressInheritance(d.Get("inheritance_sources").([]interface{})),
+		IPSpace:                   d.Get("ip_space").(string),
+		MatchType:                 swag.String(d.Get("match_type").(string)),
+		MatchValue:                swag.String(d.Get("match_value").(string)),
+		Name:                      d.Get("name").(string),
+		Parent:                    d.Get("parent").(string),
+		Tags:                      d.Get("tags"),
 	}
 
 	resp, err := c.FixedAddress.FixedAddressCreate(&fixed_address.FixedAddressCreateParams{Body: fa, Context: ctx}, nil)
@@ -200,34 +215,90 @@ func resourceIpamsvcFixedAddressRead(ctx context.Context, d *schema.ResourceData
 
 	var diags diag.Diagnostics
 
-	fa, err := c.FixedAddress.FixedAddressRead(&fixed_address.FixedAddressReadParams{ID: d.Id(), Context: ctx}, nil)
+	resp, err := c.FixedAddress.FixedAddressRead(&fixed_address.FixedAddressReadParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("address", fa.Payload.Result.Address)
+	err = d.Set("address", resp.Payload.Result.Address)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("match_type", fa.Payload.Result.MatchType)
+	err = d.Set("comment", resp.Payload.Result.Comment)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("match_value", fa.Payload.Result.MatchValue)
+	err = d.Set("created_at", resp.Payload.Result.CreatedAt.String())
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("comment", fa.Payload.Result.Comment)
-	if err != nil {
-		return diag.FromErr(err)
+	dhcpOptions := make([]interface{}, 0, len(resp.Payload.Result.DhcpOptions))
+	for _, dhcpOption := range resp.Payload.Result.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
 	}
-	err = d.Set("created_at", fa.Payload.Result.CreatedAt.String())
+	err = d.Set("dhcp_options", dhcpOptions)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("updated_at", fa.Payload.Result.UpdatedAt.String())
+	err = d.Set("header_option_filename", resp.Payload.Result.HeaderOptionFilename)
 	if err != nil {
-		return diag.FromErr(err)
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_address", resp.Payload.Result.HeaderOptionServerAddress)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_name", resp.Payload.Result.HeaderOptionServerName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname", resp.Payload.Result.Hostname)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	inheritanceAssignedHosts := make([]interface{}, 0, len(resp.Payload.Result.InheritanceAssignedHosts))
+	for _, inheritanceAssignedHost := range resp.Payload.Result.InheritanceAssignedHosts {
+		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
+	}
+	err = d.Set("inheritance_assigned_hosts", inheritanceAssignedHosts)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_parent", resp.Payload.Result.InheritanceParent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_sources", flattenIpamsvcFixedAddressInheritance(resp.Payload.Result.InheritanceSources))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ip_space", resp.Payload.Result.IPSpace)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("match_type", resp.Payload.Result.MatchType)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("match_value", resp.Payload.Result.MatchValue)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("name", resp.Payload.Result.Name)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("parent", resp.Payload.Result.Parent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("tags", resp.Payload.Result.Tags)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("updated_at", resp.Payload.Result.UpdatedAt.String())
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
 	}
 
 	return diags
@@ -240,7 +311,14 @@ func resourceIpamsvcFixedAddressUpdate(ctx context.Context, d *schema.ResourceDa
 }
 
 func resourceIpamsvcFixedAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressDelete function
-	return diags
+	c := m.(*ipamsvc.IPAddressManagementAPI)
+
+	_, err := c.FixedAddress.FixedAddressDelete(&fixed_address.FixedAddressDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId("")
+
+	return nil
 }

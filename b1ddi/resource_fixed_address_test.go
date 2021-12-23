@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/fixed_address"
-	"github.com/infobloxopen/b1ddi-go-client/models"
 	"testing"
 )
 
@@ -39,13 +38,25 @@ func TestAccResourceFixedAddress_basic(t *testing.T) {
 						depends_on = [b1ddi_subnet.tf_acc_test_subnet]
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.ComposeTestCheckFunc(
-						testAccFixedAddressCompare(t, "b1ddi_fixed_address.tf_acc_test_fixed_address", models.IpamsvcFixedAddress{
-							Name:    "tf_acc_test_fixed_address",
-							Comment: "This Fixed Address is created by terraform provider acceptance test",
-						}),
-					),
+					testAccFixedAddressExists("b1ddi_fixed_address.tf_acc_test_fixed_address"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "address", "192.168.1.15"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "comment", "This Fixed Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "created_at"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "dhcp_options.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_filename", ""),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_server_address", ""),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_server_name", ""),
+					// ToDo Check hostname
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "hostname", ""),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_assigned_hosts.%", "0"),
+					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_parent"),
+					resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources"),
+					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "ip_space"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_type", "mac"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_value", "00:00:00:00:00:00"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "name", "tf_acc_test_fixed_address"),
+					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "parent"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "tags.%", "0"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "updated_at"),
 				),
 			},
@@ -53,7 +64,7 @@ func TestAccResourceFixedAddress_basic(t *testing.T) {
 	})
 }
 
-func testAccFixedAddressCompare(t *testing.T, resPath string, expected models.IpamsvcFixedAddress) resource.TestCheckFunc {
+func testAccFixedAddressExists(resPath string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		res, found := s.RootModule().Resources[resPath]
 		if !found {
@@ -72,21 +83,12 @@ func testAccFixedAddressCompare(t *testing.T, resPath string, expected models.Ip
 		if err != nil {
 			return err
 		}
-
-		if resp.Payload.Result.Name != expected.Name {
+		if resp.Payload.Result.ID != res.Primary.ID {
 			return fmt.Errorf(
-				"'name' does not match: \n got: '%s', \nexpected: '%s'",
-				resp.Payload.Result.Name,
-				expected.Name)
+				"'id' does not match: \n got: '%s', \nexpected: '%s'",
+				resp.Payload.Result.ID,
+				res.Primary.ID)
 		}
-
-		if resp.Payload.Result.Comment != expected.Comment {
-			return fmt.Errorf(
-				"'comment' does not match: \n got: '%s', \nexpected: '%s'",
-				resp.Payload.Result.Comment,
-				expected.Comment)
-		}
-
 		return nil
 	}
 }

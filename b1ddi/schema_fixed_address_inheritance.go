@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcFixedAddressInheritance FixedAddressInheritance
@@ -51,5 +52,32 @@ func schemaIpamsvcFixedAddressInheritance() *schema.Resource {
 				Description: "The inheritance configuration for _header_option_server_name_ field.",
 			},
 		},
+	}
+}
+
+func flattenIpamsvcFixedAddressInheritance(r *models.IpamsvcFixedAddressInheritance) []interface{} {
+	if r == nil {
+		return []interface{}{}
+	}
+	return []interface{}{
+		map[string]interface{}{
+			"dhcp_options":                 flattenIpamsvcInheritedDHCPOptionList(r.DhcpOptions),
+			"header_option_filename":       flattenInheritanceInheritedString(r.HeaderOptionFilename),
+			"header_option_server_address": flattenInheritanceInheritedString(r.HeaderOptionServerAddress),
+			"header_option_server_name":    flattenInheritanceInheritedString(r.HeaderOptionServerName),
+		},
+	}
+}
+
+func expandIpamsvcFixedAddressInheritance(d []interface{}) *models.IpamsvcFixedAddressInheritance {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.IpamsvcFixedAddressInheritance{
+		DhcpOptions:               expandIpamsvcInheritedDHCPOptionList(in["dhcp_options"].([]interface{})),
+		HeaderOptionFilename:      expandInheritanceInheritedString(in["header_option_filename"].([]interface{})),
+		HeaderOptionServerAddress: expandInheritanceInheritedString(in["header_option_server_address"].([]interface{})),
+		HeaderOptionServerName:    expandInheritanceInheritedString(in["header_option_server_name"].([]interface{})),
 	}
 }
