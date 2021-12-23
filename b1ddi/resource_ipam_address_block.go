@@ -313,12 +313,40 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 func resourceIpamsvcAddressBlockCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*ipamsvc.IPAddressManagementAPI)
 
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
 	ab := &models.IpamsvcAddressBlock{
-		Address: swag.String(d.Get("address").(string)),
-		Name:    d.Get("name").(string),
-		Space:   swag.String(d.Get("space").(string)),
-		Comment: d.Get("comment").(string),
-		Tags:    d.Get("tags"),
+		Address:                   swag.String(d.Get("address").(string)),
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Cidr:                      int64(d.Get("cidr").(int)),
+		Comment:                   d.Get("comment").(string),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           d.Get("ddns_send_updates").(bool),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: d.Get("ddns_use_conflict_resolution").(bool),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
+		InheritanceParent:         d.Get("inheritance_parent").(string),
+		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                      d.Get("name").(string),
+		Parent:                    d.Get("parent").(string),
+		Space:                     swag.String(d.Get("space").(string)),
+		Tags:                      d.Get("tags"),
+		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
 	resp, err := c.AddressBlock.AddressBlockCreate(&address_block.AddressBlockCreateParams{Body: ab, Context: ctx}, nil)
@@ -336,7 +364,7 @@ func resourceIpamsvcAddressBlockRead(ctx context.Context, d *schema.ResourceData
 
 	var diags diag.Diagnostics
 
-	ab, err := c.AddressBlock.AddressBlockRead(
+	resp, err := c.AddressBlock.AddressBlockRead(
 		&address_block.AddressBlockReadParams{
 			ID: d.Id(), Context: ctx,
 		},
@@ -346,35 +374,135 @@ func resourceIpamsvcAddressBlockRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("address", ab.Payload.Result.Address)
+	err = d.Set("address", resp.Payload.Result.Address)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("cidr", ab.Payload.Result.Cidr)
+	err = d.Set("asm_config", flattenIpamsvcASMConfig(resp.Payload.Result.AsmConfig))
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("name", ab.Payload.Result.Name)
+	err = d.Set("asm_scope_flag", resp.Payload.Result.AsmScopeFlag)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("space", ab.Payload.Result.Space)
+	err = d.Set("cidr", resp.Payload.Result.Cidr)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("comment", ab.Payload.Result.Comment)
+	err = d.Set("comment", resp.Payload.Result.Comment)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("dhcp_utilization", flattenIpamsvcDHCPUtilization(ab.Payload.Result.DhcpUtilization))
+	err = d.Set("created_at", resp.Payload.Result.CreatedAt.String())
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("tags", ab.Payload.Result.Tags)
+	err = d.Set("ddns_client_update", resp.Payload.Result.DdnsClientUpdate)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("utilization", flattenIpamsvcUtilization(ab.Payload.Result.Utilization))
+	err = d.Set("ddns_domain", resp.Payload.Result.DdnsDomain)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_generate_name", resp.Payload.Result.DdnsGenerateName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_generated_prefix", resp.Payload.Result.DdnsGeneratedPrefix)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_send_updates", resp.Payload.Result.DdnsSendUpdates)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_update_on_renew", resp.Payload.Result.DdnsUpdateOnRenew)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("ddns_use_conflict_resolution", resp.Payload.Result.DdnsUseConflictResolution)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("dhcp_config", flattenIpamsvcDHCPConfig(resp.Payload.Result.DhcpConfig))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	dhcpOptions := make([]interface{}, 0, len(resp.Payload.Result.DhcpOptions))
+	for _, dhcpOption := range resp.Payload.Result.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
+	}
+	err = d.Set("dhcp_options", dhcpOptions)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("dhcp_utilization", flattenIpamsvcDHCPUtilization(resp.Payload.Result.DhcpUtilization))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_filename", resp.Payload.Result.HeaderOptionFilename)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_address", resp.Payload.Result.HeaderOptionServerAddress)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("header_option_server_name", resp.Payload.Result.HeaderOptionServerName)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_char", resp.Payload.Result.HostnameRewriteChar)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_enabled", resp.Payload.Result.HostnameRewriteEnabled)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("hostname_rewrite_regex", resp.Payload.Result.HostnameRewriteRegex)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_parent", resp.Payload.Result.InheritanceParent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_sources", flattenIpamsvcDHCPInheritance(resp.Payload.Result.InheritanceSources))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("name", resp.Payload.Result.Name)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("parent", resp.Payload.Result.Parent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("protocol", resp.Payload.Result.Protocol)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("space", resp.Payload.Result.Space)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("tags", resp.Payload.Result.Tags)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("threshold", flattenIpamsvcUtilizationThreshold(resp.Payload.Result.Threshold))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("updated_at", resp.Payload.Result.UpdatedAt.String())
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("utilization", flattenIpamsvcUtilization(resp.Payload.Result.Utilization))
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
