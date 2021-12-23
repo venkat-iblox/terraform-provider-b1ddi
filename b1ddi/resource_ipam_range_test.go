@@ -33,15 +33,124 @@ func TestAccResourceRange_basic(t *testing.T) {
 						end = "192.168.1.30"
   						name = "tf_acc_test_range"
 						space = b1ddi_ip_space.tf_acc_test_space.id 
-  						comment = "This Address Block is created by terraform provider acceptance test"
+  						comment = "This Range is created by terraform provider acceptance test"
 						depends_on = [b1ddi_subnet.tf_acc_test_subnet]
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccRangeExists("b1ddi_range.tf_acc_test_range"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "start", "192.168.1.15"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "comment", "This Range is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "created_at"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_host", ""),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.%", "0"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "end", "192.168.1.30"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_assigned_hosts.%", "0"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "inheritance_parent"),
+					resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "name", "tf_acc_test_range"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "comment", "This Address Block is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "parent"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "protocol", "ip4"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "start", "192.168.1.15"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "tags.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.enabled", "false"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.high", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.low", "0"),
+
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
+
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandon_utilization", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandoned", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.dynamic", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.free", "16"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.static", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.total", "16"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.used", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.utilization", "0"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceRange_full_config(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "b1ddi_ip_space" "tf_acc_test_space" {
+  						name = "tf_acc_test_space"
+  						comment = "This IP Space is created by terraform provider acceptance test"
+					}
+					resource "b1ddi_subnet" "tf_acc_test_subnet" {
+						name = "tf_acc_test_subnet"						
+						address = "192.168.1.0"
+						space = b1ddi_ip_space.tf_acc_test_space.id
+						cidr = 24
+  						comment = "This Subnet is created by terraform provider acceptance test"
+					}
+					resource "b1ddi_range" "tf_acc_test_range" {
+						comment = "This Range is created by terraform provider acceptance test"
+						#dhcp_host = "dhcp_host"
+						#dhcp_options {
+							#group = "acc_test_group"
+							#type = "group"
+						#}
+						end = "192.168.1.30"
+						exclusion_ranges {
+							comment = "This Exclusion Range is created by terraform provider acceptance test"
+							end = "192.168.1.25"
+							start = "192.168.1.20"
+						}
+						#inheritance_assigned_hosts
+						#inheritance_parent
+						#inheritance_sources {}
+						name = "tf_acc_test_range"
+						#parent
+						space = b1ddi_ip_space.tf_acc_test_space.id
+						start = "192.168.1.15"
+						tags = {
+							TestType = "Acceptance"
+						}
+						#threshold {}
+						depends_on = [b1ddi_subnet.tf_acc_test_subnet]
+					}`),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccRangeExists("b1ddi_range.tf_acc_test_range"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "comment", "This Range is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "created_at"),
+					//resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_host", ""),
+					//resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "end", "192.168.1.30"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.comment", "This Exclusion Range is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.end", "192.168.1.25"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.start", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_assigned_hosts.%", "0"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "inheritance_parent"),
+					resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "name", "tf_acc_test_range"),
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "parent"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "protocol", "ip4"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "start", "192.168.1.15"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "tags.%", "1"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "tags.TestType", "Acceptance"),
+
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.enabled", "false"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.high", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.low", "0"),
+
+					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
+
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandon_utilization", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandoned", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.dynamic", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.free", "16"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.static", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.total", "16"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.used", "0"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.utilization", "0"),
 				),
 			},
 		},
@@ -60,12 +169,18 @@ func testAccRangeExists(resPath string) resource.TestCheckFunc {
 
 		cli := testAccProvider.Meta().(*ipamsvc.IPAddressManagementAPI)
 
-		_, err := cli.RangeOperations.RangeRead(
+		resp, err := cli.RangeOperations.RangeRead(
 			&range_operations.RangeReadParams{ID: res.Primary.ID, Context: context.TODO()},
 			nil,
 		)
 		if err != nil {
 			return err
+		}
+		if resp.Payload.Result.ID != res.Primary.ID {
+			return fmt.Errorf(
+				"'id' does not match: \n got: '%s', \nexpected: '%s'",
+				resp.Payload.Result.ID,
+				res.Primary.ID)
 		}
 		return nil
 	}

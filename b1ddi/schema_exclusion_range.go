@@ -1,7 +1,9 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 )
 
 // IpamsvcExclusionRange ExclusionRange
@@ -36,5 +38,28 @@ func schemaIpamsvcExclusionRange() *schema.Resource {
 				Description: "The start address of the exclusion range.",
 			},
 		},
+	}
+}
+
+func flattenIpamsvcExclusionRange(r *models.IpamsvcExclusionRange) map[string]interface{} {
+	if r == nil {
+		return nil
+	}
+	return map[string]interface{}{
+		"comment": r.Comment,
+		"end":     r.End,
+		"start":   r.Start,
+	}
+}
+
+func expandIpamsvcExclusionRange(d map[string]interface{}) *models.IpamsvcExclusionRange {
+	if d == nil || len(d) == 0 {
+		return nil
+	}
+
+	return &models.IpamsvcExclusionRange{
+		Comment: d["comment"].(string),
+		End:     swag.String(d["end"].(string)),
+		Start:   swag.String(d["start"].(string)),
 	}
 }

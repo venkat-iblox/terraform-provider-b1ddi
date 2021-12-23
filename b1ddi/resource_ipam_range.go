@@ -3,12 +3,11 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/range_operations"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // IpamsvcRange Range
@@ -174,12 +173,34 @@ func resourceIpamsvcRange() *schema.Resource {
 func resourceIpamsvcRangeCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*ipamsvc.IPAddressManagementAPI)
 
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
+	exclusionRanges := make([]*models.IpamsvcExclusionRange, 0)
+	for _, er := range d.Get("exclusion_ranges").([]interface{}) {
+		if er != nil {
+			exclusionRanges = append(exclusionRanges, expandIpamsvcExclusionRange(er.(map[string]interface{})))
+		}
+	}
+
 	r := &models.IpamsvcRange{
-		Comment: d.Get("comment").(string),
-		End:     swag.String(d.Get("end").(string)),
-		Name:    d.Get("name").(string),
-		Space:   swag.String(d.Get("space").(string)),
-		Start:   swag.String(d.Get("start").(string)),
+		Comment:            d.Get("comment").(string),
+		DhcpHost:           d.Get("dhcp_host").(string),
+		DhcpOptions:        dhcpOptions,
+		End:                swag.String(d.Get("end").(string)),
+		ExclusionRanges:    exclusionRanges,
+		InheritanceParent:  d.Get("inheritance_parent").(string),
+		InheritanceSources: expandIpamsvcDHCPOptionsInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:               d.Get("name").(string),
+		Parent:             d.Get("parent").(string),
+		Space:              swag.String(d.Get("space").(string)),
+		Start:              swag.String(d.Get("start").(string)),
+		Tags:               d.Get("tags"),
+		Threshold:          expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
 	resp, err := c.RangeOperations.RangeCreate(&range_operations.RangeCreateParams{Body: r, Context: ctx}, nil)
@@ -209,11 +230,34 @@ func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
+	err = d.Set("created_at", resp.Payload.Result.CreatedAt.String())
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("dhcp_host", resp.Payload.Result.DhcpHost)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	dhcpOptions := make([]interface{}, 0, len(resp.Payload.Result.DhcpOptions))
+	for _, dhcpOption := range resp.Payload.Result.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
+	}
+	err = d.Set("dhcp_options", dhcpOptions)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
 	err = d.Set("end", resp.Payload.Result.End)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-
+	exclusionRanges := make([]interface{}, 0, len(resp.Payload.Result.ExclusionRanges))
+	for _, er := range resp.Payload.Result.ExclusionRanges {
+		exclusionRanges = append(exclusionRanges, flattenIpamsvcExclusionRange(er))
+	}
+	err = d.Set("exclusion_ranges", exclusionRanges)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
 	inheritanceAssignedHosts := make([]interface{}, 0, len(resp.Payload.Result.InheritanceAssignedHosts))
 	for _, inheritanceAssignedHost := range resp.Payload.Result.InheritanceAssignedHosts {
 		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
@@ -222,8 +266,23 @@ func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-
+	err = d.Set("inheritance_parent", resp.Payload.Result.InheritanceParent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("inheritance_sources", flattenIpamsvcDHCPOptionsInheritance(resp.Payload.Result.InheritanceSources))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
 	err = d.Set("name", resp.Payload.Result.Name)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("parent", resp.Payload.Result.Parent)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("protocol", resp.Payload.Result.Protocol)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
@@ -232,6 +291,18 @@ func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m int
 		diags = append(diags, diag.FromErr(err)...)
 	}
 	err = d.Set("start", resp.Payload.Result.Start)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("tags", resp.Payload.Result.Tags)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("threshold", flattenIpamsvcUtilizationThreshold(resp.Payload.Result.Threshold))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("updated_at", resp.Payload.Result.UpdatedAt.String())
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
