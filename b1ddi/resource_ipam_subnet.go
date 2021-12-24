@@ -400,7 +400,7 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("address", *s.Payload.Result.Address)
+	err = d.Set("address", s.Payload.Result.Address)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
@@ -560,14 +560,12 @@ func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m 
 func resourceIpamsvcSubnetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*ipamsvc.IPAddressManagementAPI)
 
-	var diags diag.Diagnostics
-
 	_, err := c.Subnet.SubnetDelete(&subnet.SubnetDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
-		diag.FromErr(err)
+		return diag.FromErr(err)
 	}
 
 	d.SetId("")
 
-	return diags
+	return nil
 }
