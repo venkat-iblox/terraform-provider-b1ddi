@@ -3,7 +3,7 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/fixed_address"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 
@@ -169,7 +169,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 }
 
 func resourceIpamsvcFixedAddressCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
@@ -198,7 +198,7 @@ func resourceIpamsvcFixedAddressCreate(ctx context.Context, d *schema.ResourceDa
 		Tags:                      d.Get("tags"),
 	}
 
-	resp, err := c.FixedAddress.FixedAddressCreate(&fixed_address.FixedAddressCreateParams{Body: fa, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.FixedAddress.FixedAddressCreate(&fixed_address.FixedAddressCreateParams{Body: fa, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -211,11 +211,11 @@ func resourceIpamsvcFixedAddressCreate(ctx context.Context, d *schema.ResourceDa
 }
 
 func resourceIpamsvcFixedAddressRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	resp, err := c.FixedAddress.FixedAddressRead(&fixed_address.FixedAddressReadParams{ID: d.Id(), Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.FixedAddress.FixedAddressRead(&fixed_address.FixedAddressReadParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -311,9 +311,9 @@ func resourceIpamsvcFixedAddressUpdate(ctx context.Context, d *schema.ResourceDa
 }
 
 func resourceIpamsvcFixedAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
-	_, err := c.FixedAddress.FixedAddressDelete(&fixed_address.FixedAddressDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.FixedAddress.FixedAddressDelete(&fixed_address.FixedAddressDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}

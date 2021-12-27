@@ -5,7 +5,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -334,7 +334,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 }
 
 func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
@@ -374,7 +374,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		Threshold: expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
-	resp, err := c.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -385,11 +385,11 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	s, err := c.Subnet.SubnetRead(
+	s, err := c.IPAddressManagementAPI.Subnet.SubnetRead(
 		&subnet.SubnetReadParams{
 			ID:      d.Id(),
 			Context: ctx,
@@ -558,9 +558,9 @@ func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceIpamsvcSubnetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
-	_, err := c.Subnet.SubnetDelete(&subnet.SubnetDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.Subnet.SubnetDelete(&subnet.SubnetDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}

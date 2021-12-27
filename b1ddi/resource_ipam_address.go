@@ -5,7 +5,7 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 
@@ -166,7 +166,7 @@ func resourceIpamsvcAddress() *schema.Resource {
 }
 
 func resourceIpamsvcAddressCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	names := make([]*models.IpamsvcName, 0)
 	for _, n := range d.Get("names").([]interface{}) {
@@ -188,7 +188,7 @@ func resourceIpamsvcAddressCreate(ctx context.Context, d *schema.ResourceData, m
 		Tags:      d.Get("tags"),
 	}
 
-	resp, err := c.Address.AddressCreate(&address.AddressCreateParams{Body: a, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.Address.AddressCreate(&address.AddressCreateParams{Body: a, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -199,11 +199,11 @@ func resourceIpamsvcAddressCreate(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceIpamsvcAddressRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	resp, err := c.Address.AddressRead(
+	resp, err := c.IPAddressManagementAPI.Address.AddressRead(
 		&address.AddressReadParams{ID: d.Id(), Context: ctx},
 		nil,
 	)
@@ -294,9 +294,12 @@ func resourceIpamsvcAddressUpdate(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceIpamsvcAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
-	_, err := c.Address.AddressDelete(&address.AddressDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.Address.AddressDelete(
+		&address.AddressDeleteParams{ID: d.Id(), Context: ctx},
+		nil,
+	)
 	if err != nil {
 		return diag.FromErr(err)
 	}

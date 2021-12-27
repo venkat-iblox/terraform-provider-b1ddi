@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/fixed_address"
 	"testing"
 )
@@ -74,9 +74,9 @@ func testAccFixedAddressExists(resPath string) resource.TestCheckFunc {
 			return fmt.Errorf("ID for %s is not set", resPath)
 		}
 
-		cli := testAccProvider.Meta().(*ipamsvc.IPAddressManagementAPI)
+		cli := testAccProvider.Meta().(*b1ddiclient.Client)
 
-		resp, err := cli.FixedAddress.FixedAddressRead(
+		resp, err := cli.IPAddressManagementAPI.FixedAddress.FixedAddressRead(
 			&fixed_address.FixedAddressReadParams{ID: res.Primary.ID, Context: context.TODO()},
 			nil,
 		)

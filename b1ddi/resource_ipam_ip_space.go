@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/ip_space"
 	b1models "github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -278,7 +278,7 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 }
 
 func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
@@ -313,7 +313,7 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 		VendorSpecificOptionOptionSpace: d.Get("vendor_specific_option_option_space").(string),
 	}
 
-	resp, err := c.IPSpace.IPSpaceCreate(&ip_space.IPSpaceCreateParams{Body: s, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.IPSpace.IPSpaceCreate(&ip_space.IPSpaceCreateParams{Body: s, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -326,11 +326,11 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	s, err := c.IPSpace.IPSpaceRead(
+	s, err := c.IPAddressManagementAPI.IPSpace.IPSpaceRead(
 		&ip_space.IPSpaceReadParams{
 			ID:      d.Id(),
 			Context: ctx,
@@ -479,7 +479,7 @@ func resourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
@@ -490,7 +490,7 @@ func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m
 			Comment:   d.Get("comment").(string),
 		}
 
-		resp, err := c.IPSpace.IPSpaceUpdate(
+		resp, err := c.IPAddressManagementAPI.IPSpace.IPSpaceUpdate(
 			&ip_space.IPSpaceUpdateParams{ID: d.Id(), Body: body, Context: ctx},
 			nil,
 		)
@@ -505,13 +505,13 @@ func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceIpamsvcIPSpaceDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
 	ipSpaceID := d.Id()
 
-	_, err := c.IPSpace.IPSpaceDelete(&ip_space.IPSpaceDeleteParams{ID: ipSpaceID, Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.IPSpace.IPSpaceDelete(&ip_space.IPSpaceDeleteParams{ID: ipSpaceID, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}

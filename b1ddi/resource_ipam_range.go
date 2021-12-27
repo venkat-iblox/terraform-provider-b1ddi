@@ -5,7 +5,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/range_operations"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -171,7 +171,7 @@ func resourceIpamsvcRange() *schema.Resource {
 }
 
 func resourceIpamsvcRangeCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
@@ -203,7 +203,7 @@ func resourceIpamsvcRangeCreate(ctx context.Context, d *schema.ResourceData, m i
 		Threshold:          expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
-	resp, err := c.RangeOperations.RangeCreate(&range_operations.RangeCreateParams{Body: r, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.RangeOperations.RangeCreate(&range_operations.RangeCreateParams{Body: r, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -214,11 +214,11 @@ func resourceIpamsvcRangeCreate(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	resp, err := c.RangeOperations.RangeRead(&range_operations.RangeReadParams{
+	resp, err := c.IPAddressManagementAPI.RangeOperations.RangeRead(&range_operations.RangeReadParams{
 		ID:      d.Id(),
 		Context: ctx,
 	}, nil)
@@ -321,9 +321,9 @@ func resourceIpamsvcRangeUpdate(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceIpamsvcRangeDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
-	_, err := c.RangeOperations.RangeDelete(&range_operations.RangeDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.RangeOperations.RangeDelete(&range_operations.RangeDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -3,7 +3,7 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 
@@ -311,7 +311,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 }
 
 func resourceIpamsvcAddressBlockCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
@@ -349,7 +349,7 @@ func resourceIpamsvcAddressBlockCreate(ctx context.Context, d *schema.ResourceDa
 		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
-	resp, err := c.AddressBlock.AddressBlockCreate(&address_block.AddressBlockCreateParams{Body: ab, Context: ctx}, nil)
+	resp, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockCreate(&address_block.AddressBlockCreateParams{Body: ab, Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -360,11 +360,11 @@ func resourceIpamsvcAddressBlockCreate(ctx context.Context, d *schema.ResourceDa
 }
 
 func resourceIpamsvcAddressBlockRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
 	var diags diag.Diagnostics
 
-	resp, err := c.AddressBlock.AddressBlockRead(
+	resp, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockRead(
 		&address_block.AddressBlockReadParams{
 			ID: d.Id(), Context: ctx,
 		},
@@ -517,9 +517,9 @@ func resourceIpamsvcAddressBlockUpdate(ctx context.Context, d *schema.ResourceDa
 }
 
 func resourceIpamsvcAddressBlockDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*ipamsvc.IPAddressManagementAPI)
+	c := m.(*b1ddiclient.Client)
 
-	_, err := c.AddressBlock.AddressBlockDelete(&address_block.AddressBlockDeleteParams{ID: d.Id(), Context: ctx}, nil)
+	_, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockDelete(&address_block.AddressBlockDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -2,12 +2,10 @@ package b1ddi
 
 import (
 	"context"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
-
-	httptransport "github.com/go-openapi/runtime/client"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 )
 
@@ -76,7 +74,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	transport.DefaultAuthentication = tokenAuth
 
 	// create the API client
-	c := ipamsvc.New(transport, strfmt.Default)
+	c := b1ddiclient.NewClient(transport, strfmt.Default)
 
 	return c, diags
 }

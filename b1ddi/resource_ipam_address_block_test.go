@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc"
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
 	"testing"
 )
@@ -114,9 +114,9 @@ func testAccAddressBlockExists(resPath string) resource.TestCheckFunc {
 			return fmt.Errorf("ID for %s is not set", resPath)
 		}
 
-		cli := testAccProvider.Meta().(*ipamsvc.IPAddressManagementAPI)
+		cli := testAccProvider.Meta().(*b1ddiclient.Client)
 
-		resp, err := cli.AddressBlock.AddressBlockRead(
+		resp, err := cli.IPAddressManagementAPI.AddressBlock.AddressBlockRead(
 			&address_block.AddressBlockReadParams{ID: res.Primary.ID, Context: context.TODO()},
 			nil,
 		)
