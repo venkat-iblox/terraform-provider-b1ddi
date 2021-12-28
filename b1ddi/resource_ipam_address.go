@@ -55,7 +55,6 @@ func resourceIpamsvcAddress() *schema.Resource {
 			"dhcp_info": {
 				Type:        schema.TypeList,
 				Elem:        schemaIpamsvcDHCPInfo(),
-				MaxItems:    1,
 				Computed:    true,
 				Description: "The DHCP information associated with this object.",
 			},
