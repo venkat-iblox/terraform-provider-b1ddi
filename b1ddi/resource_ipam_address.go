@@ -156,7 +156,7 @@ func resourceIpamsvcAddress() *schema.Resource {
 			// Read Only: true
 			"usage": {
 				Type:        schema.TypeList,
-				Elem:        schema.TypeString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 				Description: "The usage is a combination of indicators, each tracking a specific associated use. Listed below are usage indicators with their meaning:\n usage indicator        | description\n ---------------------- | --------------------------------\n _IPAM_                 |  Address was created by the IPAM component.\n _IPAM_, _RESERVED_     |  Address was created by the API call _ipam/address_ or _ipam/host_.\n _IPAM_, _NETWORK_      |  Address was automatically created by the IPAM component and is the network address of the parent subnet.\n _IPAM_, _BROADCAST_    |  Address was automatically created by the IPAM component and is the broadcast address of the parent subnet.\n _DHCP_                 |  Address was created by the DHCP component.\n _DHCP_, _FIXEDADDRESS_ |  Address was created by the API call _dhcp/fixed_address_.\n _DHCP_, _LEASED_       |  An active lease for that address was issued by a DHCP server.\n _DNS_                  |  Address is used by one or more DNS records.",
 			},

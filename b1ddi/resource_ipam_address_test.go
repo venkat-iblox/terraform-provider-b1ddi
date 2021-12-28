@@ -25,7 +25,6 @@ func TestAccResourceAddress_basic(t *testing.T) {
 						address = "192.168.1.15"
 						comment = "This Address is created by terraform provider acceptance test"
 						space = b1ddi_ip_space.tf_acc_test_space.id
-						name = "tf_acc_test_address"
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccAddressExists("b1ddi_address.tf_acc_test_address"),
