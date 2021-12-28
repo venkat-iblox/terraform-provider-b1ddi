@@ -55,19 +55,31 @@ func schemaInheritanceInheritedUInt32() *schema.Resource {
 	}
 }
 
-func flattenInheritanceInheritedUInt32(r *models.InheritanceInheritedUInt32) []interface{} {
+func flattenInheritanceInheritedUInt32(r interface{}) []interface{} {
 	if r == nil {
 		return []interface{}{}
 	}
-
-	return []interface{}{
-		map[string]interface{}{
-			"action":       r.Action,
-			"display_name": r.DisplayName,
-			"source":       r.Source,
-			"value":        r.Value,
-		},
+	switch v := r.(type) {
+	case *models.InheritanceInheritedUInt32:
+		return []interface{}{
+			map[string]interface{}{
+				"action":       v.Action,
+				"display_name": v.DisplayName,
+				"source":       v.Source,
+				"value":        v.Value,
+			},
+		}
+	case *models.Inheritance2InheritedUInt32:
+		return []interface{}{
+			map[string]interface{}{
+				"action":       v.Action,
+				"display_name": v.DisplayName,
+				"source":       v.Source,
+				"value":        v.Value,
+			},
+		}
 	}
+	return nil
 }
 
 func expandInheritanceInheritedUInt32(d []interface{}) *models.InheritanceInheritedUInt32 {
@@ -76,6 +88,19 @@ func expandInheritanceInheritedUInt32(d []interface{}) *models.InheritanceInheri
 	}
 	in := d[0].(map[string]interface{})
 	return &models.InheritanceInheritedUInt32{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       int64(in["value"].(int)),
+	}
+}
+
+func expandInheritance2InheritedUInt32(d []interface{}) *models.Inheritance2InheritedUInt32 {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+	return &models.Inheritance2InheritedUInt32{
 		Action:      in["action"].(string),
 		DisplayName: in["display_name"].(string),
 		Source:      in["source"].(string),

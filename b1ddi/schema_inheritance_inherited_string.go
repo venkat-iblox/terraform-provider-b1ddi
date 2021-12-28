@@ -55,19 +55,32 @@ func schemaInheritanceInheritedString() *schema.Resource {
 	}
 }
 
-func flattenInheritanceInheritedString(r *models.InheritanceInheritedString) []interface{} {
+func flattenInheritanceInheritedString(r interface{}) []interface{} {
 	if r == nil {
 		return []interface{}{}
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"action":       r.Action,
-			"display_name": r.DisplayName,
-			"source":       r.Source,
-			"value":        r.Value,
-		},
+	switch v := r.(type) {
+	case *models.InheritanceInheritedString:
+		return []interface{}{
+			map[string]interface{}{
+				"action":       v.Action,
+				"display_name": v.DisplayName,
+				"source":       v.Source,
+				"value":        v.Value,
+			},
+		}
+	case *models.Inheritance2InheritedString:
+		return []interface{}{
+			map[string]interface{}{
+				"action":       v.Action,
+				"display_name": v.DisplayName,
+				"source":       v.Source,
+				"value":        v.Value,
+			},
+		}
 	}
+	return nil
 }
 
 func expandInheritanceInheritedString(d []interface{}) *models.InheritanceInheritedString {
@@ -77,6 +90,20 @@ func expandInheritanceInheritedString(d []interface{}) *models.InheritanceInheri
 	in := d[0].(map[string]interface{})
 
 	return &models.InheritanceInheritedString{
+		Action:      in["action"].(string),
+		DisplayName: in["display_name"].(string),
+		Source:      in["source"].(string),
+		Value:       in["value"].(string),
+	}
+}
+
+func expandInheritance2InheritedString(d []interface{}) *models.Inheritance2InheritedString {
+	if len(d) == 0 || d[0] == nil {
+		return nil
+	}
+	in := d[0].(map[string]interface{})
+
+	return &models.Inheritance2InheritedString{
 		Action:      in["action"].(string),
 		DisplayName: in["display_name"].(string),
 		Source:      in["source"].(string),
