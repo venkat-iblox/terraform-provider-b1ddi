@@ -33,6 +33,7 @@ func Provider() *schema.Provider {
 			"b1ddi_range":         resourceIpamsvcRange(),
 			"b1ddi_address":       resourceIpamsvcAddress(),
 			"b1ddi_dns_view":      resourceConfigView(),
+			"b1ddi_dns_record":    resourceDataRecord(),
 		},
 		DataSourcesMap:       map[string]*schema.Resource{},
 		ConfigureContextFunc: providerConfigure,
