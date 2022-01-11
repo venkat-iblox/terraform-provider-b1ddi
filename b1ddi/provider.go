@@ -9,7 +9,6 @@ import (
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 )
 
-// Provider -
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -23,6 +22,11 @@ func Provider() *schema.Provider {
 				Required:    true,
 				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("B1DDI_TOKEN", nil),
+			},
+			"base_path": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "api/ddi/v1",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -43,6 +47,7 @@ func Provider() *schema.Provider {
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	host := d.Get("host").(string)
 	token := d.Get("token").(string)
+	basePath := d.Get("base_path").(string)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
@@ -51,7 +56,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Unable to initialise B1DDI client without API host",
-			// ToDo add detail Detail: "Please set token via"
 		})
 		return nil, diags
 	}
@@ -60,15 +64,21 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Unable to initialise B1DDI client without API token",
-			// ToDo add detail Detail: "Please set token via"
+		})
+		return nil, diags
+	}
+
+	if basePath == "" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Unable to initialise B1DDI client without API base path",
 		})
 		return nil, diags
 	}
 
 	// create the transport
 	transport := httptransport.New(
-		// Todo configure schemes via terraform
-		host, "api/ddi/v1", nil,
+		host, basePath, nil,
 	)
 
 	// Create default auth header for all API requests
