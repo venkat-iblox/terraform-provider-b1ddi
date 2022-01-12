@@ -3,12 +3,11 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/view"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // ConfigView View
@@ -78,6 +77,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_enable_validation": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _true_ to perform DNSSEC validation.\nIgnored if _dnssec_enabled_ is _false_.\n\nDefaults to _true_.",
 			},
 
@@ -88,6 +88,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Master toggle for all DNSSEC processing.\nOther _dnssec_*_ configuration is unused if this is disabled.\n\nDefaults to _true_.",
 			},
 
@@ -121,6 +122,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_validate_expiry": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _true_ to reject expired DNSSEC keys.\nIgnored if either _dnssec_enabled_ or _dnssec_enable_validation_ is _false_.\n\nDefaults to _true_.",
 			},
 
@@ -151,6 +153,7 @@ func resourceConfigView() *schema.Resource {
 			"ecs_prefix_v4": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Maximum scope length for v4 ECS.\n\nUnsigned integer, min 1 max 24\n\nDefaults to 24.",
 			},
 
@@ -162,6 +165,7 @@ func resourceConfigView() *schema.Resource {
 			"ecs_prefix_v6": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Maximum scope length for v6 ECS.\n\nUnsigned integer, min 1 max 56\n\nDefaults to 56.",
 			},
 
@@ -185,6 +189,7 @@ func resourceConfigView() *schema.Resource {
 			"edns_udp_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _edns_udp_size_ represents the edns UDP size.\nThe size a querying DNS server advertises to the DNS server it’s sending a query to.\n\nDefaults to 1232 bytes.",
 			},
 
@@ -244,6 +249,7 @@ func resourceConfigView() *schema.Resource {
 			"lame_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Unused in the current on-prem DNS server implementation.\n\nUnsigned integer, min 0 max 3600 (1h).\n\nDefaults to 600.",
 			},
 
@@ -284,6 +290,7 @@ func resourceConfigView() *schema.Resource {
 			"max_cache_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Seconds to cache positive responses.\n\nUnsigned integer, min 1 max 604800 (7d).\n\nDefaults to 604800 (7d).",
 			},
 
@@ -295,6 +302,7 @@ func resourceConfigView() *schema.Resource {
 			"max_negative_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Seconds to cache negative responses.\n\nUnsigned integer, min 1 max 604800 (7d).\n\nDefaults to 10800 (3h).",
 			},
 
@@ -305,6 +313,7 @@ func resourceConfigView() *schema.Resource {
 			"max_udp_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _max_udp_size_ represents maximum UDP payload size.\nThe maximum number of bytes a responding DNS server will send to a UDP datagram.\n\nDefaults to 1232 bytes.",
 			},
 
@@ -361,6 +370,7 @@ func resourceConfigView() *schema.Resource {
 			"recursion_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _true_ to allow recursive DNS queries.\n\nDefaults to _true_.",
 			},
 
@@ -406,6 +416,7 @@ func resourceConfigView() *schema.Resource {
 			"use_forwarders_for_subzones": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Use default forwarders to resolve queries for subzones.\n\nDefaults to _true_.",
 			},
 
@@ -415,6 +426,7 @@ func resourceConfigView() *schema.Resource {
 				Elem:        schemaConfigZoneAuthority(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. ZoneAuthority.",
 			},
 		},
