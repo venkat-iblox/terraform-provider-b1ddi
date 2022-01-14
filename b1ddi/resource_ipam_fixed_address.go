@@ -97,6 +97,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 			"inheritance_parent": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -146,6 +147,7 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 			"parent": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
