@@ -38,6 +38,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 				Elem:        schemaIpamsvcASMConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The Automated Scope Management configuration for the address block.",
 			},
 
@@ -88,6 +89,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_client_update": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Controls who does the DDNS updates.\n\nValid values are:\n* _client_: DHCP server updates DNS if requested by client.\n* _server_: DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _ignore_: DHCP server always updates DNS, even if the client says not to.\n* _over_client_update_: Same as _server_. DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _over_no_update_: DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it.\n\nDefaults to _client_.",
 			},
 
@@ -118,6 +120,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_generated_prefix": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The prefix used in the generation of an FQDN.\n\nWhen generating a name, DHCP server will construct the name in the format: [ddns-generated-prefix]-[address-text].[ddns-qualifying-suffix].\nwhere address-text is simply the lease IP address converted to a hyphenated string.\n\nDefaults to \"myhost\".",
 			},
 
@@ -126,6 +129,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_send_updates": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Determines if DDNS updates are enabled at the address block level.\nDefaults to _true_.",
 			},
 
@@ -146,6 +150,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_use_conflict_resolution": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.\n\nWhen false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients.\n\nDefaults to _true_.",
 			},
 
@@ -155,6 +160,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 				Elem:        schemaIpamsvcDHCPConfig(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The shared DHCP configuration that controls how leases are issued for the address block.",
 			},
 
@@ -204,6 +210,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"hostname_rewrite_char": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The character to replace non-matching characters with, when hostname rewrite is enabled.\n\nAny single ASCII character.\n\nDefaults to \"_\".",
 			},
 
@@ -224,6 +231,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"hostname_rewrite_regex": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The regex bracket expression to match valid characters.\n\nMust begin with \"[\" and end with \"]\" and be a compilable POSIX regex.\n\nDefaults to \"[^a-zA-Z0-9_.]\".",
 			},
 
@@ -286,6 +294,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 				Elem:        schemaIpamsvcUtilizationThreshold(),
 				MaxItems:    1,
 				Optional:    true,
+				Computed:    true,
 				Description: "The IP address utilization thresholds for the address block.",
 			},
 
