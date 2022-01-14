@@ -21,18 +21,38 @@ func TestAccResourceAddress_basic(t *testing.T) {
   						name = "tf_acc_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}
+					resource "b1ddi_subnet" "tf_acc_test_subnet" {
+						name = "tf_acc_test_subnet"						
+						address = "192.168.1.0"
+						space = b1ddi_ip_space.tf_acc_test_space.id
+						cidr = 24
+  						comment = "This Subnet is created by terraform provider acceptance test"
+					}
 					resource "b1ddi_address" "tf_acc_test_address" {
 						address = "192.168.1.15"
 						comment = "This Address is created by terraform provider acceptance test"
 						space = b1ddi_ip_space.tf_acc_test_space.id
+						depends_on = [b1ddi_subnet.tf_acc_test_subnet]
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccAddressExists("b1ddi_address.tf_acc_test_address"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					// ToDo Add checks for dhcp_info
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "", ""),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", ""),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", ""),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.%", "0"),
+					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "parent"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "protocol", "ip4"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "range", ""),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "range", ""),
+					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "space"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "state", "used"),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "tags"),
+					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "updated_at"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "usage.0", "IPAM RESERVED"),
 				),
 			},
 		},

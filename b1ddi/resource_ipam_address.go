@@ -90,6 +90,7 @@ func resourceIpamsvcAddress() *schema.Resource {
 			"parent": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
