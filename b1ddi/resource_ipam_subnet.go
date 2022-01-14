@@ -365,13 +365,11 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
 		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
 		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
-		//InheritanceParent:         d.Get("inheritance_parent").(string),
-		InheritanceSources: expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
-		Name:               d.Get("name").(string),
-		//Parent:                    d.Get("parent").(string),
-		Space:     swag.String(d.Get("space").(string)),
-		Tags:      d.Get("tags"),
-		Threshold: expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
+		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                      d.Get("name").(string),
+		Space:                     swag.String(d.Get("space").(string)),
+		Tags:                      d.Get("tags"),
+		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
 	}
 
 	resp, err := c.IPAddressManagementAPI.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
