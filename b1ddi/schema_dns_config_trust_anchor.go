@@ -74,19 +74,17 @@ func schemaConfigTrustAnchor() *schema.Resource {
 	}
 }
 
-func flattenConfigTrustAnchor(r *models.ConfigTrustAnchor) []interface{} {
+func flattenConfigTrustAnchor(r *models.ConfigTrustAnchor) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"algorithm":     r.Algorithm,
-			"protocol_zone": r.ProtocolZone,
-			"public_key":    r.PublicKey,
-			"sep":           r.Sep,
-			"zone":          r.Zone,
-		},
+	return map[string]interface{}{
+		"algorithm":     r.Algorithm,
+		"protocol_zone": r.ProtocolZone,
+		"public_key":    r.PublicKey,
+		"sep":           r.Sep,
+		"zone":          r.Zone,
 	}
 }
 
