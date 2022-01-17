@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
+	"os"
 	"testing"
 )
 
@@ -16,15 +17,31 @@ func TestAccResourceDnsRecord_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: fmt.Sprintf(`
-					resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
-						rdata = {
-							"address" = "192.168.1.15"
-						}
-						type = "TYPE1"
-					}`),
+				Config: testAccResourceDnsRecordConfig(t),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsRecordExists("b1ddi_dns_view.tf_acc_test_dns_view"),
+					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "absolute_name_spec", "tf_acc_test_a_record.tf-acc-test.com."),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "absolute_zone_name", "tf-acc-test.com."),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "comment", ""),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "created_at"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "delegation", ""),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "disabled", "false"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_absolute_name_spec", "tf_acc_test_a_record.tf-acc-test.com."),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_absolute_zone_name", "tf-acc-test.com."),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "source.0", "STATIC"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "ttl", "28800"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "type", "A"),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "updated_at"),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "view"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "view_name", "tf_acc_test_dns_view"),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
 				),
 			},
 		},
@@ -58,4 +75,33 @@ func testAccDnsRecordExists(resPath string) resource.TestCheckFunc {
 		}
 		return nil
 	}
+}
+
+func testAccResourceDnsRecordConfig(t *testing.T) string {
+	internalSecondary := os.Getenv("INTERNAL_SECONDARY")
+
+	if internalSecondary == "" {
+		t.Skip("No INTERNAL_SECONDARY env is set for the DNS Auth Zone acceptance test")
+	}
+
+	return fmt.Sprintf(`
+		resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
+			name = "tf_acc_test_dns_view"
+		}
+		resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
+			internal_secondaries {
+				host = "%s"
+			}
+			fqdn = "tf-acc-test.com."
+			primary_type = "cloud"
+			view = b1ddi_dns_view.tf_acc_test_dns_view.id
+		}
+		resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
+			zone = b1ddi_dns_auth_zone.tf_acc_test_auth_zone.id
+			name_in_zone = "tf_acc_test_a_record"
+			rdata = {
+				"address" = "192.168.1.15"
+			}
+			type = "A"
+		}`, internalSecondary)
 }

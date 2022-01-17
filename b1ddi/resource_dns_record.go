@@ -32,6 +32,7 @@ func resourceDataRecord() *schema.Resource {
 			"absolute_name_spec": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Synthetic field, used to determine _zone_ and/or _name_in_zone_ field for records.",
 			},
 
@@ -291,6 +292,7 @@ func resourceDataRecord() *schema.Resource {
 			"ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "The record time to live value in seconds. The range of this value is 0 to 2147483647.\n\nDefaults to TTL value from the SOA record of the zone.",
 			},
 
@@ -331,6 +333,7 @@ func resourceDataRecord() *schema.Resource {
 			"view": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -364,6 +367,7 @@ func resourceDataRecordCreate(ctx context.Context, d *schema.ResourceData, m int
 		InheritanceSources: expandDataRecordInheritance(d.Get("inheritance_sources").([]interface{})),
 		NameInZone:         d.Get("name_in_zone").(string),
 		Options:            d.Get("options"),
+		Rdata:              d.Get("rdata"),
 		Tags:               d.Get("tags"),
 		TTL:                int64(d.Get("ttl").(int)),
 		Type:               swag.String(d.Get("type").(string)),
