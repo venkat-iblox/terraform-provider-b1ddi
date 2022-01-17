@@ -2,11 +2,14 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
+	"strconv"
+	"strings"
 )
 
 func Provider() *schema.Provider {
@@ -40,7 +43,14 @@ func Provider() *schema.Provider {
 			"b1ddi_dns_auth_zone": resourceConfigAuthZone(),
 			"b1ddi_dns_record":    resourceDataRecord(),
 		},
-		DataSourcesMap:       map[string]*schema.Resource{},
+		DataSourcesMap: map[string]*schema.Resource{
+			"b1ddi_ip_spaces":       dataSourceIpamsvcIPSpace(),
+			"b1ddi_subnets":         dataSourceIpamsvcSubnet(),
+			"b1ddi_fixed_addresses": dataSourceIpamsvcFixedAddress(),
+			"b1ddi_address_blocks":  dataSourceIpamsvcAddressBlock(),
+			"b1ddi_ranges":          dataSourceIpamsvcRange(),
+			"b1ddi_addresses":       dataSourceIpamsvcAddress(),
+		},
 		ConfigureContextFunc: providerConfigure,
 	}
 }
@@ -90,4 +100,19 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	c := b1ddiclient.NewClient(transport, strfmt.Default)
 
 	return c, diags
+}
+
+// Generates filter string for B1DDI API list request from the map
+func filterFromMap(filtersMap map[string]interface{}) string {
+	filters := make([]string, 0, len(filtersMap))
+
+	for k, v := range filtersMap {
+		if val, err := strconv.Atoi(v.(string)); err == nil {
+			filters = append(filters, fmt.Sprintf("%s==%v", k, val))
+		} else {
+			filters = append(filters, fmt.Sprintf("%s=='%s'", k, v))
+		}
+	}
+
+	return strings.Join(filters, " and ")
 }

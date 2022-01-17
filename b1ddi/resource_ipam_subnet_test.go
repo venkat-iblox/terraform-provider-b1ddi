@@ -29,7 +29,7 @@ func TestAccResourceSubnet_basic(t *testing.T) {
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccSubnetCompare("b1ddi_subnet.tf_acc_test_subnet"),
+					testAccSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "90"),
@@ -160,7 +160,7 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 						#threshold {}
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccSubnetCompare("b1ddi_subnet.tf_acc_test_subnet"),
+					testAccSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "80"),
@@ -237,7 +237,7 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 	})
 }
 
-func testAccSubnetCompare(resPath string) resource.TestCheckFunc {
+func testAccSubnetExists(resPath string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		res, found := s.RootModule().Resources[resPath]
 		if !found {

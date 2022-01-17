@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -33,5 +34,31 @@ func testAccPreCheck(t *testing.T) {
 	err := testAccProvider.Configure(context.TODO(), terraform.NewResourceConfigRaw(nil))
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestFilterFromMap(t *testing.T) {
+	testCases := []struct {
+		expectedResult string
+		inputMap       map[string]interface{}
+	}{
+		{
+			expectedResult: "name=='test_name'",
+			inputMap: map[string]interface{}{
+				"name": "test_name",
+			},
+		},
+		{
+			expectedResult: "int_val==15",
+			inputMap: map[string]interface{}{
+				"int_val": "15",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.expectedResult, func(t *testing.T) {
+			assert.Equal(t, tc.expectedResult, filterFromMap(tc.inputMap))
+		})
 	}
 }

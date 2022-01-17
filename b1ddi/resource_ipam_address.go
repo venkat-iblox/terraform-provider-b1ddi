@@ -285,6 +285,43 @@ func resourceIpamsvcAddressRead(ctx context.Context, d *schema.ResourceData, m i
 	return diags
 }
 
+func flattenIpamsvcAddress(r *models.IpamsvcAddress) []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	names := make([]interface{}, 0, len(r.Names))
+	for _, n := range r.Names {
+		names = append(names, flattenIpamsvcName(n))
+	}
+
+	usage := make([]interface{}, 0, len(r.Usage))
+	for _, u := range r.Usage {
+		usage = append(usage, u)
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"address":    r.Address,
+			"comment":    r.Comment,
+			"created_at": r.CreatedAt.String(),
+			"dhcp_info":  flattenIpamsvcDHCPInfo(r.DhcpInfo),
+			"host":       r.Host,
+			"hwaddr":     r.Hwaddr,
+			"interface":  r.Interface,
+			"names":      names,
+			"parent":     r.Parent,
+			"protocol":   r.Protocol,
+			"range":      r.Range,
+			"space":      r.Space,
+			"state":      r.State,
+			"tags":       r.Tags,
+			"updated_at": r.UpdatedAt.String(),
+			"usage":      usage,
+		},
+	}
+}
+
 func resourceIpamsvcAddressUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	// ToDo Implement resourceIpamsvcAddressUpdate function
