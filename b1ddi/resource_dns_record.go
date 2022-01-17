@@ -493,6 +493,39 @@ func resourceDataRecordRead(ctx context.Context, d *schema.ResourceData, m inter
 	return diags
 }
 
+func flattenDataRecord(r *models.DataRecord) []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"absolute_name_spec":     r.AbsoluteNameSpec,
+			"absolute_zone_name":     r.AbsoluteZoneName,
+			"comment":                r.Comment,
+			"created_at":             r.CreatedAt.String(),
+			"delegation":             r.Delegation,
+			"disabled":               r.Disabled,
+			"dns_absolute_name_spec": r.DNSAbsoluteNameSpec,
+			"dns_absolute_zone_name": r.DNSAbsoluteZoneName,
+			"dns_name_in_zone":       r.DNSNameInZone,
+			"dns_rdata":              r.DNSRdata,
+			"inheritance_sources":    flattenDataRecordInheritance(r.InheritanceSources),
+			"name_in_zone":           r.NameInZone,
+			"options":                r.Options,
+			"rdata":                  r.Rdata,
+			"source":                 r.Source,
+			"tags":                   r.Tags,
+			"ttl":                    r.TTL,
+			"type":                   r.Type,
+			"updated_at":             r.UpdatedAt.String(),
+			"view":                   r.View,
+			"view_name":              r.ViewName,
+			"zone":                   r.Zone,
+		},
+	}
+}
+
 func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	// ToDo Implement resourceDataRecordUpdate function
