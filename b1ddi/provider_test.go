@@ -54,6 +54,12 @@ func TestFilterFromMap(t *testing.T) {
 				"int_val": "15",
 			},
 		},
+		{
+			expectedResult: "mac_addr=='00:00:00:00:00:00'",
+			inputMap: map[string]interface{}{
+				"mac_addr": "00:00:00:00:00:00",
+			},
+		},
 	}
 
 	for _, tc := range testCases {
