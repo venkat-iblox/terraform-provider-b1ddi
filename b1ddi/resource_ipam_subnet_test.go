@@ -89,15 +89,6 @@ func TestAccResourceSubnet_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.low", "0"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
-
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.free", "254"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.static", "2"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.total", "256"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.used", "2"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.utilization", "1"),
 				),
 			},
 		},
@@ -222,15 +213,6 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.low", "0"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
-
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.free", "254"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.static", "2"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.total", "256"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.used", "2"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "utilization.0.utilization", "1"),
 				),
 			},
 		},

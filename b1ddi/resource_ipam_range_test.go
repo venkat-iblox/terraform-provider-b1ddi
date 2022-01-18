@@ -58,15 +58,6 @@ func TestAccResourceRange_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.low", "0"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
-
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.free", "16"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.static", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.total", "16"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.used", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.utilization", "0"),
 				),
 			},
 		},
@@ -142,15 +133,6 @@ func TestAccResourceRange_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "threshold.0.low", "0"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
-
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.free", "16"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.static", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.total", "16"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.used", "0"),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "utilization.0.utilization", "0"),
 				),
 			},
 		},

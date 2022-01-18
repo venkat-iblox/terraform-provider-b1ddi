@@ -22,8 +22,9 @@ func TestAccResourceAddressBlock_basic(t *testing.T) {
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}
 					resource "b1ddi_address_block" "tf_acc_test_address_block" {
-						address = "192.168.1.0/24"
+						address = "192.168.1.0"
   						name = "tf_acc_test_address_block"
+						cidr = 24
 						space = b1ddi_ip_space.tf_acc_test_space.id 
   						comment = "This Address Block is created by terraform provider acceptance test"
 						tags = {
@@ -89,15 +90,6 @@ func TestAccResourceAddressBlock_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.low", "0"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
-
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.free", "254"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.static", "2"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.total", "256"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.used", "2"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "utilization.0.utilization", "1"),
 				),
 			},
 		},
