@@ -523,27 +523,48 @@ func flattenIpamsvcIPSpace(r *b1models.IpamsvcIPSpace) []interface{} {
 func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	var diags diag.Diagnostics
-
-	if d.HasChanges("asm_config", "comment") {
-		body := &b1models.IpamsvcIPSpace{
-			AsmConfig: expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
-			Name:      swag.String(d.Get("name").(string)),
-			Comment:   d.Get("comment").(string),
+	dhcpOptions := make([]*b1models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
 		}
-
-		resp, err := c.IPAddressManagementAPI.IPSpace.IPSpaceUpdate(
-			&ip_space.IPSpaceUpdateParams{ID: d.Id(), Body: body, Context: ctx},
-			nil,
-		)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		d.SetId(resp.Payload.Result.ID)
 	}
 
-	return diags
+	body := &b1models.IpamsvcIPSpace{
+		AsmConfig:                       expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Comment:                         d.Get("comment").(string),
+		DdnsClientUpdate:                d.Get("ddns_client_update").(string),
+		DdnsDomain:                      d.Get("ddns_domain").(string),
+		DdnsGenerateName:                d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:             d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:                 swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:               d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution:       swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                      expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpOptions:                     dhcpOptions,
+		HeaderOptionFilename:            d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress:       d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:          d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:             d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:          d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:            d.Get("hostname_rewrite_regex").(string),
+		InheritanceSources:              expandIpamsvcIPSpaceInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                            swag.String(d.Get("name").(string)),
+		Tags:                            d.Get("tags"),
+		VendorSpecificOptionOptionSpace: d.Get("vendor_specific_option_option_space").(string),
+	}
+
+	resp, err := c.IPAddressManagementAPI.IPSpace.IPSpaceUpdate(
+		&ip_space.IPSpaceUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcIPSpaceRead(ctx, d, m)
 }
 
 func resourceIpamsvcIPSpaceDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

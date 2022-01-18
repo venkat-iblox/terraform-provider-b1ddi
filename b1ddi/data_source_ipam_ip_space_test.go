@@ -11,27 +11,19 @@ func TestAccDataSourceIpamsvcIPSpace(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					resource "b1ddi_ip_space" "tf_acc_test_space" {
-						name = "tf_acc_test_space"
-  						comment = "This IP Space is created by terraform provider acceptance test"
-					}
-				`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
-				),
-			},
+			// Create IP Space resource
+			resourceIPSpaceBasicTestStep(),
+			// Test IP Space Data Source
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_ip_spaces" "tf_acc_spaces" {
 						filters = {
 							# Check integer filter
-							#"asm_scope_flag" = 0
+							"asm_scope_flag" = 0
 							# Check string filter
 							"name" = "tf_acc_test_space"
 							# Check bool filter
-							#"hostname_rewrite_enabled" = false
+							"hostname_rewrite_enabled" = false
 						}
 					}
 				`),
