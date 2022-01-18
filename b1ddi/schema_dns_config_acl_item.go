@@ -73,19 +73,17 @@ func schemaConfigACLItem() *schema.Resource {
 	}
 }
 
-func flattenConfigACLItem(r *models.ConfigACLItem) []interface{} {
+func flattenConfigACLItem(r *models.ConfigACLItem) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"access":   r.Access,
-			"acl":      r.ACL,
-			"address":  r.Address,
-			"element":  r.Element,
-			"tsig_key": flattenConfigTSIGKey(r.TsigKey),
-		},
+	return map[string]interface{}{
+		"access":   r.Access,
+		"acl":      r.ACL,
+		"address":  r.Address,
+		"element":  r.Element,
+		"tsig_key": flattenConfigTSIGKey(r.TsigKey),
 	}
 }
 
