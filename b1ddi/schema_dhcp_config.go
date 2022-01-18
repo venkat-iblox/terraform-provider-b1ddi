@@ -30,6 +30,7 @@ func schemaIpamsvcDHCPConfig() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Optional:    true,
+				Computed:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -38,6 +39,7 @@ func schemaIpamsvcDHCPConfig() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        schemaIpamsvcIgnoreItem(),
 				Optional:    true,
+				Computed:    true,
 				Description: "The list of clients to ignore requests from.",
 			},
 
