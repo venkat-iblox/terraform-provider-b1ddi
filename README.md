@@ -6,6 +6,7 @@ Terraform provider for the BloxOne DDI that enables lifecycle management of Blox
 
 - [Getting the provider plugin](GETTING.md)
 - [Examples](examples)
+- [Provider Limitations](LIMITATIONS.md)
 
 ## Provider Features
 
