@@ -346,9 +346,42 @@ func flattenIpamsvcFixedAddress(r *models.IpamsvcFixedAddress) []interface{} {
 }
 
 func resourceIpamsvcFixedAddressUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcFixedAddressUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
+	fa := &models.IpamsvcFixedAddress{
+		Address:                   swag.String(d.Get("address").(string)),
+		Comment:                   d.Get("comment").(string),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		Hostname:                  d.Get("hostname").(string),
+		InheritanceSources:        expandIpamsvcFixedAddressInheritance(d.Get("inheritance_sources").([]interface{})),
+		IPSpace:                   d.Get("ip_space").(string),
+		MatchType:                 swag.String(d.Get("match_type").(string)),
+		MatchValue:                swag.String(d.Get("match_value").(string)),
+		Name:                      d.Get("name").(string),
+		Tags:                      d.Get("tags"),
+	}
+
+	resp, err := c.IPAddressManagementAPI.FixedAddress.FixedAddressUpdate(
+		&fixed_address.FixedAddressUpdateParams{ID: d.Id(), Body: fa, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcFixedAddressRead(ctx, d, m)
 }
 
 func resourceIpamsvcFixedAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
