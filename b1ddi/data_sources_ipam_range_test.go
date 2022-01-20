@@ -35,7 +35,7 @@ func TestAccDataSourceIpamsvcRange(t *testing.T) {
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
-					testAccSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
+					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					testAccRangeExists("b1ddi_range.tf_acc_test_range"),
 				),
 			},

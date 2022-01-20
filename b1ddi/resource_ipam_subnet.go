@@ -28,6 +28,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 			},
 
@@ -605,9 +606,52 @@ func flattenIpamsvcSubnet(r *models.IpamsvcSubnet) []interface{} {
 }
 
 func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcSubnetUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
+	body := &models.IpamsvcSubnet{
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Cidr:                      int64(d.Get("cidr").(int)),
+		Comment:                   d.Get("comment").(string),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpHost:                  d.Get("dhcp_host").(string),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
+		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                      d.Get("name").(string),
+		Tags:                      d.Get("tags"),
+		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
+	}
+
+	resp, err := c.IPAddressManagementAPI.Subnet.SubnetUpdate(
+		&subnet.SubnetUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcSubnetRead(ctx, d, m)
 }
 
 func resourceIpamsvcSubnetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
