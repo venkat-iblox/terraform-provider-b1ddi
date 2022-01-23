@@ -21,3 +21,6 @@ examples/*/*/.terraform
 examples/*/*/.terraform.lock.hcl
 examples/*/*/terraform.tfstate
 examples/*/*/terraform.tfstate.backup
+
+# Test coverage reports
+*cover.out
