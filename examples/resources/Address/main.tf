@@ -20,12 +20,9 @@ resource "b1ddi_subnet" "example_tf_subnet" {
   comment = "Example Subnet for the terraform provider"
 }
 
-resource "b1ddi_fixed_address" "example_tf_fixed_address" {
-  name = "example_tf_fixed_address"
-  ip_space = b1ddi_ip_space.example_tf_space.id
+resource "b1ddi_address" "example_tf_address" {
   address = "192.168.1.45"
-  match_type = "mac"
-  match_value = "00:00:00:00:00:00"
-  comment = "Example Fixed Address for the terraform provider"
+  comment = "Example Address for the terraform provider"
+  space = b1ddi_ip_space.example_tf_space.id
   depends_on = [b1ddi_subnet.example_tf_subnet]
 }
