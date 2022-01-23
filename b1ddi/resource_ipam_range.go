@@ -124,6 +124,7 @@ func resourceIpamsvcRange() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -362,9 +363,46 @@ func flattenIpamsvcRange(r *models.IpamsvcRange) []interface{} {
 }
 
 func resourceIpamsvcRangeUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcRangeUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
+	exclusionRanges := make([]*models.IpamsvcExclusionRange, 0)
+	for _, er := range d.Get("exclusion_ranges").([]interface{}) {
+		if er != nil {
+			exclusionRanges = append(exclusionRanges, expandIpamsvcExclusionRange(er.(map[string]interface{})))
+		}
+	}
+
+	body := &models.IpamsvcRange{
+		Comment:            d.Get("comment").(string),
+		DhcpHost:           d.Get("dhcp_host").(string),
+		DhcpOptions:        dhcpOptions,
+		End:                swag.String(d.Get("end").(string)),
+		ExclusionRanges:    exclusionRanges,
+		InheritanceSources: expandIpamsvcDHCPOptionsInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:               d.Get("name").(string),
+		Start:              swag.String(d.Get("start").(string)),
+		Tags:               d.Get("tags"),
+		Threshold:          expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
+	}
+
+	resp, err := c.IPAddressManagementAPI.RangeOperations.RangeUpdate(
+		&range_operations.RangeUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcRangeRead(ctx, d, m)
 }
 
 func resourceIpamsvcRangeDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
