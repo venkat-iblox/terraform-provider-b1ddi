@@ -114,6 +114,7 @@ func resourceIpamsvcAddress() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -323,9 +324,37 @@ func flattenIpamsvcAddress(r *models.IpamsvcAddress) []interface{} {
 }
 
 func resourceIpamsvcAddressUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcAddressUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	names := make([]*models.IpamsvcName, 0)
+	for _, n := range d.Get("names").([]interface{}) {
+		if n != nil {
+			names = append(names, expandIpamsvcName(n.(map[string]interface{})))
+		}
+	}
+
+	body := &models.IpamsvcAddress{
+		Address:   swag.String(d.Get("address").(string)),
+		Comment:   d.Get("comment").(string),
+		Host:      d.Get("host").(string),
+		Hwaddr:    d.Get("hwaddr").(string),
+		Interface: d.Get("interface").(string),
+		Names:     names,
+		Range:     d.Get("range").(string),
+		Tags:      d.Get("tags"),
+	}
+
+	resp, err := c.IPAddressManagementAPI.Address.AddressUpdate(
+		&address.AddressUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcAddressRead(ctx, d, m)
 }
 
 func resourceIpamsvcAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
