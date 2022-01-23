@@ -4,6 +4,7 @@ package b1ddi
 
 import (
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/infobloxopen/b1ddi-go-client/models"
@@ -135,8 +136,8 @@ func expandIpamsvcASMConfig(d []interface{}) *models.IpamsvcASMConfig {
 
 	return &models.IpamsvcASMConfig{
 		AsmThreshold:       int64(in["asm_threshold"].(int)),
-		Enable:             in["enable"].(bool),
-		EnableNotification: in["enable_notification"].(bool),
+		Enable:             swag.Bool(in["enable"].(bool)),
+		EnableNotification: swag.Bool(in["enable_notification"].(bool)),
 		ForecastPeriod:     int64(in["forecast_period"].(int)),
 		GrowthFactor:       int64(in["growth_factor"].(int)),
 		GrowthType:         in["growth_type"].(string),

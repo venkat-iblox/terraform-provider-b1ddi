@@ -29,6 +29,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The address field in form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 			},
 
@@ -129,7 +130,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_send_updates": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Determines if DDNS updates are enabled at the address block level.\nDefaults to _true_.",
 			},
 
@@ -150,7 +151,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"ddns_use_conflict_resolution": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.\n\nWhen false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients.\n\nDefaults to _true_.",
 			},
 
@@ -278,6 +279,7 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -338,9 +340,9 @@ func resourceIpamsvcAddressBlockCreate(ctx context.Context, d *schema.ResourceDa
 		DdnsDomain:                d.Get("ddns_domain").(string),
 		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
 		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
-		DdnsSendUpdates:           d.Get("ddns_send_updates").(bool),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
 		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
-		DdnsUseConflictResolution: d.Get("ddns_use_conflict_resolution").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
 		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
 		DhcpOptions:               dhcpOptions,
 		HeaderOptionFilename:      d.Get("header_option_filename").(string),
@@ -569,9 +571,53 @@ func flattenIpamsvcAddressBlock(r *models.IpamsvcAddressBlock) []interface{} {
 }
 
 func resourceIpamsvcAddressBlockUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceIpamsvcAddressBlockUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
+		}
+	}
+
+	ab := &models.IpamsvcAddressBlock{
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Cidr:                      int64(d.Get("cidr").(int)),
+		Comment:                   d.Get("comment").(string),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
+		InheritanceParent:         d.Get("inheritance_parent").(string),
+		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		Name:                      d.Get("name").(string),
+		Parent:                    d.Get("parent").(string),
+		Tags:                      d.Get("tags"),
+		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
+	}
+
+	resp, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockUpdate(
+		&address_block.AddressBlockUpdateParams{ID: d.Id(), Body: ab, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceIpamsvcAddressBlockRead(ctx, d, m)
 }
 
 func resourceIpamsvcAddressBlockDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

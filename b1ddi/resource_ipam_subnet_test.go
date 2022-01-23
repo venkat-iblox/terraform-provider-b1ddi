@@ -35,7 +35,7 @@ func resourceSubnetBasicTestStep() resource.TestStep {
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
 		Check: resource.ComposeAggregateTestCheckFunc(
-			testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+			testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 			testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 			testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
@@ -116,6 +116,8 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 						address = "192.168.1.0"
 						asm_config {
 							asm_threshold = 80
+							enable = false
+							enable_notification = false
 							forecast_period = 9
 							growth_type = "count"
 							history = 50
@@ -162,8 +164,8 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "true"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "true"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "false"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "false"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.forecast_period", "9"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_factor", "20"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_type", "count"),
@@ -246,7 +248,7 @@ func TestAccResourceSubnet_update_address(t *testing.T) {
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.15.0"),
@@ -339,7 +341,7 @@ func TestAccResourceSubnet_update_space(t *testing.T) {
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_new_test_space"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.15.0"),
@@ -423,6 +425,8 @@ func TestAccResourceSubnet_update(t *testing.T) {
 						address = "192.168.1.0"
 						asm_config {
 							asm_threshold = 80
+							enable = false
+							enable_notification = false
 							forecast_period = 9
 							growth_type = "count"
 							history = 50
@@ -469,8 +473,8 @@ func TestAccResourceSubnet_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "true"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "true"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "false"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "false"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.forecast_period", "9"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_factor", "20"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_type", "count"),

@@ -32,7 +32,7 @@ func resourceIPSpaceBasicTestStep() resource.TestStep {
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}`),
 		Check: resource.ComposeAggregateTestCheckFunc(
-			testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+			testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 			// Check default values
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.asm_threshold", "90"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "true"),
@@ -106,6 +106,8 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 				resource "b1ddi_ip_space" "tf_acc_test_space" {
 					asm_config {
 						asm_threshold = 80
+						enable = false
+						enable_notification = false
 						forecast_period = 9
 						growth_type = "count"
 						history = 50
@@ -149,11 +151,11 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 					
 				}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "true"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "true"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "false"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "false"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.forecast_period", "9"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_factor", "20"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_type", "count"),
@@ -228,6 +230,8 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 				resource "b1ddi_ip_space" "tf_acc_test_space" {
 					asm_config {
 						asm_threshold = 80
+						enable = false
+						enable_notification = false
 						forecast_period = 9
 						growth_type = "count"
 						history = 50
@@ -265,11 +269,11 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 					
 				}`),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "true"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "true"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "false"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "false"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.forecast_period", "9"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_factor", "20"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_type", "count"),
@@ -333,7 +337,7 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 	})
 }
 
-func testAccIPSpaceExists(resPath string) resource.TestCheckFunc {
+func testCheckIPSpaceExists(resPath string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		res, found := s.RootModule().Resources[resPath]
 		if !found {

@@ -11,25 +11,7 @@ func TestAccDataSourceIpamsvcAddressBlock(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					resource "b1ddi_ip_space" "tf_acc_test_space" {
-  						name = "tf_acc_test_space"
-  						comment = "This IP Space is created by terraform provider acceptance test"
-					}
-					resource "b1ddi_address_block" "tf_acc_test_address_block" {
-						address = "192.168.1.0"
-						cidr = 24
-  						name = "tf_acc_test_address_block"
-						space = b1ddi_ip_space.tf_acc_test_space.id 
-  						comment = "This Address Block is created by terraform provider acceptance test"
-					}
-				`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
-					testAccAddressBlockExists("b1ddi_address_block.tf_acc_test_address_block"),
-				),
-			},
+			resourceAddressBlockBasicTestStep(),
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_address_blocks" "tf_acc_address_blocks" {
