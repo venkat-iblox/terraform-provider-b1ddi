@@ -11,16 +11,7 @@ func TestAccDataSourceConfigView(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
-						name = "tf_acc_test_dns_view"
-					}
-				`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
-				),
-			},
+			resourceDnsViewBasicTestStep(),
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_dns_views" "tf_acc_dns_views" {

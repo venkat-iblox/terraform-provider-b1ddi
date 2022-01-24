@@ -1,6 +1,7 @@
 package b1ddi
 
 import (
+	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -20,6 +21,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"default_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     28800,
 				Description: "Optional. ZoneAuthority default ttl for resource records in zone (value in seconds).\n\nDefaults to 28800.",
 			},
 
@@ -29,6 +31,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"expire": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     2419200,
 				Description: "Optional. ZoneAuthority expire time in seconds.\n\nDefaults to 2419200.",
 			},
 
@@ -47,6 +50,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"negative_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     900,
 				Description: "Optional. ZoneAuthority negative caching (minimum) ttl in seconds.\n\nDefaults to 900.",
 			},
 
@@ -76,6 +80,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"refresh": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     10800,
 				Description: "Optional. ZoneAuthority refresh.\n\nDefaults to 10800.",
 			},
 
@@ -85,6 +90,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"retry": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     3600,
 				Description: "Optional. ZoneAuthority retry.\n\nDefaults to 3600.",
 			},
 
@@ -103,6 +109,7 @@ func schemaConfigZoneAuthority() *schema.Resource {
 			"use_default_mname": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     true,
 				Description: "Optional. Use default value for master name server.\n\nDefaults to true.",
 			},
 		},
@@ -136,14 +143,19 @@ func expandConfigZoneAuthority(d []interface{}) *models.ConfigZoneAuthority {
 	}
 	in := d[0].(map[string]interface{})
 
+	mname := in["mname"].(string)
+	if in["use_default_mname"].(bool) == true {
+		mname = ""
+	}
+
 	return &models.ConfigZoneAuthority{
 		DefaultTTL:      int64(in["default_ttl"].(int)),
 		Expire:          int64(in["expire"].(int)),
-		Mname:           in["mname"].(string),
+		Mname:           mname,
 		NegativeTTL:     int64(in["negative_ttl"].(int)),
 		Refresh:         int64(in["refresh"].(int)),
 		Retry:           int64(in["retry"].(int)),
 		Rname:           in["rname"].(string),
-		UseDefaultMname: in["use_default_mname"].(bool),
+		UseDefaultMname: swag.Bool(in["use_default_mname"].(bool)),
 	}
 }

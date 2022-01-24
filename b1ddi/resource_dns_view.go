@@ -8,6 +8,7 @@ import (
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/view"
 	"github.com/infobloxopen/b1ddi-go-client/models"
+	"time"
 )
 
 // ConfigView View
@@ -77,7 +78,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_enable_validation": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. _true_ to perform DNSSEC validation.\nIgnored if _dnssec_enabled_ is _false_.\n\nDefaults to _true_.",
 			},
 
@@ -88,7 +89,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. Master toggle for all DNSSEC processing.\nOther _dnssec_*_ configuration is unused if this is disabled.\n\nDefaults to _true_.",
 			},
 
@@ -122,7 +123,7 @@ func resourceConfigView() *schema.Resource {
 			"dnssec_validate_expiry": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. _true_ to reject expired DNSSEC keys.\nIgnored if either _dnssec_enabled_ or _dnssec_enable_validation_ is _false_.\n\nDefaults to _true_.",
 			},
 
@@ -133,6 +134,7 @@ func resourceConfigView() *schema.Resource {
 			"ecs_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _true_ to enable EDNS client subnet for recursive queries.\nOther _ecs_*_ fields are ignored if this field is not enabled.\n\nDefaults to _false-.",
 			},
 
@@ -142,6 +144,7 @@ func resourceConfigView() *schema.Resource {
 			"ecs_forwarding": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. _true_ to enable ECS options in outbound queries. This functionality has additional overhead so it is disabled by default.\n\nDefaults to _false_.",
 			},
 
@@ -212,6 +215,7 @@ func resourceConfigView() *schema.Resource {
 			"forwarders_only": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Optional. _true_ to only forward.\n\nDefaults to _false_.",
 			},
 
@@ -221,6 +225,7 @@ func resourceConfigView() *schema.Resource {
 			"gss_tsig_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "_gss_tsig_enabled_ enables/disables GSS-TSIG signed dynamic updates.\n\nDefaults to _false_.",
 			},
 
@@ -279,6 +284,7 @@ func resourceConfigView() *schema.Resource {
 			"match_recursive_only": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Optional. If _true_ only recursive queries from matching clients access the view.\n\nDefaults to _false_.",
 			},
 
@@ -290,7 +296,7 @@ func resourceConfigView() *schema.Resource {
 			"max_cache_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     604800,
 				Description: "Optional. Seconds to cache positive responses.\n\nUnsigned integer, min 1 max 604800 (7d).\n\nDefaults to 604800 (7d).",
 			},
 
@@ -302,7 +308,7 @@ func resourceConfigView() *schema.Resource {
 			"max_negative_ttl": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     10800,
 				Description: "Optional. Seconds to cache negative responses.\n\nUnsigned integer, min 1 max 604800 (7d).\n\nDefaults to 10800 (3h).",
 			},
 
@@ -313,7 +319,7 @@ func resourceConfigView() *schema.Resource {
 			"max_udp_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     1232,
 				Description: "Optional. _max_udp_size_ represents maximum UDP payload size.\nThe maximum number of bytes a responding DNS server will send to a UDP datagram.\n\nDefaults to 1232 bytes.",
 			},
 
@@ -323,6 +329,7 @@ func resourceConfigView() *schema.Resource {
 			"minimal_responses": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Optional. When enabled, the DNS server will only add records to the authority and additional data sections when they are required.\n\nDefaults to _false_.",
 			},
 
@@ -340,6 +347,7 @@ func resourceConfigView() *schema.Resource {
 			"notify": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "_notify_ all external secondary DNS servers.\n\nDefaults to _false_.",
 			},
 
@@ -370,7 +378,7 @@ func resourceConfigView() *schema.Resource {
 			"recursion_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. _true_ to allow recursive DNS queries.\n\nDefaults to _true_.",
 			},
 
@@ -416,7 +424,7 @@ func resourceConfigView() *schema.Resource {
 			"use_forwarders_for_subzones": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. Use default forwarders to resolve queries for subzones.\n\nDefaults to _true_.",
 			},
 
@@ -518,10 +526,10 @@ func resourceConfigViewCreate(ctx context.Context, d *schema.ResourceData, m int
 		CustomRootNs:             customRootNs,
 		CustomRootNsEnabled:      d.Get("custom_root_ns_enabled").(bool),
 		Disabled:                 d.Get("disabled").(bool),
-		DnssecEnableValidation:   d.Get("dnssec_enable_validation").(bool),
-		DnssecEnabled:            d.Get("dnssec_enabled").(bool),
+		DnssecEnableValidation:   swag.Bool(d.Get("dnssec_enable_validation").(bool)),
+		DnssecEnabled:            swag.Bool(d.Get("dnssec_enabled").(bool)),
 		DnssecTrustAnchors:       dnssecTrustAnchors,
-		DnssecValidateExpiry:     d.Get("dnssec_validate_expiry").(bool),
+		DnssecValidateExpiry:     swag.Bool(d.Get("dnssec_validate_expiry").(bool)),
 		EcsEnabled:               d.Get("ecs_enabled").(bool),
 		EcsForwarding:            d.Get("ecs_forwarding").(bool),
 		EcsPrefixV4:              int64(d.Get("ecs_prefix_v4").(int)),
@@ -545,11 +553,11 @@ func resourceConfigViewCreate(ctx context.Context, d *schema.ResourceData, m int
 		Notify:                   d.Get("notify").(bool),
 		QueryACL:                 queryACL,
 		RecursionACL:             recursionACL,
-		RecursionEnabled:         d.Get("recursion_enabled").(bool),
+		RecursionEnabled:         swag.Bool(d.Get("recursion_enabled").(bool)),
 		Tags:                     d.Get("tags"),
 		TransferACL:              transferACL,
 		UpdateACL:                updateACL,
-		UseForwardersForSubzones: d.Get("use_forwarders_for_subzones").(bool),
+		UseForwardersForSubzones: swag.Bool(d.Get("use_forwarders_for_subzones").(bool)),
 		ZoneAuthority:            expandConfigZoneAuthority(d.Get("zone_authority").([]interface{})),
 	}
 
@@ -894,9 +902,135 @@ func flattenConfigView(r *models.ConfigView) []interface{} {
 }
 
 func resourceConfigViewUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceConfigViewUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+	customRootNs := make([]*models.ConfigRootNS, 0)
+	for _, rns := range d.Get("custom_root_ns").([]interface{}) {
+		if rns != nil {
+			customRootNs = append(customRootNs, expandConfigRootNS(rns.(map[string]interface{})))
+		}
+	}
+
+	dnssecTrustAnchors := make([]*models.ConfigTrustAnchor, 0)
+	for _, ta := range d.Get("dnssec_trust_anchors").([]interface{}) {
+		if ta != nil {
+			dnssecTrustAnchors = append(dnssecTrustAnchors, expandConfigTrustAnchor(ta.(map[string]interface{})))
+		}
+	}
+
+	ecsZones := make([]*models.ConfigECSZone, 0)
+	for _, ecsZone := range d.Get("ecs_zones").([]interface{}) {
+		if ecsZone != nil {
+			ecsZones = append(ecsZones, expandConfigECSZone(ecsZone.(map[string]interface{})))
+		}
+	}
+
+	forwarders := make([]*models.ConfigForwarder, 0)
+	for _, fwd := range d.Get("forwarders").([]interface{}) {
+		if fwd != nil {
+			forwarders = append(forwarders, expandConfigForwarder(fwd.(map[string]interface{})))
+		}
+	}
+
+	ipSpaces := make([]string, 0)
+	for _, is := range d.Get("ip_spaces").([]interface{}) {
+		if is != nil {
+			ipSpaces = append(ipSpaces, is.(string))
+		}
+	}
+
+	matchClientsACL := make([]*models.ConfigACLItem, 0)
+	for _, aclItem := range d.Get("match_clients_acl").([]interface{}) {
+		if aclItem != nil {
+			matchClientsACL = append(matchClientsACL, expandConfigACLItem(aclItem.(map[string]interface{})))
+		}
+	}
+
+	matchDestinationsACL := make([]*models.ConfigACLItem, 0)
+	for _, aclItem := range d.Get("match_destinations_acl").([]interface{}) {
+		if aclItem != nil {
+			matchDestinationsACL = append(matchDestinationsACL, expandConfigACLItem(aclItem.(map[string]interface{})))
+		}
+	}
+
+	queryACL := make([]*models.ConfigACLItem, 0)
+	for _, ai := range d.Get("query_acl").([]interface{}) {
+		if ai != nil {
+			queryACL = append(queryACL, expandConfigACLItem(ai.(map[string]interface{})))
+		}
+	}
+
+	recursionACL := make([]*models.ConfigACLItem, 0)
+	for _, ai := range d.Get("recursion_acl").([]interface{}) {
+		if ai != nil {
+			recursionACL = append(recursionACL, expandConfigACLItem(ai.(map[string]interface{})))
+		}
+	}
+
+	transferACL := make([]*models.ConfigACLItem, 0)
+	for _, ai := range d.Get("transfer_acl").([]interface{}) {
+		if ai != nil {
+			transferACL = append(transferACL, expandConfigACLItem(ai.(map[string]interface{})))
+		}
+	}
+
+	updateACL := make([]*models.ConfigACLItem, 0)
+	for _, ai := range d.Get("update_acl").([]interface{}) {
+		if ai != nil {
+			updateACL = append(updateACL, expandConfigACLItem(ai.(map[string]interface{})))
+		}
+	}
+
+	body := &models.ConfigView{
+		Comment:                  d.Get("comment").(string),
+		CustomRootNs:             customRootNs,
+		CustomRootNsEnabled:      d.Get("custom_root_ns_enabled").(bool),
+		Disabled:                 d.Get("disabled").(bool),
+		DnssecEnableValidation:   swag.Bool(d.Get("dnssec_enable_validation").(bool)),
+		DnssecEnabled:            swag.Bool(d.Get("dnssec_enabled").(bool)),
+		DnssecTrustAnchors:       dnssecTrustAnchors,
+		DnssecValidateExpiry:     swag.Bool(d.Get("dnssec_validate_expiry").(bool)),
+		EcsEnabled:               d.Get("ecs_enabled").(bool),
+		EcsForwarding:            d.Get("ecs_forwarding").(bool),
+		EcsPrefixV4:              int64(d.Get("ecs_prefix_v4").(int)),
+		EcsPrefixV6:              int64(d.Get("ecs_prefix_v6").(int)),
+		EcsZones:                 ecsZones,
+		EdnsUDPSize:              int64(d.Get("edns_udp_size").(int)),
+		Forwarders:               forwarders,
+		ForwardersOnly:           d.Get("forwarders_only").(bool),
+		GssTsigEnabled:           d.Get("gss_tsig_enabled").(bool),
+		InheritanceSources:       expandConfigViewInheritance(d.Get("inheritance_sources").([]interface{})),
+		IPSpaces:                 ipSpaces,
+		LameTTL:                  int64(d.Get("lame_ttl").(int)),
+		MatchClientsACL:          matchClientsACL,
+		MatchDestinationsACL:     matchDestinationsACL,
+		MatchRecursiveOnly:       d.Get("match_recursive_only").(bool),
+		MaxCacheTTL:              int64(d.Get("max_cache_ttl").(int)),
+		MaxNegativeTTL:           int64(d.Get("max_negative_ttl").(int)),
+		MaxUDPSize:               int64(d.Get("max_udp_size").(int)),
+		MinimalResponses:         d.Get("minimal_responses").(bool),
+		Name:                     swag.String(d.Get("name").(string)),
+		Notify:                   d.Get("notify").(bool),
+		QueryACL:                 queryACL,
+		RecursionACL:             recursionACL,
+		RecursionEnabled:         swag.Bool(d.Get("recursion_enabled").(bool)),
+		Tags:                     d.Get("tags"),
+		TransferACL:              transferACL,
+		UpdateACL:                updateACL,
+		UseForwardersForSubzones: swag.Bool(d.Get("use_forwarders_for_subzones").(bool)),
+		ZoneAuthority:            expandConfigZoneAuthority(d.Get("zone_authority").([]interface{})),
+	}
+
+	resp, err := c.DNSConfigurationAPI.View.ViewUpdate(
+		&view.ViewUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceConfigViewRead(ctx, d, m)
 }
 
 func resourceConfigViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -908,6 +1042,14 @@ func resourceConfigViewDelete(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	// If IP Spaces are used in the DNS Configuration, provider
+	// should wait for the API to finish deletion process
+	spaces := d.Get("ip_spaces").([]interface{})
+	if len(spaces) != 0 {
+		time.Sleep(time.Second)
+	}
+
 	d.SetId("")
 	return nil
 }
