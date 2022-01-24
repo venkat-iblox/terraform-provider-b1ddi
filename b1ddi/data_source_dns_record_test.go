@@ -11,14 +11,7 @@ func TestAccDataSourceDataRecord(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			{
-				Config: testAccResourceDnsRecordConfig(t),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
-					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
-					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
-				),
-			},
+			resourceDnsRecordBasicTestStep(t),
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_dns_records" "tf_acc_dns_records" {

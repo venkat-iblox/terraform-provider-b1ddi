@@ -6,6 +6,7 @@ import (
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
 	"github.com/infobloxopen/b1ddi-go-client/models"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -41,6 +42,7 @@ func resourceDataRecord() *schema.Resource {
 			"absolute_zone_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				ForceNew:    true,
 				Description: "The absolute domain name of the zone where this record belongs.",
 			},
 
@@ -73,6 +75,7 @@ func resourceDataRecord() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Indicates if the DNS resource record is disabled. A disabled object is effectively non-existent when generating configuration.\n\nDefaults to _false_.",
 			},
 
@@ -317,6 +320,7 @@ func resourceDataRecord() *schema.Resource {
 			"type": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The DNS resource record type specified in the textual mnemonic format or in the \"TYPEnnn\" format where \"nnn\" indicates the numeric type value.\n\nValue | Numeric Type | Description\n------|--------------|---------------------------------------------\nA     | 1            | Address record\nAAAA  | 28           | IPv6 Address record\nCAA   | 257          | Certification Authority Authorization record\nCNAME | 5            | Canonical Name record\nDNAME | 39           | Delegation Name record\nDHCID | 49           | DHCP Identifier record\nMX    | 15           | Mail Exchanger record\nNAPTR | 35           | Naming Authority Pointer record\nNS    | 2            | Name Server record\nPTR   | 12           | Pointer record\nSOA   | 6            | Start of Authority record\nSRV   | 33           | Service record\nTXT   | 16           | Text record",
 			},
 
@@ -334,6 +338,7 @@ func resourceDataRecord() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -349,6 +354,8 @@ func resourceDataRecord() *schema.Resource {
 			"zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 		},
@@ -384,6 +391,8 @@ func resourceDataRecordCreate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	d.SetId(resp.Payload.Result.ID)
+
+	time.Sleep(time.Second)
 
 	return resourceDataRecordRead(ctx, d, m)
 }
@@ -527,9 +536,31 @@ func flattenDataRecord(r *models.DataRecord) []interface{} {
 }
 
 func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceDataRecordUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	body := &models.DataRecord{
+		Comment:            d.Get("comment").(string),
+		Delegation:         d.Get("delegation").(string),
+		Disabled:           d.Get("disabled").(bool),
+		InheritanceSources: expandDataRecordInheritance(d.Get("inheritance_sources").([]interface{})),
+		NameInZone:         d.Get("name_in_zone").(string),
+		Options:            d.Get("options"),
+		Rdata:              d.Get("rdata"),
+		Tags:               d.Get("tags"),
+		TTL:                int64(d.Get("ttl").(int)),
+	}
+
+	resp, err := c.DNSDataAPI.Record.RecordUpdate(
+		&record.RecordUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceDataRecordRead(ctx, d, m)
 }
 
 func resourceDataRecordDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

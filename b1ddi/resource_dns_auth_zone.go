@@ -3,12 +3,11 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // ConfigAuthZone AuthZone
