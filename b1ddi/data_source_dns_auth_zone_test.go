@@ -11,13 +11,7 @@ func TestAccDataSourceConfigAuthZone(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			{
-				Config: testAccResourceDnsAuthZoneConfig(t),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
-					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
-				),
-			},
+			resourceDnsAuthZoneBasicTestStep(t),
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_dns_auth_zones" "tf_acc_auth_zones" {

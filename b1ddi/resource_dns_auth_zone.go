@@ -44,6 +44,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Optional. _true_ to disable object. A disabled object is effectively non-existent when generating configuration.",
 			},
 
@@ -71,6 +72,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"fqdn": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Zone FQDN.\nThe FQDN supplied at creation will be converted to canonical form.\n\nRead-only after creation.",
 			},
 
@@ -80,6 +82,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"gss_tsig_enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "_gss_tsig_enabled_ enables/disables GSS-TSIG signed dynamic updates.\n\nDefaults to _false_.",
 			},
 
@@ -106,6 +109,7 @@ func resourceConfigAuthZone() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 				Description: "On-create-only. SOA serial is allowed to be set when the authoritative zone is created.",
 			},
 
@@ -146,6 +150,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"notify": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Default:     false,
 				Description: "Also notify all external secondary DNS servers if enabled.\n\nDefaults to _false_.",
 			},
 
@@ -173,6 +178,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"primary_type": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Primary type for an authoritative zone.\nRead only after creation.\nAllowed values:\n * _external_: zone data owned by an external nameserver,\n * _cloud_: zone data is owned by a BloxOne DDI host.",
 			},
 
@@ -235,7 +241,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"use_forwarders_for_subzones": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Optional. Use default forwarders to resolve queries for subzones.\n\nDefaults to _true_.",
 			},
 
@@ -243,6 +249,7 @@ func resourceConfigAuthZone() *schema.Resource {
 			"view": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -329,7 +336,7 @@ func resourceConfigAuthZoneCreate(ctx context.Context, d *schema.ResourceData, m
 		Tags:                     d.Get("tags"),
 		TransferACL:              transferACL,
 		UpdateACL:                updateACL,
-		UseForwardersForSubzones: d.Get("use_forwarders_for_subzones").(bool),
+		UseForwardersForSubzones: swag.Bool(d.Get("use_forwarders_for_subzones").(bool)),
 		View:                     d.Get("view").(string),
 		ZoneAuthority:            expandConfigZoneAuthority(d.Get("zone_authority").([]interface{})),
 	}
@@ -571,9 +578,87 @@ func flattenConfigAuthZone(r *models.ConfigAuthZone) []interface{} {
 }
 
 func resourceConfigAuthZoneUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	// ToDo Implement resourceConfigAuthZoneUpdate function
-	return diags
+	c := m.(*b1ddiclient.Client)
+
+	externalPrimaries := make([]*models.ConfigExternalPrimary, 0)
+	for _, ep := range d.Get("external_primaries").([]interface{}) {
+		if ep != nil {
+			externalPrimaries = append(externalPrimaries, expandConfigExternalPrimary(ep.(map[string]interface{})))
+		}
+	}
+
+	externalSecondaries := make([]*models.ConfigExternalSecondary, 0)
+	for _, es := range d.Get("external_secondaries").([]interface{}) {
+		if es != nil {
+			externalSecondaries = append(externalSecondaries, expandConfigExternalSecondary(es.(map[string]interface{})))
+		}
+	}
+
+	internalSecondaries := make([]*models.ConfigInternalSecondary, 0)
+	for _, is := range d.Get("internal_secondaries").([]interface{}) {
+		if is != nil {
+			internalSecondaries = append(internalSecondaries, expandConfigInternalSecondary(is.(map[string]interface{})))
+		}
+	}
+
+	nsgs := make([]string, 0)
+	for _, n := range d.Get("nsgs").([]interface{}) {
+		if n != nil {
+			nsgs = append(nsgs, n.(string))
+		}
+	}
+
+	queryACL := make([]*models.ConfigACLItem, 0)
+	for _, aclItem := range d.Get("query_acl").([]interface{}) {
+		if aclItem != nil {
+			queryACL = append(queryACL, expandConfigACLItem(aclItem.(map[string]interface{})))
+		}
+	}
+
+	transferACL := make([]*models.ConfigACLItem, 0)
+	for _, aclItem := range d.Get("transfer_acl").([]interface{}) {
+		if aclItem != nil {
+			transferACL = append(transferACL, expandConfigACLItem(aclItem.(map[string]interface{})))
+		}
+	}
+
+	updateACL := make([]*models.ConfigACLItem, 0)
+	for _, aclItem := range d.Get("update_acl").([]interface{}) {
+		if aclItem != nil {
+			updateACL = append(updateACL, expandConfigACLItem(aclItem.(map[string]interface{})))
+		}
+	}
+
+	body := &models.ConfigAuthZone{
+		Comment:                  d.Get("comment").(string),
+		Disabled:                 d.Get("disabled").(bool),
+		ExternalPrimaries:        externalPrimaries,
+		ExternalSecondaries:      externalSecondaries,
+		GssTsigEnabled:           d.Get("gss_tsig_enabled").(bool),
+		InheritanceSources:       expandConfigAuthZoneInheritance(d.Get("inheritance_sources").([]interface{})),
+		InternalSecondaries:      internalSecondaries,
+		Notify:                   d.Get("notify").(bool),
+		Nsgs:                     nsgs,
+		Parent:                   d.Get("parent").(string),
+		QueryACL:                 queryACL,
+		Tags:                     d.Get("tags"),
+		TransferACL:              transferACL,
+		UpdateACL:                updateACL,
+		UseForwardersForSubzones: swag.Bool(d.Get("use_forwarders_for_subzones").(bool)),
+		ZoneAuthority:            expandConfigZoneAuthority(d.Get("zone_authority").([]interface{})),
+	}
+
+	resp, err := c.DNSConfigurationAPI.AuthZone.AuthZoneUpdate(
+		&auth_zone.AuthZoneUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+		nil,
+	)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
+
+	return resourceConfigAuthZoneRead(ctx, d, m)
 }
 
 func resourceConfigAuthZoneDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
