@@ -10,7 +10,8 @@ terraform {
 resource "b1ddi_dns_view" "tf_example_dns_view" {
   name = "example_tf_dns_view"
 }
-resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
+
+resource "b1ddi_dns_auth_zone" "tf_example_auth_zone" {
   internal_secondaries {
     host = "{{ On Prem Host Name }}"
   }
