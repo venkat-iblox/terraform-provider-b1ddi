@@ -9,7 +9,7 @@ terraform {
 
 resource "b1ddi_ip_space" "tf_example_space" {
   name    = "tf_example_space"
-  comment = "This is the example IP Space created by B1DDI terraform provider"
+  comment = "This is the example IP Space created by the B1DDI terraform provider"
 }
 
 resource "b1ddi_subnet" "tf_example_subnet" {
@@ -25,6 +25,6 @@ resource "b1ddi_fixed_address" "tf_example_fixed_address" {
   ip_space    = b1ddi_ip_space.tf_example_space.id
   match_type  = "mac"
   match_value = "00:00:00:00:00:00"
-  comment     = "This Fixed Address is created by terraform provider acceptance test"
+  comment     = "This is the example Fixed Address created by the B1DDI terraform provider"
   depends_on  = [b1ddi_subnet.tf_example_subnet]
 }

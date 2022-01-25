@@ -17,5 +17,5 @@ resource "b1ddi_subnet" "example_tf_subnet" {
   space = b1ddi_ip_space.example_tf_space.id
   address = "192.168.1.0"
   cidr = 24
-  comment = "Example Subnet for the terraform provider"
+  comment = "Example Subnet created by the terraform provider"
 }
