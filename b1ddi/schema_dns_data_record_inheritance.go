@@ -17,10 +17,11 @@ func schemaDataRecordInheritance() *schema.Resource {
 
 			// The field config for the _ttl_ field from the _Record_ object
 			"ttl": {
-				Type:     schema.TypeList,
-				Elem:     schemaInheritanceInheritedUInt32(),
-				MaxItems: 1,
-				Optional: true,
+				Type:        schema.TypeList,
+				Elem:        schemaInheritanceInheritedUInt32(),
+				MaxItems:    1,
+				Optional:    true,
+				Description: "The field config for the _ttl_ field from the _Record_ object",
 			},
 		},
 	}
