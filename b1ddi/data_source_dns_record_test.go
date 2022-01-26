@@ -24,6 +24,7 @@ func TestAccDataSourceDataRecord(t *testing.T) {
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_records.tf_acc_dns_records", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_dns_records.tf_acc_dns_records", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_records.tf_acc_dns_records", "results.0.name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_records.tf_acc_dns_records", "results.0.type", "A"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_records.tf_acc_dns_records", "results.0.rdata.address", "192.168.1.15"),

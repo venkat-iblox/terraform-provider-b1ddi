@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 	"strconv"
 	"time"
 )
@@ -22,7 +23,7 @@ func dataSourceConfigAuthZone() *schema.Resource {
 			"results": {
 				Type:     schema.TypeList,
 				Computed: true,
-				Elem:     resourceConfigAuthZone(),
+				Elem:     dataSourceSchemaFromResource(resourceConfigAuthZone),
 			},
 		},
 	}
@@ -57,4 +58,77 @@ func dataSourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
+}
+
+func flattenConfigAuthZone(r *models.ConfigAuthZone) []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	externalPrimaries := make([]interface{}, 0, len(r.ExternalPrimaries))
+	for _, ep := range r.ExternalPrimaries {
+		externalPrimaries = append(externalPrimaries, flattenConfigExternalPrimary(ep))
+	}
+
+	externalSecondaries := make([]interface{}, 0, len(r.ExternalSecondaries))
+	for _, es := range r.ExternalSecondaries {
+		externalSecondaries = append(externalSecondaries, flattenConfigExternalSecondary(es))
+	}
+
+	inheritanceAssignedHosts := make([]interface{}, 0, len(r.InheritanceAssignedHosts))
+	for _, iah := range r.InheritanceAssignedHosts {
+		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritance2AssignedHost(iah))
+	}
+
+	internalSecondaries := make([]interface{}, 0, len(r.InternalSecondaries))
+	for _, is := range r.InternalSecondaries {
+		internalSecondaries = append(internalSecondaries, flattenConfigInternalSecondary(is))
+	}
+
+	queryACL := make([]interface{}, 0, len(r.QueryACL))
+	for _, aclItem := range r.QueryACL {
+		queryACL = append(queryACL, flattenConfigACLItem(aclItem))
+	}
+
+	transferACL := make([]interface{}, 0, len(r.TransferACL))
+	for _, aclItem := range r.TransferACL {
+		transferACL = append(transferACL, flattenConfigACLItem(aclItem))
+	}
+
+	updateACL := make([]interface{}, 0, len(r.UpdateACL))
+	for _, aclItem := range r.UpdateACL {
+		updateACL = append(updateACL, flattenConfigACLItem(aclItem))
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"id":                          r.ID,
+			"comment":                     r.Comment,
+			"created_at":                  r.CreatedAt.String(),
+			"disabled":                    r.Disabled,
+			"external_primaries":          externalPrimaries,
+			"external_secondaries":        externalSecondaries,
+			"fqdn":                        r.Fqdn,
+			"gss_tsig_enabled":            r.GssTsigEnabled,
+			"inheritance_assigned_hosts":  inheritanceAssignedHosts,
+			"inheritance_sources":         flattenConfigAuthZoneInheritance(r.InheritanceSources),
+			"initial_soa_serial":          r.InitialSoaSerial,
+			"internal_secondaries":        internalSecondaries,
+			"mapped_subnet":               r.MappedSubnet,
+			"mapping":                     r.Mapping,
+			"notify":                      r.Notify,
+			"nsgs":                        r.Nsgs,
+			"parent":                      r.Parent,
+			"primary_type":                r.PrimaryType,
+			"protocol_fqdn":               r.ProtocolFqdn,
+			"query_acl":                   queryACL,
+			"tags":                        r.Tags,
+			"transfer_acl":                transferACL,
+			"update_acl":                  updateACL,
+			"updated_at":                  r.UpdatedAt.String(),
+			"use_forwarders_for_subzones": r.UseForwardersForSubzones,
+			"view":                        r.View,
+			"zone_authority":              flattenConfigZoneAuthority(r.ZoneAuthority),
+		},
+	}
 }

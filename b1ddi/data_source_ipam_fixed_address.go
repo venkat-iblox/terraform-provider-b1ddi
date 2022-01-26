@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/fixed_address"
+	"github.com/infobloxopen/b1ddi-go-client/models"
 	"strconv"
 	"time"
 )
@@ -22,7 +23,7 @@ func dataSourceIpamsvcFixedAddress() *schema.Resource {
 			"results": {
 				Type:     schema.TypeList,
 				Computed: true,
-				Elem:     resourceIpamsvcFixedAddress(),
+				Elem:     dataSourceSchemaFromResource(resourceIpamsvcFixedAddress),
 			},
 		},
 	}
@@ -57,4 +58,44 @@ func dataSourceIpamsvcFixedAddressRead(ctx context.Context, d *schema.ResourceDa
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
+}
+
+func flattenIpamsvcFixedAddress(r *models.IpamsvcFixedAddress) []interface{} {
+	if r == nil {
+		return nil
+	}
+
+	dhcpOptions := make([]interface{}, 0, len(r.DhcpOptions))
+	for _, dhcpOption := range r.DhcpOptions {
+		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
+	}
+
+	inheritanceAssignedHosts := make([]interface{}, 0, len(r.InheritanceAssignedHosts))
+	for _, inheritanceAssignedHost := range r.InheritanceAssignedHosts {
+		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"id":                           r.ID,
+			"address":                      r.Address,
+			"comment":                      r.Comment,
+			"created_at":                   r.CreatedAt.String(),
+			"dhcp_options":                 dhcpOptions,
+			"header_option_filename":       r.HeaderOptionFilename,
+			"header_option_server_address": r.HeaderOptionServerAddress,
+			"header_option_server_name":    r.HeaderOptionServerName,
+			"hostname":                     r.Hostname,
+			"inheritance_assigned_hosts":   inheritanceAssignedHosts,
+			"inheritance_parent":           r.InheritanceParent,
+			"inheritance_sources":          flattenIpamsvcFixedAddressInheritance(r.InheritanceSources),
+			"ip_space":                     r.IPSpace,
+			"match_type":                   r.MatchType,
+			"match_value":                  r.MatchValue,
+			"name":                         r.Name,
+			"parent":                       r.Parent,
+			"tags":                         r.Tags,
+			"updated_at":                   r.UpdatedAt.String(),
+		},
+	}
 }

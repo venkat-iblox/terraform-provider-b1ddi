@@ -321,50 +321,6 @@ func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m int
 	return diags
 }
 
-func flattenIpamsvcRange(r *models.IpamsvcRange) []interface{} {
-	if r == nil {
-		return nil
-	}
-
-	dhcpOptions := make([]interface{}, 0, len(r.DhcpOptions))
-	for _, dhcpOption := range r.DhcpOptions {
-		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
-	}
-
-	exclusionRanges := make([]interface{}, 0, len(r.ExclusionRanges))
-	for _, er := range r.ExclusionRanges {
-		exclusionRanges = append(exclusionRanges, flattenIpamsvcExclusionRange(er))
-	}
-
-	inheritanceAssignedHosts := make([]interface{}, 0, len(r.InheritanceAssignedHosts))
-	for _, inheritanceAssignedHost := range r.InheritanceAssignedHosts {
-		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
-	}
-
-	return []interface{}{
-		map[string]interface{}{
-			"comment":                    r.Comment,
-			"created_at":                 r.CreatedAt.String(),
-			"dhcp_host":                  r.DhcpHost,
-			"dhcp_options":               dhcpOptions,
-			"end":                        r.End,
-			"exclusion_ranges":           exclusionRanges,
-			"inheritance_assigned_hosts": inheritanceAssignedHosts,
-			"inheritance_parent":         r.InheritanceParent,
-			"inheritance_sources":        flattenIpamsvcDHCPOptionsInheritance(r.InheritanceSources),
-			"name":                       r.Name,
-			"parent":                     r.Parent,
-			"protocol":                   r.Protocol,
-			"space":                      r.Space,
-			"start":                      r.Start,
-			"tags":                       r.Tags,
-			"threshold":                  flattenIpamsvcUtilizationThreshold(r.Threshold),
-			"updated_at":                 r.UpdatedAt.String(),
-			"utilization":                flattenIpamsvcUtilization(r.Utilization),
-		},
-	}
-}
-
 func resourceIpamsvcRangeUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 

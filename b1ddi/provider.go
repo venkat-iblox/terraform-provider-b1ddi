@@ -122,3 +122,19 @@ func filterFromMap(filtersMap map[string]interface{}) string {
 
 	return strings.Join(filters, " and ")
 }
+
+// dataSourceSchemaFromResource -- generates schema for results field in each data source
+// This function gets the original resource, schema, and injects the ID field in it.
+func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Resource {
+	// Get the resource schema
+	resultSchema := resource().Schema
+	// Inject id field into the resource schema
+	resultSchema["id"] = &schema.Schema{
+		Type:        schema.TypeString,
+		Computed:    true,
+		Description: "The resource identifier.",
+	}
+	return &schema.Resource{
+		Schema: resultSchema,
+	}
+}

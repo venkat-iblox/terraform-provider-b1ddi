@@ -25,6 +25,7 @@ func TestAccDataSourceIpamsvcRange(t *testing.T) {
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_ranges.tf_acc_ranges", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_ranges.tf_acc_ranges", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_ranges.tf_acc_ranges", "results.0.comment", "This Range is created by terraform provider acceptance test"),
 				),
 			},

@@ -22,6 +22,7 @@ func TestAccDataSourceIpamsvcFixedAddress(t *testing.T) {
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.0.comment", "This Fixed Address is created by terraform provider acceptance test"),
 				),
 			},

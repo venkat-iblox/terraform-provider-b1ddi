@@ -23,6 +23,7 @@ func TestAccDataSourceIpamsvcAddressBlock(t *testing.T) {
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_address_blocks.tf_acc_address_blocks", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_address_blocks.tf_acc_address_blocks", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_address_blocks.tf_acc_address_blocks", "results.0.comment", "This Address Block is created by terraform provider acceptance test"),
 				),
 			},
