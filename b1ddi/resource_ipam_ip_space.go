@@ -22,6 +22,9 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 		ReadContext:   resourceIpamsvcIPSpaceRead,
 		UpdateContext: resourceIpamsvcIPSpaceUpdate,
 		DeleteContext: resourceIpamsvcIPSpaceDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// The Automated Scope Management configuration for the IP space.

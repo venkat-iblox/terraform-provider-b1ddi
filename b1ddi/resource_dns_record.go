@@ -27,6 +27,9 @@ func resourceDataRecord() *schema.Resource {
 		ReadContext:   resourceDataRecordRead,
 		UpdateContext: resourceDataRecordUpdate,
 		DeleteContext: resourceDataRecordDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// Synthetic field, used to determine _zone_ and/or _name_in_zone_ field for records.

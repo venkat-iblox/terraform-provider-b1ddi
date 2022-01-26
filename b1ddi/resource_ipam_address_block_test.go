@@ -16,6 +16,12 @@ func TestAccResourceAddressBlock_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceAddressBlockBasicTestStep(),
+			{
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -210,6 +216,12 @@ func TestAccResourceAddressBlock_full_config(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
 				),
 			},
+			{
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -298,6 +310,12 @@ func TestAccResourceAddressBlock_update_address(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})
@@ -391,6 +409,12 @@ func TestAccResourceAddressBlock_update_space(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})
@@ -503,6 +527,12 @@ func TestAccResourceAddressBlock_update(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})

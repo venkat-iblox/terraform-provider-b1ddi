@@ -22,6 +22,9 @@ func resourceIpamsvcFixedAddress() *schema.Resource {
 		ReadContext:   resourceIpamsvcFixedAddressRead,
 		UpdateContext: resourceIpamsvcFixedAddressUpdate,
 		DeleteContext: resourceIpamsvcFixedAddressDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// The reserved address.

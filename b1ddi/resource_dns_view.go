@@ -22,6 +22,9 @@ func resourceConfigView() *schema.Resource {
 		ReadContext:   resourceConfigViewRead,
 		UpdateContext: resourceConfigViewUpdate,
 		DeleteContext: resourceConfigViewDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// Optional. Comment for view.

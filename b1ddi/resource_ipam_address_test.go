@@ -16,6 +16,11 @@ func TestAccResourceAddress_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceAddressBasicTestStep(),
+			{
+				ResourceName:      "b1ddi_address.tf_acc_test_address",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -127,6 +132,11 @@ func TestAccResourceAddress_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "usage.0", "IPAM RESERVED"),
 				),
 			},
+			{
+				ResourceName:      "b1ddi_address.tf_acc_test_address",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -182,6 +192,11 @@ func TestAccResourceAddress_update_space(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "updated_at"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "usage.0", "IPAM RESERVED"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_address.tf_acc_test_address",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -249,6 +264,11 @@ func TestAccResourceAddress_update(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "updated_at"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "usage.0", "IPAM RESERVED"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_address.tf_acc_test_address",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

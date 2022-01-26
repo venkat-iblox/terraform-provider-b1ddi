@@ -22,6 +22,9 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 		ReadContext:   resourceIpamsvcAddressBlockRead,
 		UpdateContext: resourceIpamsvcAddressBlockUpdate,
 		DeleteContext: resourceIpamsvcAddressBlockDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// The address field in form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.

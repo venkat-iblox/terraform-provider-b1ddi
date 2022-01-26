@@ -16,6 +16,11 @@ func TestAccResourceDnsView_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceDnsViewBasicTestStep(),
+			{
+				ResourceName:      "b1ddi_dns_view.tf_acc_test_dns_view",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -244,6 +249,11 @@ func TestAccResourceDnsView_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "zone_authority.0.use_default_mname", "false"),
 				),
 			},
+			{
+				ResourceName:      "b1ddi_dns_view.tf_acc_test_dns_view",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -404,6 +414,11 @@ func TestAccResourceDnsView_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "zone_authority.0.rname", "rname"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "zone_authority.0.use_default_mname", "false"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_dns_view.tf_acc_test_dns_view",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

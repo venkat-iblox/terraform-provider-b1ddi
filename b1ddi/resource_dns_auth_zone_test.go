@@ -28,6 +28,11 @@ func TestAccResourceDnsAuthZone_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceDnsAuthZoneBasicTestStep(t),
+			{
+				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -200,6 +205,11 @@ func TestAccResourceDnsAuthZone_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.use_default_mname", "false"),
 				),
 			},
+			{
+				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -310,6 +320,11 @@ func TestAccResourceDnsAuthZone_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.rname", "rname@tf-acc-test.com"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.use_default_mname", "false"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

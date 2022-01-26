@@ -16,6 +16,11 @@ func TestAccResourceDnsRecord_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceDnsRecordBasicTestStep(t),
+			{
+				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -136,6 +141,11 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
 				),
 			},
+			{
+				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -205,6 +215,11 @@ func TestAccResourceDnsRecord_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "view_name", "tf_acc_test_dns_view"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

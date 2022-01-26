@@ -20,6 +20,12 @@ func TestAccResourceIPSpace_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceIPSpaceBasicTestStep(),
+			{
+				ResourceName:            "b1ddi_ip_space.tf_acc_test_space",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -215,6 +221,12 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "vendor_specific_option_option_space", ""),
 				),
 			},
+			{
+				ResourceName:            "b1ddi_ip_space.tf_acc_test_space",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -332,6 +344,12 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "vendor_specific_option_option_space", ""),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_ip_space.tf_acc_test_space",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})

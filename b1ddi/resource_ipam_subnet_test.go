@@ -16,6 +16,12 @@ func TestAccResourceSubnet_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceSubnetBasicTestStep(),
+			{
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -224,6 +230,12 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
 				),
 			},
+			{
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -311,6 +323,12 @@ func TestAccResourceSubnet_update_address(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})
@@ -404,6 +422,12 @@ func TestAccResourceSubnet_update_space(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})
@@ -532,6 +556,12 @@ func TestAccResourceSubnet_update(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})

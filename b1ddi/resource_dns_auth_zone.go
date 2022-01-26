@@ -21,6 +21,9 @@ func resourceConfigAuthZone() *schema.Resource {
 		ReadContext:   resourceConfigAuthZoneRead,
 		UpdateContext: resourceConfigAuthZoneUpdate,
 		DeleteContext: resourceConfigAuthZoneDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// Optional. Comment for zone configuration.

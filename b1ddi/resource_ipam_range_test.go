@@ -16,6 +16,12 @@ func TestAccResourceRange_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceRangeBasicTestStep(),
+			{
+				ResourceName:            "b1ddi_range.tf_acc_test_range",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -147,6 +153,12 @@ func TestAccResourceRange_full_config(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
 				),
 			},
+			{
+				ResourceName:            "b1ddi_range.tf_acc_test_range",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
 		},
 	})
 }
@@ -210,6 +222,12 @@ func TestAccResourceRange_update_space(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_range.tf_acc_test_range",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})
@@ -290,6 +308,12 @@ func TestAccResourceRange_update(t *testing.T) {
 
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "updated_at"),
 				),
+			},
+			{
+				ResourceName:            "b1ddi_range.tf_acc_test_range",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
 			},
 		},
 	})

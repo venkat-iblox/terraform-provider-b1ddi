@@ -16,6 +16,11 @@ func TestAccResourceFixedAddress_basic(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceFixedAddressBasicTestStep(),
+			{
+				ResourceName:      "b1ddi_fixed_address.tf_acc_test_fixed_address",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -135,6 +140,11 @@ func TestAccResourceFixedAddress_full_config(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "updated_at"),
 				),
 			},
+			{
+				ResourceName:      "b1ddi_fixed_address.tf_acc_test_fixed_address",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -207,6 +217,11 @@ func TestAccResourceFixedAddress_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "tags.TestType", "Acceptance"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "updated_at"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_fixed_address.tf_acc_test_fixed_address",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

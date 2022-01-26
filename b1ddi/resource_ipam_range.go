@@ -21,6 +21,9 @@ func resourceIpamsvcRange() *schema.Resource {
 		ReadContext:   resourceIpamsvcRangeRead,
 		UpdateContext: resourceIpamsvcRangeUpdate,
 		DeleteContext: resourceIpamsvcRangeDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// The description for the range. May contain 0 to 1024 characters. Can include UTF-8.

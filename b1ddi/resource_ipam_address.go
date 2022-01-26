@@ -22,6 +22,9 @@ func resourceIpamsvcAddress() *schema.Resource {
 		ReadContext:   resourceIpamsvcAddressRead,
 		UpdateContext: resourceIpamsvcAddressUpdate,
 		DeleteContext: resourceIpamsvcAddressDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 
 			// The address in form "a.b.c.d".
