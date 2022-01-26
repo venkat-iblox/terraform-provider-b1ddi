@@ -19,17 +19,20 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("B1DDI_HOST", nil),
+				Description: "BloxOne DDI host URL.",
 			},
-			"token": {
+			"api_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("B1DDI_TOKEN", nil),
+				DefaultFunc: schema.EnvDefaultFunc("B1DDI_API_KEY", nil),
+				Description: "API token for authentication against the Infoblox BloxOne DDI platform.",
 			},
 			"base_path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "api/ddi/v1",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "api/ddi/v1",
+				Description: "The base path is to indicate the API version and the product name.",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -60,7 +63,7 @@ func Provider() *schema.Provider {
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	host := d.Get("host").(string)
-	token := d.Get("token").(string)
+	apiKey := d.Get("api_key").(string)
 	basePath := d.Get("base_path").(string)
 
 	// Warning or errors can be collected in a slice type
@@ -74,10 +77,10 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diags
 	}
 
-	if token == "" {
+	if apiKey == "" {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Unable to initialise B1DDI client without API token",
+			Summary:  "Unable to initialise B1DDI client without API key",
 		})
 		return nil, diags
 	}
@@ -96,7 +99,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	)
 
 	// Create default auth header for all API requests
-	tokenAuth := b1ddiclient.B1DDIToken(token)
+	tokenAuth := b1ddiclient.B1DDIAPIKey(apiKey)
 	transport.DefaultAuthentication = tokenAuth
 
 	// create the API client

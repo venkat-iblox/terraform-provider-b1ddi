@@ -27,8 +27,8 @@ func testAccPreCheck(t *testing.T) {
 		t.Fatal("B1DDI_HOST must be set for acceptance tests")
 	}
 
-	if token := os.Getenv("B1DDI_TOKEN"); token == "" {
-		t.Fatal("B1DDI_TOKEN must be set for acceptance tests")
+	if token := os.Getenv("B1DDI_API_KEY"); token == "" {
+		t.Fatal("B1DDI_API_KEY must be set for acceptance tests")
 	}
 
 	err := testAccProvider.Configure(context.TODO(), terraform.NewResourceConfigRaw(nil))
