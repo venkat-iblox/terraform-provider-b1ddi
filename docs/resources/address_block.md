@@ -59,7 +59,7 @@ resource "b1ddi_address_block" "tf_example_address_block" {
   Defaults to "myhost".
 
 - **ddns_send_updates** (Boolean) Determines if DDNS updates are enabled at the address block level. Defaults to _true_.
-- 
+
 - **ddns_update_on_renew** (Boolean) Instructs the DHCP server to always update the DNS information when a lease is renewed even if its DNS information has not changed. Defaults to _false_.
 
 - **ddns_use_conflict_resolution** (Boolean) When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.
