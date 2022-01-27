@@ -17,13 +17,15 @@ func dataSourceIpamsvcFixedAddress() *schema.Resource {
 		ReadContext: dataSourceIpamsvcFixedAddressRead,
 		Schema: map[string]*schema.Schema{
 			"filters": {
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of filters to be applied on the search result.",
 			},
 			"results": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     dataSourceSchemaFromResource(resourceIpamsvcFixedAddress),
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        dataSourceSchemaFromResource(resourceIpamsvcFixedAddress),
+				Description: "List of Fixed Addresses matching filters. The schema of each element is identical to the b1ddi_fixed_address resource schema.",
 			},
 		},
 	}

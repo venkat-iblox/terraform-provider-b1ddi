@@ -17,13 +17,15 @@ func dataSourceConfigView() *schema.Resource {
 		ReadContext: dataSourceConfigViewRead,
 		Schema: map[string]*schema.Schema{
 			"filters": {
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of filters to be applied on the search result.",
 			},
 			"results": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     dataSourceSchemaFromResource(resourceConfigView),
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        dataSourceSchemaFromResource(resourceConfigView),
+				Description: "List of DNS Views matching filters. The schema of each element is identical to the b1ddi_dns_view resource schema.",
 			},
 		},
 	}

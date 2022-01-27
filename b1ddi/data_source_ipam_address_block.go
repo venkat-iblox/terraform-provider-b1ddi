@@ -17,13 +17,15 @@ func dataSourceIpamsvcAddressBlock() *schema.Resource {
 		ReadContext: dataSourceIpamsvcAddressBlockRead,
 		Schema: map[string]*schema.Schema{
 			"filters": {
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of filters to be applied on the search result.",
 			},
 			"results": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     dataSourceSchemaFromResource(resourceIpamsvcAddressBlock),
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        dataSourceSchemaFromResource(resourceIpamsvcAddressBlock),
+				Description: "List of Address Blocks matching filters. The schema of each element is identical to the b1ddi_address_block resource schema.",
 			},
 		},
 	}

@@ -17,13 +17,15 @@ func dataSourceIpamsvcIPSpace() *schema.Resource {
 		ReadContext: dataSourceIpamsvcIPSpaceRead,
 		Schema: map[string]*schema.Schema{
 			"filters": {
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of filters to be applied on the search result.",
 			},
 			"results": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     dataSourceSchemaFromResource(resourceIpamsvcIPSpace),
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        dataSourceSchemaFromResource(resourceIpamsvcIPSpace),
+				Description: "List of IP Spaces matching filters. The schema of each element is identical to the b1ddi_ip_space resource schema.",
 			},
 		},
 	}
