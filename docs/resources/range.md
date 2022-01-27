@@ -161,9 +161,9 @@ Required:
 
 Read-Only:
 
-- **display_name** (String)
-- **host** (String)
-- **ophid** (String)
+- **display_name** (String) The human-readable display name for the host referred to by _ophid_.
+- **host** (String) The resource identifier.
+- **ophid** (String) The on-prem host ID.
 
 
 <a id="nestedatt--utilization"></a>
