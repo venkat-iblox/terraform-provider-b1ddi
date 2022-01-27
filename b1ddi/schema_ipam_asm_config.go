@@ -100,6 +100,7 @@ func schemaIpamsvcASMConfig() *schema.Resource {
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.IsRFC3339Time,
+				Description:  "Reenable date",
 			},
 		},
 	}
