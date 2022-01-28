@@ -12,6 +12,12 @@ import (
 	"strings"
 )
 
+const (
+	errAddressBlockNotFound          = "response status code indicates client error (status 400): \n{\"error\":[{\"message\":\"Failed to find address block\"}]}"
+	errIncorrectUtilizationUpdateRef = "response status code indicates client error (status 400): \n{\"error\":[{\"message\":\"The 'Utilization Update' object does not refer to a valid 'IP Space' object.\"}]}"
+	errRecordNotFound                = "response status code indicates client error (status 404): \n{\"error\":[{\"message\":\"record not found\"}]}"
+)
+
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{

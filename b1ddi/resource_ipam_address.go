@@ -2,13 +2,13 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // IpamsvcAddress Address
@@ -117,7 +117,6 @@ func resourceIpamsvcAddress() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -292,6 +291,11 @@ func resourceIpamsvcAddressRead(ctx context.Context, d *schema.ResourceData, m i
 func resourceIpamsvcAddressUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	if d.HasChange("space") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+	}
+
 	names := make([]*models.IpamsvcName, 0)
 	for _, n := range d.Get("names").([]interface{}) {
 		if n != nil {
@@ -326,15 +330,21 @@ func resourceIpamsvcAddressUpdate(ctx context.Context, d *schema.ResourceData, m
 func resourceIpamsvcAddressDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	var diags diag.Diagnostics
+
 	_, err := c.IPAddressManagementAPI.Address.AddressDelete(
 		&address.AddressDeleteParams{ID: d.Id(), Context: ctx},
 		nil,
 	)
 	if err != nil {
-		return diag.FromErr(err)
+		if err.Error() == errRecordNotFound {
+			diags = append(diags, diag.Diagnostic{Severity: diag.Warning, Summary: err.Error()})
+		} else {
+			return diag.FromErr(err)
+		}
 	}
 
 	d.SetId("")
 
-	return nil
+	return diags
 }

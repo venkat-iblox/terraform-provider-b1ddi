@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address"
+	"regexp"
 	"testing"
 )
 
@@ -141,7 +142,7 @@ func TestAccResourceAddress_full_config(t *testing.T) {
 	})
 }
 
-func TestAccResourceAddress_update_space(t *testing.T) {
+func TestAccResourceAddress_UpdateSpaceExpectError(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -157,10 +158,10 @@ func TestAccResourceAddress_update_space(t *testing.T) {
   						name = "tf_acc_new_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}
-					resource "b1ddi_subnet" "tf_acc_new_test_subnet" {
+					resource "b1ddi_subnet" "tf_acc_test_subnet" {
 						name = "tf_acc_test_subnet"						
 						address = "192.168.1.0"
-						space = b1ddi_ip_space.tf_acc_new_test_space.id
+						space = b1ddi_ip_space.tf_acc_test_space.id
 						cidr = 24
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}
@@ -168,30 +169,9 @@ func TestAccResourceAddress_update_space(t *testing.T) {
 						address = "192.168.1.15"
 						comment = "This Address is created by terraform provider acceptance test"
 						space = b1ddi_ip_space.tf_acc_new_test_space.id
-						depends_on = [b1ddi_subnet.tf_acc_new_test_subnet]
+						depends_on = [b1ddi_subnet.tf_acc_test_subnet]
 					}`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
-					testCheckSubnetExists("b1ddi_subnet.tf_acc_new_test_subnet"),
-					testAccAddressExists("b1ddi_address.tf_acc_test_address"),
-					testCheckAddressInSpace("b1ddi_address.tf_acc_test_address", "b1ddi_ip_space.tf_acc_new_test_space"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.15"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
-					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", ""),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", ""),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.%", "0"),
-					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "parent"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "protocol", "ip4"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "range", ""),
-					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "space"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "state", "used"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "tags"),
-					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "updated_at"),
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "usage.0", "IPAM RESERVED"),
-				),
+				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
 			},
 			{
 				ResourceName:      "b1ddi_address.tf_acc_test_address",

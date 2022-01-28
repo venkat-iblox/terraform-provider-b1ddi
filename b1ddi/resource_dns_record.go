@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
@@ -45,7 +46,6 @@ func resourceDataRecord() *schema.Resource {
 			"absolute_zone_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "The absolute domain name of the zone where this record belongs.",
 			},
 
@@ -323,7 +323,6 @@ func resourceDataRecord() *schema.Resource {
 			"type": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The DNS resource record type specified in the textual mnemonic format or in the \"TYPEnnn\" format where \"nnn\" indicates the numeric type value.\n\nValue | Numeric Type | Description\n------|--------------|---------------------------------------------\nA     | 1            | Address record\nAAAA  | 28           | IPv6 Address record\nCAA   | 257          | Certification Authority Authorization record\nCNAME | 5            | Canonical Name record\nDNAME | 39           | Delegation Name record\nDHCID | 49           | DHCP Identifier record\nMX    | 15           | Mail Exchanger record\nNAPTR | 35           | Naming Authority Pointer record\nNS    | 2            | Name Server record\nPTR   | 12           | Pointer record\nSOA   | 6            | Start of Authority record\nSRV   | 33           | Service record\nTXT   | 16           | Text record",
 			},
 
@@ -341,7 +340,6 @@ func resourceDataRecord() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -358,7 +356,6 @@ func resourceDataRecord() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 		},
@@ -507,6 +504,21 @@ func resourceDataRecordRead(ctx context.Context, d *schema.ResourceData, m inter
 
 func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
+
+	if d.HasChange("type") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'type' field is not allowed"))
+	}
+
+	if d.HasChange("view") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'view' field is not allowed"))
+	}
+
+	if d.HasChange("zone") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'zone' field is not allowed"))
+	}
 
 	body := &models.DataRecord{
 		Comment:            d.Get("comment").(string),
