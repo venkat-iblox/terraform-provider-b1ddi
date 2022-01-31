@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
+	"regexp"
 	"testing"
 )
 
@@ -215,6 +216,104 @@ func TestAccResourceDnsRecord_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "view_name", "tf_acc_test_dns_view"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
 				),
+			},
+			{
+				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccResourceDnsRecord_UpdateTypeExpectError(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			resourceDnsRecordBasicTestStep(t),
+			{
+				Config: fmt.Sprintf(`
+					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
+						name = "tf_acc_test_dns_view"
+					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
+						internal_secondaries {
+							host = "%s"
+						}
+						fqdn = "tf-acc-test.com."
+						primary_type = "cloud"
+						view = b1ddi_dns_view.tf_acc_test_dns_view.id
+					}
+					resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
+						comment = "This DNS Record is created by the terraform provider acceptance test"
+						disabled = true
+						name_in_zone = "tf_acc_test_a_record"
+						rdata = {
+							"address" = "192.168.1.15"
+						}
+						type = "PTR"
+						zone = b1ddi_dns_auth_zone.tf_acc_test_auth_zone.id
+					}`, testAccReadInternalSecondary(t),
+				),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
+					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "type", "A"),
+				),
+				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
+			},
+			{
+				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccResourceDnsRecord_UpdateViewExpectError(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			resourceDnsRecordBasicTestStep(t),
+			{
+				Config: fmt.Sprintf(`
+					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
+						name = "tf_acc_test_dns_view"
+					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
+						internal_secondaries {
+							host = "%s"
+						}
+						fqdn = "tf-acc-test.com."
+						primary_type = "cloud"
+						view = b1ddi_dns_view.tf_acc_test_dns_view.id
+					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_new_auth_zone" {
+						internal_secondaries {
+							host = "%s"
+						}
+						fqdn = "tf-new-acc-test.com."
+						primary_type = "cloud"
+						view = b1ddi_dns_view.tf_acc_test_dns_view.id
+					}
+					resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
+						comment = "This DNS Record is created by the terraform provider acceptance test"
+						disabled = true
+						name_in_zone = "tf_acc_test_a_record"
+						rdata = {
+							"address" = "192.168.1.15"
+						}
+						type = "PTR"
+						zone = b1ddi_dns_auth_zone.tf_acc_test_new_auth_zone.id
+					}`, testAccReadInternalSecondary(t), testAccReadInternalSecondary(t),
+				),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
+				),
+				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
 			},
 			{
 				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",

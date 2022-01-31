@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -127,7 +128,6 @@ func resourceIpamsvcRange() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -323,6 +323,11 @@ func resourceIpamsvcRangeRead(ctx context.Context, d *schema.ResourceData, m int
 
 func resourceIpamsvcRangeUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
+
+	if d.HasChange("space") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+	}
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {

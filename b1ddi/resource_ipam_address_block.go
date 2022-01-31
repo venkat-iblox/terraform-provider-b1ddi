@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
@@ -32,7 +33,6 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The address field in form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 			},
 
@@ -282,7 +282,6 @@ func resourceIpamsvcAddressBlock() *schema.Resource {
 			"space": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -527,6 +526,16 @@ func resourceIpamsvcAddressBlockRead(ctx context.Context, d *schema.ResourceData
 func resourceIpamsvcAddressBlockUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	if d.HasChange("address") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'address' field is not allowed"))
+	}
+
+	if d.HasChange("space") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+	}
+
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
 		if o != nil {
@@ -577,9 +586,16 @@ func resourceIpamsvcAddressBlockUpdate(ctx context.Context, d *schema.ResourceDa
 func resourceIpamsvcAddressBlockDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	var diags diag.Diagnostics
+
 	_, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockDelete(&address_block.AddressBlockDeleteParams{ID: d.Id(), Context: ctx}, nil)
 	if err != nil {
-		return diag.FromErr(err)
+		switch err.Error() {
+		case errAddressBlockNotFound, errRecordNotFound, errIncorrectUtilizationUpdateRef:
+			diags = append(diags, diag.Diagnostic{Severity: diag.Warning, Summary: err.Error()})
+		default:
+			return diag.FromErr(err)
+		}
 	}
 
 	d.SetId("")

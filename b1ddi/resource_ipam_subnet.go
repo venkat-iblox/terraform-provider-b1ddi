@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -31,7 +32,6 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 			},
 
@@ -555,6 +555,16 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 
 func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
+
+	if d.HasChange("address") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'address' field is not allowed"))
+	}
+
+	if d.HasChange("space") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+	}
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {

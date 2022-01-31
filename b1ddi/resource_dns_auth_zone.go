@@ -2,12 +2,14 @@ package b1ddi
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
 	"github.com/infobloxopen/b1ddi-go-client/models"
+	"time"
 )
 
 // ConfigAuthZone AuthZone
@@ -74,7 +76,6 @@ func resourceConfigAuthZone() *schema.Resource {
 			"fqdn": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "Zone FQDN.\nThe FQDN supplied at creation will be converted to canonical form.\n\nRead-only after creation.",
 			},
 
@@ -111,7 +112,6 @@ func resourceConfigAuthZone() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "On-create-only. SOA serial is allowed to be set when the authoritative zone is created.",
 			},
 
@@ -180,7 +180,6 @@ func resourceConfigAuthZone() *schema.Resource {
 			"primary_type": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "Primary type for an authoritative zone.\nRead only after creation.\nAllowed values:\n * _external_: zone data owned by an external nameserver,\n * _cloud_: zone data is owned by a BloxOne DDI host.",
 			},
 
@@ -251,7 +250,6 @@ func resourceConfigAuthZone() *schema.Resource {
 			"view": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
 				Description: "The resource identifier.",
 			},
 
@@ -352,6 +350,9 @@ func resourceConfigAuthZoneCreate(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	// Wait for API to create the Auth Zone
+	time.Sleep(time.Second * 2)
 
 	d.SetId(resp.Payload.Result.ID)
 
@@ -509,6 +510,26 @@ func resourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m i
 
 func resourceConfigAuthZoneUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
+
+	if d.HasChange("fqdn") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'fqdn' field is not allowed"))
+	}
+
+	if d.HasChange("initial_soa_serial") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'initial_soa_serial' field is not allowed"))
+	}
+
+	if d.HasChange("primary_type") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'primary_type' field is not allowed"))
+	}
+
+	if d.HasChange("view") {
+		d.Partial(true)
+		return diag.FromErr(fmt.Errorf("changing the value of 'view' field is not allowed"))
+	}
 
 	externalPrimaries := make([]*models.ConfigExternalPrimary, 0)
 	for _, ep := range d.Get("external_primaries").([]interface{}) {

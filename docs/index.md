@@ -11,6 +11,12 @@ provider "b1ddi" {
 }
 ```
 
+You can also configure the credentials using environment variables as follows:
+```shell
+export B1DDI_HOST=<B1DDI HOSTNAME> or <B1DDI IP ADDR>
+export B1DDI_API_KEY=<B1DDI API KEY>
+``` 
+
 ## Provider Features
 
 The provider plugin has BloxOne DDI resources represented as Terraform resources and data sources. The consolidated
