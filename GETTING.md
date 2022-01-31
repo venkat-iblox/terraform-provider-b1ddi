@@ -3,7 +3,7 @@
 ## Building a Binary from the Source Code and Using it
 
 Complete the following steps to build the binary:
-* Install and set up Golang version 1.16 or later from
+* Install and set up Golang version 1.16.4 or later from
   https://golang.org/doc/install
 * Install Terraform CLI from
   https://www.terraform.io/downloads.html
