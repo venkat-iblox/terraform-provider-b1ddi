@@ -6,12 +6,36 @@ import (
 	"testing"
 )
 
-func TestAccDataSourceConfigAuthZone(t *testing.T) {
+func TestAccDataSourceConfigAuthZone_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			resourceDnsAuthZoneBasicTestStep(t),
+			{
+				Config: fmt.Sprintf(`
+					data "b1ddi_dns_auth_zones" "tf_acc_auth_zones" {
+						filters = {
+							fqdn = "tf-acc-test.com."
+						}
+					}
+				`),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.id"),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.fqdn", "tf-acc-test.com."),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourceConfigAuthZone_FullConfig(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			resourceDnsAuthZoneFullConfigTestStep(t),
 			{
 				Config: fmt.Sprintf(`
 					data "b1ddi_dns_auth_zones" "tf_acc_auth_zones" {

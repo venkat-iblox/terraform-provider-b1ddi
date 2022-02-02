@@ -23,7 +23,7 @@ func testAccReadInternalSecondary(t *testing.T) string {
 	return internalSecondary
 }
 
-func TestAccResourceDnsAuthZone_basic(t *testing.T) {
+func TestAccResourceDnsAuthZone_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -98,13 +98,24 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 	}
 }
 
-func TestAccResourceDnsAuthZone_full_config(t *testing.T) {
+func TestAccResourceDnsAuthZone_FullConfig(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
+			resourceDnsAuthZoneFullConfigTestStep(t),
 			{
-				Config: fmt.Sprintf(`
+				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
+	return resource.TestStep{
+		Config: fmt.Sprintf(`
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
@@ -131,8 +142,25 @@ func TestAccResourceDnsAuthZone_full_config(t *testing.T) {
 						
 						primary_type = "cloud"
 
+						query_acl {
+							access = "deny"
+							address = "192.168.1.10"
+							element = "ip"
+						}
+
 						tags = {
 							TestType = "Acceptance"
+						}
+
+						transfer_acl {
+							access = "allow"
+							address = "192.168.1.20"
+							element = "ip"
+						}
+						update_acl {
+							access = "allow"
+							address = "192.168.1.30"
+							element = "ip"
 						}
 
 						use_forwarders_for_subzones = false
@@ -151,68 +179,72 @@ func TestAccResourceDnsAuthZone_full_config(t *testing.T) {
 						}
 						
 					}`, testAccReadInternalSecondary(t),
-				),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "comment", "This Auth Zone is created by the terraform provider acceptance test"),
-					resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "created_at"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "disabled", "true"),
-					// ToDo Add check for custom external_primaries
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.%", "0"),
-					// ToDo Add check for custom external_secondaries
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.%", "0"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "gss_tsig_enabled", "true"),
-					// ToDo Add check for custom inheritance_assigned_hosts
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.%", "0"),
-					// ToDo Add check for custom inheritance_sources
-					resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "3"),
+		),
+		Check: resource.ComposeAggregateTestCheckFunc(
+			testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "comment", "This Auth Zone is created by the terraform provider acceptance test"),
+			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "created_at"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "disabled", "true"),
+			// ToDo Add check for custom external_primaries
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.%", "0"),
+			// ToDo Add check for custom external_secondaries
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "gss_tsig_enabled", "true"),
+			// ToDo Add check for custom inheritance_assigned_hosts
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.%", "0"),
+			// ToDo Add check for custom inheritance_sources
+			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "3"),
 
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "internal_secondaries.0.host", "dns/host/301005"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "internal_secondaries.0.host", "dns/host/301005"),
 
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapped_subnet", ""),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapping", "forward"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "notify", "true"),
-					// ToDo Add check for custom nsgs
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.%", "0"),
-					// ToDo Add check for custom parent
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "parent", ""),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapped_subnet", ""),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapping", "forward"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "notify", "true"),
+			// ToDo Add check for custom nsgs
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.%", "0"),
+			// ToDo Add check for custom parent
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "parent", ""),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
 
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "protocol_fqdn", "tf-acc-test.com."),
-					// ToDo Add check for custom query_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.%", "0"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags"),
-					// ToDo Add check for custom transfer_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.%", "0"),
-					// ToDo Add check for custom update_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.%", "0"),
-					resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "updated_at"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "protocol_fqdn", "tf-acc-test.com."),
 
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "use_forwarders_for_subzones", "false"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.access", "deny"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.address", "192.168.1.10"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.element", "ip"),
 
-					resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "view"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags"),
 
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.default_ttl", "14400"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.expire", "1209600"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.mname", "mname.tf-acc-test.com."),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.negative_ttl", "700"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.protocol_mname", "mname.tf-acc-test.com."),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.protocol_rname", "rname.tf-acc-test.com"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.refresh", "5400"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.retry", "1800"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.rname", "rname@tf-acc-test.com"),
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.use_default_mname", "false"),
-				),
-			},
-			{
-				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.access", "allow"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.address", "192.168.1.20"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.element", "ip"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.access", "allow"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.address", "192.168.1.30"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.element", "ip"),
+
+			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "updated_at"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "use_forwarders_for_subzones", "false"),
+
+			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "view"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.default_ttl", "14400"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.expire", "1209600"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.mname", "mname.tf-acc-test.com."),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.negative_ttl", "700"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.protocol_mname", "mname.tf-acc-test.com."),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.protocol_rname", "rname.tf-acc-test.com"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.refresh", "5400"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.retry", "1800"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.rname", "rname@tf-acc-test.com"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.use_default_mname", "false"),
+		),
+	}
 }
 
 func TestAccResourceDnsAuthZone_UpdateFQDNExpectError(t *testing.T) {
@@ -285,7 +317,7 @@ func TestAccResourceDnsAuthZone_UpdatePrimaryTypeExpectError(t *testing.T) {
 	})
 }
 
-func TestAccResourceDnsAuthZone_update(t *testing.T) {
+func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -317,8 +349,25 @@ func TestAccResourceDnsAuthZone_update(t *testing.T) {
 						
 						primary_type = "cloud"
 
+						query_acl {
+							access = "deny"
+							address = "192.168.1.10"
+							element = "ip"
+						}
+
 						tags = {
 							TestType = "Acceptance"
+						}
+
+						transfer_acl {
+							access = "allow"
+							address = "192.168.1.20"
+							element = "ip"
+						}
+						update_acl {
+							access = "allow"
+							address = "192.168.1.30"
+							element = "ip"
 						}
 
 						use_forwarders_for_subzones = false
@@ -367,13 +416,24 @@ func TestAccResourceDnsAuthZone_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "protocol_fqdn", "tf-acc-test.com."),
-					// ToDo Add check for custom query_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.access", "deny"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.address", "192.168.1.10"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.element", "ip"),
+
 					resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags"),
-					// ToDo Add check for custom transfer_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.%", "0"),
-					// ToDo Add check for custom update_acl
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.access", "allow"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.address", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.element", "ip"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.access", "allow"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.address", "192.168.1.30"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.0.element", "ip"),
+
 					resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "updated_at"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "use_forwarders_for_subzones", "false"),

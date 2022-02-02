@@ -18,6 +18,7 @@ func TestAccDataSourceIpamsvcAddress(t *testing.T) {
 						filters = {
 							# Check string filter
 							"address" = "192.168.1.15"
+							"comment" = "This Address is created by terraform provider acceptance test"
 						}
 					}
 				`),
