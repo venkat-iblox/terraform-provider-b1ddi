@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceAddressBlock_basic(t *testing.T) {
+func TestAccResourceAddressBlock_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -109,16 +109,33 @@ func resourceAddressBlockBasicTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceAddressBlock_full_config(t *testing.T) {
+func TestAccResourceAddressBlock_FullConfig(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
+			resourceAddressBlockFullConfigTestStep(),
 			{
-				Config: fmt.Sprintf(`
+				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
+		},
+	})
+}
+
+func resourceAddressBlockFullConfigTestStep() resource.TestStep {
+	return resource.TestStep{
+		Config: fmt.Sprintf(`
 					resource "b1ddi_ip_space" "tf_acc_test_space" {
   						name = "tf_acc_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
+					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
 					}
 					resource "b1ddi_address_block" "tf_acc_test_address_block" {
 						address = "192.168.1.0"
@@ -145,6 +162,11 @@ func TestAccResourceAddressBlock_full_config(t *testing.T) {
 						ddns_update_on_renew = true
 						ddns_use_conflict_resolution = false
 
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
 
   						name = "tf_acc_test_address_block"
 						
@@ -154,77 +176,72 @@ func TestAccResourceAddressBlock_full_config(t *testing.T) {
 							TestType = "Acceptance"
 						}
 					}`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
-					testAccAddressBlockExists("b1ddi_address_block.tf_acc_test_address_block"),
-					testCheckAddressBlockInSpace("b1ddi_address_block.tf_acc_test_address_block", "b1ddi_ip_space.tf_acc_test_space"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "address", "192.168.1.0"),
+		Check: resource.ComposeAggregateTestCheckFunc(
+			testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+			testAccAddressBlockExists("b1ddi_address_block.tf_acc_test_address_block"),
+			testCheckAddressBlockInSpace("b1ddi_address_block.tf_acc_test_address_block", "b1ddi_ip_space.tf_acc_test_space"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "address", "192.168.1.0"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.enable", "false"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.enable_notification", "false"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.forecast_period", "9"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.growth_factor", "15"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.growth_type", "count"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.history", "50"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.min_total", "20"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.min_unused", "20"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.asm_threshold", "80"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.enable", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.enable_notification", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.forecast_period", "9"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.growth_factor", "15"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.growth_type", "count"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.history", "50"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.min_total", "20"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.min_unused", "20"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_scope_flag", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "cidr", "24"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "comment", "This Address Block is created by terraform provider acceptance test"),
-					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "created_at"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_client_update", "ignore"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_domain", "domain"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_generate_name", "true"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_generated_prefix", "tf_acc_host"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_send_updates", "false"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_update_on_renew", "true"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_use_conflict_resolution", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "asm_scope_flag", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "cidr", "24"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "comment", "This Address Block is created by terraform provider acceptance test"),
+			resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "created_at"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_client_update", "ignore"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_domain", "domain"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_generate_name", "true"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_generated_prefix", "tf_acc_host"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_send_updates", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_update_on_renew", "true"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "ddns_use_conflict_resolution", "false"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.allow_unknown", "true"),
-					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.filters"),
-					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.ignore_list"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.lease_time", "3600"),
-					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_host"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.allow_unknown", "true"),
+			resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.filters"),
+			resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.ignore_list"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.lease_time", "3600"),
+			resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_host"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_free", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_total", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_used", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_utilization", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.0.option_value", "192.168.1.20"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.0.type", "option"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_filename", ""),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_address", ""),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_name", ""),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "_"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_enabled", "false"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_free", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_total", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_used", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_utilization", "0"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "inheritance_parent", ""),
-					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "inheritance_sources"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "name", "tf_acc_test_address_block"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "parent", ""),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "protocol", "ip4"),
-					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "space"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "tags.%", "1"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_filename", ""),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_address", ""),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_name", ""),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "_"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_enabled", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
 
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.enabled", "false"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.high", "0"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.low", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "inheritance_parent", ""),
+			resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "inheritance_sources"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "name", "tf_acc_test_address_block"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "parent", ""),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "protocol", "ip4"),
+			resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "space"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "tags.%", "1"),
 
-					resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
-				),
-			},
-			{
-				ResourceName:            "b1ddi_address_block.tf_acc_test_address_block",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
-			},
-		},
-	})
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.enabled", "false"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.high", "0"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "threshold.0.low", "0"),
+
+			resource.TestCheckResourceAttrSet("b1ddi_address_block.tf_acc_test_address_block", "updated_at"),
+		),
+	}
 }
 
 func TestAccResourceAddressBlock_UpdateAddressExpectError(t *testing.T) {

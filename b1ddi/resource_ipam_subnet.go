@@ -463,7 +463,7 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 		diags = append(diags, diag.FromErr(err)...)
 	}
 
-	dhcpOptions := make([]interface{}, 0, len(s.Payload.Result.DhcpOptions))
+	dhcpOptions := make([]map[string]interface{}, 0, len(s.Payload.Result.DhcpOptions))
 	for _, dhcpOption := range s.Payload.Result.DhcpOptions {
 		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
 	}

@@ -108,16 +108,33 @@ func resourceSubnetBasicTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceSubnet_full_config(t *testing.T) {
+func TestAccResourceSubnet_FullConfig(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
+			resourceSubnetFullConfigTestStep(),
 			{
-				Config: fmt.Sprintf(`
+				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
+		},
+	})
+}
+
+func resourceSubnetFullConfigTestStep() resource.TestStep {
+	return resource.TestStep{
+		Config: fmt.Sprintf(`
 					resource "b1ddi_ip_space" "tf_acc_test_space" {
   						name = "tf_acc_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
+					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
 					}
 					resource "b1ddi_subnet" "tf_acc_test_subnet" {
 						address = "192.168.1.0"
@@ -146,10 +163,12 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 							lease_time = 1800
 						}
 						#dhcp_host = "dhcp_host"
-						#dhcp_options {
-							#group = "acc_test_group"
-							#type = "group"
-						#}
+						
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
 
 						header_option_filename = "Acc Test Header"
 						header_option_server_address = "192.168.1.10"
@@ -165,80 +184,75 @@ func TestAccResourceSubnet_full_config(t *testing.T) {
 						}
 						#threshold {}
 					}`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
-					testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
+		Check: resource.ComposeAggregateTestCheckFunc(
+			testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
+			testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "address", "192.168.1.0"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "false"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "false"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.forecast_period", "9"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_factor", "20"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_type", "count"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.history", "50"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.min_total", "20"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.min_unused", "20"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.asm_threshold", "80"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable", "false"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.enable_notification", "false"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.forecast_period", "9"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_factor", "20"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.growth_type", "count"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.history", "50"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.min_total", "20"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.min_unused", "20"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_scope_flag", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "cidr", "24"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "comment", "This Subnet is created by terraform provider acceptance test"),
-					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "created_at"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "asm_scope_flag", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "cidr", "24"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "comment", "This Subnet is created by terraform provider acceptance test"),
+			resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "created_at"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_client_update", "ignore"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_domain", "domain"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_generate_name", "true"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_generated_prefix", "tf_acc_host"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_send_updates", "false"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_update_on_renew", "true"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_use_conflict_resolution", "false"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_client_update", "ignore"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_domain", "domain"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_generate_name", "true"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_generated_prefix", "tf_acc_host"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_send_updates", "false"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_update_on_renew", "true"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_use_conflict_resolution", "false"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.allow_unknown", "false"),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
-					// ToDo Add dhcp_host parameter
-					//resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", "dhcp_host"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.allow_unknown", "false"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
+			// ToDo Add dhcp_host parameter
+			//resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", "dhcp_host"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_free", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_total", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_used", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_utilization", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.0.option_value", "192.168.1.20"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.0.type", "option"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_filename", "Acc Test Header"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_server_address", "192.168.1.10"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_server_name", "Header Option Server Name"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_char", " "),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_enabled", "true"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_regex", "[aaa bbb]"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_free", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_total", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_used", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_utilization", "0"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_assigned_hosts.%", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_parent", ""),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "name", "tf_acc_test_subnet"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "parent", ""),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "protocol", "ip4"),
-					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "space"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "tags.%", "1"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "tags.TestType", "Acceptance"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_filename", "Acc Test Header"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_server_address", "192.168.1.10"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_server_name", "Header Option Server Name"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_char", " "),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_enabled", "true"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_regex", "[aaa bbb]"),
 
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.enabled", "false"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.high", "0"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.low", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_assigned_hosts.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_parent", ""),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "name", "tf_acc_test_subnet"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "parent", ""),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "protocol", "ip4"),
+			resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "space"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "tags.%", "1"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "tags.TestType", "Acceptance"),
 
-					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
-				),
-			},
-			{
-				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
-			},
-		},
-	})
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.enabled", "false"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.high", "0"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "threshold.0.low", "0"),
+
+			resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "updated_at"),
+		),
+	}
 }
 
 func TestAccResourceSubnet_UpdateAddressExpectError(t *testing.T) {

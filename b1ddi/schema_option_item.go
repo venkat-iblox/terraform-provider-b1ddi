@@ -49,18 +49,16 @@ func schemaIpamsvcOptionItem() *schema.Resource {
 	}
 }
 
-func flattenIpamsvcOptionItem(r *models.IpamsvcOptionItem) []interface{} {
+func flattenIpamsvcOptionItem(r *models.IpamsvcOptionItem) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"group":        r.Group,
-			"option_code":  r.OptionCode,
-			"option_value": r.OptionValue,
-			"type":         r.Type,
-		},
+	return map[string]interface{}{
+		"group":        r.Group,
+		"option_code":  r.OptionCode,
+		"option_value": r.OptionValue,
+		"type":         r.Type,
 	}
 }
 

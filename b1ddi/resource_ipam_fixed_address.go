@@ -237,7 +237,7 @@ func resourceIpamsvcFixedAddressRead(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	dhcpOptions := make([]interface{}, 0, len(resp.Payload.Result.DhcpOptions))
+	dhcpOptions := make([]map[string]interface{}, 0, len(resp.Payload.Result.DhcpOptions))
 	for _, dhcpOption := range resp.Payload.Result.DhcpOptions {
 		dhcpOptions = append(dhcpOptions, flattenIpamsvcOptionItem(dhcpOption))
 	}

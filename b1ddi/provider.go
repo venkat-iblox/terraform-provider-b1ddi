@@ -59,6 +59,7 @@ func Provider() *schema.Provider {
 			"b1ddi_address_blocks":  dataSourceIpamsvcAddressBlock(),
 			"b1ddi_ranges":          dataSourceIpamsvcRange(),
 			"b1ddi_addresses":       dataSourceIpamsvcAddress(),
+			"b1ddi_option_codes":    dataSourceIpamsvcOptionCode(),
 			"b1ddi_dns_views":       dataSourceConfigView(),
 			"b1ddi_dns_auth_zones":  dataSourceConfigAuthZone(),
 			"b1ddi_dns_records":     dataSourceDataRecord(),

@@ -14,7 +14,7 @@ import (
 // ToDo add test case for IP Space with Inheritance Sources
 // ToDo add check deleted
 
-func TestAccResourceIPSpace_basic(t *testing.T) {
+func TestAccResourceIPSpace_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -102,13 +102,31 @@ func resourceIPSpaceBasicTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceIPSpace_full_config(t *testing.T) {
+func TestAccResourceIPSpace_FullConfig(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
+			resourceIPSpaceFullConfigTestStep(),
 			{
-				Config: fmt.Sprintf(`
+				ResourceName:            "b1ddi_ip_space.tf_acc_test_space",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+			},
+		},
+	})
+}
+
+func resourceIPSpaceFullConfigTestStep() resource.TestStep {
+	return resource.TestStep{
+		Config: fmt.Sprintf(`
+				data "b1ddi_option_codes" "tf_acc_option_code" {
+					filters = {
+						"name" = "routers"
+					}
+				}
+
 				resource "b1ddi_ip_space" "tf_acc_test_space" {
 					asm_config {
 						asm_threshold = 80
@@ -135,10 +153,11 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 						lease_time = 1800
 					}
 
-					#dhcp_options {
-						#group = "acc_test_group"
-						#type = "group"
-					#}
+					dhcp_options {
+						option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+						option_value = "192.168.1.20"
+						type = "option"
+					}
 
 					header_option_filename = "Acc Test Header"
 					header_option_server_address = "192.168.1.10"
@@ -147,7 +166,13 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 					hostname_rewrite_enabled = true
 					hostname_rewrite_regex = "[aaa bbb]"
 			
-					#inheritance_sources {}
+					#inheritance_sources {
+					#	asm_config {
+					#		asm_enable_block {
+					#			action = "override"
+					#		}
+					#	}
+					#}
 
 					name = "tf_acc_test_space"
 					tags = {
@@ -156,79 +181,73 @@ func TestAccResourceIPSpace_full_config(t *testing.T) {
 
 					
 				}`),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
+		Check: resource.ComposeAggregateTestCheckFunc(
+			testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.asm_threshold", "80"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "false"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "false"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.forecast_period", "9"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_factor", "20"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_type", "count"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.history", "50"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.min_total", "20"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.min_unused", "20"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_scope_flag", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.asm_threshold", "80"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable", "false"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.enable_notification", "false"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.forecast_period", "9"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_factor", "20"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.growth_type", "count"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.history", "50"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.min_total", "20"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.min_unused", "20"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_config.0.reenable_date", "1970-01-01T00:00:00.000Z"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "asm_scope_flag", "0"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "comment", "This IP Space is created by terraform provider acceptance test"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "comment", "This IP Space is created by terraform provider acceptance test"),
 
-					resource.TestCheckResourceAttrSet("b1ddi_ip_space.tf_acc_test_space", "created_at"),
+			resource.TestCheckResourceAttrSet("b1ddi_ip_space.tf_acc_test_space", "created_at"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_client_update", "ignore"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_domain", "domain"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_generate_name", "true"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_generated_prefix", "tf_acc_host"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_send_updates", "false"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_update_on_renew", "true"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_use_conflict_resolution", "false"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_client_update", "ignore"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_domain", "domain"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_generate_name", "true"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_generated_prefix", "tf_acc_host"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_send_updates", "false"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_update_on_renew", "true"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_use_conflict_resolution", "false"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
-					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
-					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
+			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
+			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
 
-					//resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.type", "group"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.option_value", "192.168.1.20"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.type", "option"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_filename", "Acc Test Header"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_server_address", "192.168.1.10"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_server_name", "Header Option Server Name"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_char", " "),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_enabled", "true"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_regex", "[aaa bbb]"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_filename", "Acc Test Header"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_server_address", "192.168.1.10"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_server_name", "Header Option Server Name"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_char", " "),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_enabled", "true"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "hostname_rewrite_regex", "[aaa bbb]"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "inheritance_sources.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "inheritance_sources.%", "0"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "name", "tf_acc_test_space"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "tags.%", "1"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "tags.TestType", "Acceptance"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "name", "tf_acc_test_space"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "tags.%", "1"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "tags.TestType", "Acceptance"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.enabled", "false"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.high", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.low", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.enabled", "false"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.high", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "threshold.0.low", "0"),
 
-					resource.TestCheckResourceAttrSet("b1ddi_ip_space.tf_acc_test_space", "updated_at"),
+			resource.TestCheckResourceAttrSet("b1ddi_ip_space.tf_acc_test_space", "updated_at"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.abandon_utilization", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.abandoned", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.dynamic", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.free", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.static", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.total", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.used", "0"),
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.utilization", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.abandon_utilization", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.abandoned", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.dynamic", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.free", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.static", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.total", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.used", "0"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "utilization.0.utilization", "0"),
 
-					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "vendor_specific_option_option_space", ""),
-				),
-			},
-			{
-				ResourceName:            "b1ddi_ip_space.tf_acc_test_space",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
-			},
-		},
-	})
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "vendor_specific_option_option_space", ""),
+		),
+	}
 }
 
 func TestAccResourceIPSpace_update(t *testing.T) {
