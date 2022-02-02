@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceAddress_basic(t *testing.T) {
+func TestAccResourceAddress_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -71,7 +71,7 @@ func resourceAddressBasicTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceAddress_full_config(t *testing.T) {
+func TestAccResourceAddress_FullConfig(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -95,10 +95,10 @@ func TestAccResourceAddress_full_config(t *testing.T) {
 						#host = ""
 						hwaddr = "00:00:00:00:00:00"
 						interface = "eth0"
-						#names {
-						#	name = "tf_acc_test_address"
-						#	type = "test_name"
-						#}
+						names {
+							name = "tf_acc_test_address"
+							type = "user"
+						}
 						space = b1ddi_ip_space.tf_acc_test_space.id
 						tags = {
 							TestType = "Acceptance"
@@ -119,8 +119,10 @@ func TestAccResourceAddress_full_config(t *testing.T) {
 
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", "00:00:00:00:00:00"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", "eth0"),
-					// ToDo Add check for custom names
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.0.name", "tf_acc_test_address"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.0.type", "user"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "parent"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "protocol", "ip4"),
@@ -182,7 +184,7 @@ func TestAccResourceAddress_UpdateSpaceExpectError(t *testing.T) {
 	})
 }
 
-func TestAccResourceAddress_update(t *testing.T) {
+func TestAccResourceAddress_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -207,10 +209,10 @@ func TestAccResourceAddress_update(t *testing.T) {
 						#host = ""
 						hwaddr = "00:00:00:00:00:00"
 						interface = "eth0"
-						#names {
-						#	name = "tf_acc_test_address"
-						#	type = "test_name"
-						#}
+						names {
+							name = "tf_acc_test_address"
+							type = "user"
+						}
 						space = b1ddi_ip_space.tf_acc_test_space.id
 						tags = {
 							TestType = "Acceptance"
@@ -231,8 +233,10 @@ func TestAccResourceAddress_update(t *testing.T) {
 
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", "00:00:00:00:00:00"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", "eth0"),
-					// ToDo Add check for custom names
-					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.0.name", "tf_acc_test_address"),
+					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "names.0.type", "user"),
 
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "parent"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "protocol", "ip4"),

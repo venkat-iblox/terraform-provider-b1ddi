@@ -240,7 +240,7 @@ func resourceIpamsvcAddressRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	names := make([]interface{}, 0, len(resp.Payload.Result.Names))
+	names := make([]map[string]interface{}, 0, len(resp.Payload.Result.Names))
 	for _, n := range resp.Payload.Result.Names {
 		names = append(names, flattenIpamsvcName(n))
 	}

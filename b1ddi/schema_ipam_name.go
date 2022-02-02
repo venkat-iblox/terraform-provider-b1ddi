@@ -36,16 +36,14 @@ func schemaIpamsvcName() *schema.Resource {
 	}
 }
 
-func flattenIpamsvcName(r *models.IpamsvcName) []interface{} {
+func flattenIpamsvcName(r *models.IpamsvcName) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"name": r.Name,
-			"type": r.Type,
-		},
+	return map[string]interface{}{
+		"name": r.Name,
+		"type": r.Type,
 	}
 }
 
