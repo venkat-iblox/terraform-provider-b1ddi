@@ -61,7 +61,7 @@ func flattenInheritedDHCPConfigIgnoreItemList(r *models.InheritedDHCPConfigIgnor
 		return []interface{}{}
 	}
 
-	values := make([]interface{}, 0, len(r.Value))
+	values := make([]map[string]interface{}, 0, len(r.Value))
 	for _, value := range r.Value {
 		values = append(values, flattenIpamsvcIgnoreItem(value))
 	}
@@ -84,7 +84,7 @@ func expandInheritedDHCPConfigIgnoreItemList(d []interface{}) *models.InheritedD
 
 	values := make([]*models.IpamsvcIgnoreItem, 0)
 	for _, value := range in["value"].([]interface{}) {
-		values = append(values, expandIpamsvcIgnoreItem(value.([]interface{})))
+		values = append(values, expandIpamsvcIgnoreItem(value.(map[string]interface{})))
 	}
 
 	return &models.InheritedDHCPConfigIgnoreItemList{

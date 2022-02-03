@@ -59,7 +59,7 @@ func flattenIpamsvcDHCPConfig(r *models.IpamsvcDHCPConfig) []interface{} {
 		return nil
 	}
 
-	ignoreList := make([]interface{}, 0, len(r.IgnoreList))
+	ignoreList := make([]map[string]interface{}, 0, len(r.IgnoreList))
 	for _, ii := range r.IgnoreList {
 		ignoreList = append(ignoreList, flattenIpamsvcIgnoreItem(ii))
 	}
@@ -82,7 +82,7 @@ func expandIpamsvcDHCPConfig(d []interface{}) *models.IpamsvcDHCPConfig {
 
 	ignoreList := make([]*models.IpamsvcIgnoreItem, 0)
 	for _, ignoreItem := range in["ignore_list"].([]interface{}) {
-		ignoreList = append(ignoreList, expandIpamsvcIgnoreItem(ignoreItem.([]interface{})))
+		ignoreList = append(ignoreList, expandIpamsvcIgnoreItem(ignoreItem.(map[string]interface{})))
 	}
 
 	filters := make([]string, 0)

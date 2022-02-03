@@ -151,6 +151,10 @@ func resourceIPSpaceFullConfigTestStep() resource.TestStep {
 						allow_unknown = false
 						#filters = ["filter1"]
 						lease_time = 1800
+						ignore_list {
+							type = "hardware"
+							value = "00:00:00:00:00:00"
+						}
 					}
 
 					dhcp_options {
@@ -169,7 +173,7 @@ func resourceIPSpaceFullConfigTestStep() resource.TestStep {
 					#inheritance_sources {
 					#	asm_config {
 					#		asm_enable_block {
-					#			action = "override"
+					#			action = "inherit"
 					#		}
 					#	}
 					#}
@@ -210,8 +214,10 @@ func resourceIPSpaceFullConfigTestStep() resource.TestStep {
 
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
 			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
-			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.type", "hardware"),
+			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.value", "00:00:00:00:00:00"),
 
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.option_value", "192.168.1.20"),
@@ -250,7 +256,7 @@ func resourceIPSpaceFullConfigTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceIPSpace_update(t *testing.T) {
+func TestAccResourceIPSpace_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -282,6 +288,10 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 						allow_unknown = false
 						#filters = ["filter1"]
 						lease_time = 1800
+						ignore_list {
+							type = "hardware"
+							value = "00:00:00:00:00:00"
+						}
 					}
 
 
@@ -328,8 +338,10 @@ func TestAccResourceIPSpace_update(t *testing.T) {
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
 					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
-					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.type", "hardware"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.value", "00:00:00:00:00:00"),
 
 					//resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.type", "group"),
 

@@ -39,27 +39,24 @@ func schemaIpamsvcIgnoreItem() *schema.Resource {
 	}
 }
 
-func flattenIpamsvcIgnoreItem(r *models.IpamsvcIgnoreItem) []interface{} {
+func flattenIpamsvcIgnoreItem(r *models.IpamsvcIgnoreItem) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"type":  r.Type,
-			"value": r.Value,
-		},
+	return map[string]interface{}{
+		"type":  r.Type,
+		"value": r.Value,
 	}
 }
 
-func expandIpamsvcIgnoreItem(d []interface{}) *models.IpamsvcIgnoreItem {
-	if len(d) == 0 || d[0] == nil {
+func expandIpamsvcIgnoreItem(d map[string]interface{}) *models.IpamsvcIgnoreItem {
+	if len(d) == 0 || d == nil {
 		return nil
 	}
-	in := d[0].(map[string]interface{})
 
 	return &models.IpamsvcIgnoreItem{
-		Type:  swag.String(in["type"].(string)),
-		Value: swag.String(in["value"].(string)),
+		Type:  swag.String(d["type"].(string)),
+		Value: swag.String(d["value"].(string)),
 	}
 }

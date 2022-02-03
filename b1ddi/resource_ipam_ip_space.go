@@ -283,8 +283,6 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	var diags diag.Diagnostics
-
 	dhcpOptions := make([]*b1models.IpamsvcOptionItem, 0)
 	for _, o := range d.Get("dhcp_options").([]interface{}) {
 		if o != nil {
@@ -323,9 +321,7 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 
 	d.SetId(resp.Payload.Result.ID)
 
-	resourceIpamsvcIPSpaceRead(ctx, d, m)
-
-	return diags
+	return resourceIpamsvcIPSpaceRead(ctx, d, m)
 }
 
 func resourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
