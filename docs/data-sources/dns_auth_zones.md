@@ -7,7 +7,7 @@ terraform {
   required_providers {
     b1ddi = {
       version = "0.1"
-      source  = "github.com/infobloxopen/b1ddi"
+      source  = "infobloxopen/b1ddi"
     }
   }
 }

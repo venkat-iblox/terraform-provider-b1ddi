@@ -4,6 +4,9 @@ Terraform provider for the BloxOne DDI that enables lifecycle management of Blox
 
 ## Example Usage
 
+Follow the "[BloxOne DDI API Guide](https://docs.infoblox.com/display/BloxOneDDI/BloxOne+DDI+API+Guide)" 
+to get the API Key. 
+
 ```terraform
 provider "b1ddi" {
   host = "b1ddi.infoblox.com"
@@ -47,10 +50,6 @@ list of supported resources and data sources is as follows:
 - IPAM Addresses
 
 ## Provider Limitations
-
-- Some resource fields, when updated, will lead to resource recreation. Notice fields with `Update Strategy == ForceNew` 
-  in the documentation and pay attention to the terraform execution plan when updating resources, it always will state, 
-  that resource is about to be replaced (deleted and then created again with new parameters).
 
 - Utilization data can be outdated after the respective IPAM resource is created. If you need the latest utilization
   data for previously created IPAM resources, you can run `terraform refresh` command.
