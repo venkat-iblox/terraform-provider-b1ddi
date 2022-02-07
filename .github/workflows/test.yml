@@ -1,7 +1,7 @@
 # This GitHub action runs your tests for each commit push and/or PR. Optionally
 # you can turn it on using a cron schedule for regular testing.
 #
-name: Tests
+name: tests
 on:
   pull_request:
     paths-ignore:
@@ -43,6 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         # list whatever Terraform versions here you would like to support
