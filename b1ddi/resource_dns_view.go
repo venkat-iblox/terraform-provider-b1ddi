@@ -268,6 +268,7 @@ func resourceConfigView() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        schemaConfigACLItem(),
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Specifies which clients have access to the view.\n\nDefaults to empty.",
 			},
 
@@ -278,6 +279,7 @@ func resourceConfigView() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        schemaConfigACLItem(),
 				Optional:    true,
+				Computed:    true,
 				Description: "Optional. Specifies which destination addresses have access to the view.\n\nDefaults to empty.",
 			},
 
