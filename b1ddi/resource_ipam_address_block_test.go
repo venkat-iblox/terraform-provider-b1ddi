@@ -332,6 +332,11 @@ func TestAccResourceAddressBlock_update(t *testing.T) {
   						name = "tf_acc_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
+					}
 					resource "b1ddi_address_block" "tf_acc_test_address_block" {
 						address = "192.168.1.0"
 						
@@ -357,6 +362,11 @@ func TestAccResourceAddressBlock_update(t *testing.T) {
 						ddns_update_on_renew = true
 						ddns_use_conflict_resolution = false
 
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
 
   						name = "tf_acc_test_address_block"
 						
@@ -399,7 +409,9 @@ func TestAccResourceAddressBlock_update(t *testing.T) {
 					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.ignore_list"),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_config.0.lease_time", "3600"),
 					resource.TestCheckNoResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_host"),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.0.option_value", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_options.0.type", "option"),
 
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_free", "0"),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "dhcp_utilization.0.dhcp_total", "0"),

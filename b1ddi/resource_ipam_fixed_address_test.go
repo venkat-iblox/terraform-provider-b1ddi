@@ -182,14 +182,20 @@ func TestAccResourceFixedAddress_update(t *testing.T) {
 						space = b1ddi_ip_space.tf_acc_test_space.id
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
+					}
 					resource "b1ddi_fixed_address" "tf_acc_test_fixed_address" {
 						address = "192.168.1.15"
 						comment = "This Fixed Address is created by terraform provider acceptance test"
 						
-						#dhcp_options {
-							#group = "acc_test_group"
-							#type = "group"
-						#}
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
 
 						header_option_filename = "Acc Test Header"
 						header_option_server_address = "192.168.1.10"
@@ -213,7 +219,9 @@ func TestAccResourceFixedAddress_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "comment", "This Fixed Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "created_at"),
-					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "dhcp_options.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "dhcp_options.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "dhcp_options.0.option_value", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "dhcp_options.0.type", "option"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_filename", "Acc Test Header"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_server_address", "192.168.1.10"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "header_option_server_name", "Header Option Server Name"),

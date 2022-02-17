@@ -347,6 +347,11 @@ func TestAccResourceSubnet_update(t *testing.T) {
   						name = "tf_acc_test_space"
   						comment = "This IP Space is created by terraform provider acceptance test"
 					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
+					}
 					resource "b1ddi_subnet" "tf_acc_test_subnet" {
 						address = "192.168.1.0"
 						asm_config {
@@ -374,10 +379,11 @@ func TestAccResourceSubnet_update(t *testing.T) {
 							lease_time = 1800
 						}
 						#dhcp_host = "dhcp_host"
-						#dhcp_options {
-							#group = "acc_test_group"
-							#type = "group"
-						#}
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
 
 						header_option_filename = "Acc Test Header Updated"
 						header_option_server_address = "192.168.1.10"
@@ -428,7 +434,10 @@ func TestAccResourceSubnet_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
 					// ToDo Add dhcp_host parameter
 					//resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", "dhcp_host"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.0.option_value", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.0.type", "option"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_free", "0"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_utilization.0.dhcp_total", "0"),

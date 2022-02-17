@@ -264,6 +264,11 @@ func TestAccResourceIPSpace_Update(t *testing.T) {
 			resourceIPSpaceBasicTestStep(),
 			{
 				Config: fmt.Sprintf(`
+				data "b1ddi_option_codes" "tf_acc_option_code" {
+					filters = {
+						"name" = "routers"
+					}
+				}
 				resource "b1ddi_ip_space" "tf_acc_test_space" {
 					asm_config {
 						asm_threshold = 80
@@ -294,6 +299,11 @@ func TestAccResourceIPSpace_Update(t *testing.T) {
 						}
 					}
 
+					dhcp_options {
+						option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+						option_value = "192.168.1.20"
+						type = "option"
+					}
 
 					header_option_filename = "Acc Test Header"
 					header_option_server_address = "192.168.1.10"
@@ -343,7 +353,9 @@ func TestAccResourceIPSpace_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.type", "hardware"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.value", "00:00:00:00:00:00"),
 
-					//resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.type", "group"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.option_value", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.0.type", "option"),
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_filename", "Acc Test Header"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "header_option_server_address", "192.168.1.10"),

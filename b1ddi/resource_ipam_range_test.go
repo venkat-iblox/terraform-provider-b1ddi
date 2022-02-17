@@ -250,13 +250,21 @@ func TestAccResourceRange_update(t *testing.T) {
 						cidr = 24
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}
+					data "b1ddi_option_codes" "tf_acc_option_code" {
+						filters = {
+							"name" = "routers"
+						}
+					}
 					resource "b1ddi_range" "tf_acc_test_range" {
 						comment = "This Range is created by terraform provider acceptance test"
 						#dhcp_host = "dhcp_host"
-						#dhcp_options {
-							#group = "acc_test_group"
-							#type = "group"
-						#}
+						
+						dhcp_options {
+							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
+							option_value = "192.168.1.20"
+							type = "option"
+						}
+
 						end = "192.168.1.30"
 						exclusion_ranges {
 							comment = "This Exclusion Range is created by terraform provider acceptance test"
@@ -285,7 +293,11 @@ func TestAccResourceRange_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "comment", "This Range is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "created_at"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_host", ""),
-					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.0.option_value", "192.168.1.20"),
+					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "dhcp_options.0.type", "option"),
+
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "end", "192.168.1.30"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.comment", "This Exclusion Range is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.end", "192.168.1.25"),
