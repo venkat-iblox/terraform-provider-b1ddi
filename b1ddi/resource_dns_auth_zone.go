@@ -384,7 +384,7 @@ func resourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	externalPrimaries := make([]interface{}, 0, len(resp.Payload.Result.ExternalPrimaries))
+	externalPrimaries := make([]map[string]interface{}, 0, len(resp.Payload.Result.ExternalPrimaries))
 	for _, ep := range resp.Payload.Result.ExternalPrimaries {
 		externalPrimaries = append(externalPrimaries, flattenConfigExternalPrimary(ep))
 	}
@@ -392,7 +392,7 @@ func resourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	externalSecondaries := make([]interface{}, 0, len(resp.Payload.Result.ExternalSecondaries))
+	externalSecondaries := make([]map[string]interface{}, 0, len(resp.Payload.Result.ExternalSecondaries))
 	for _, es := range resp.Payload.Result.ExternalSecondaries {
 		externalSecondaries = append(externalSecondaries, flattenConfigExternalSecondary(es))
 	}

@@ -67,12 +67,12 @@ func flattenConfigAuthZone(r *models.ConfigAuthZone) []interface{} {
 		return nil
 	}
 
-	externalPrimaries := make([]interface{}, 0, len(r.ExternalPrimaries))
+	externalPrimaries := make([]map[string]interface{}, 0, len(r.ExternalPrimaries))
 	for _, ep := range r.ExternalPrimaries {
 		externalPrimaries = append(externalPrimaries, flattenConfigExternalPrimary(ep))
 	}
 
-	externalSecondaries := make([]interface{}, 0, len(r.ExternalSecondaries))
+	externalSecondaries := make([]map[string]interface{}, 0, len(r.ExternalSecondaries))
 	for _, es := range r.ExternalSecondaries {
 		externalSecondaries = append(externalSecondaries, flattenConfigExternalSecondary(es))
 	}

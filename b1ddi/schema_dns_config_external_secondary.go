@@ -72,19 +72,17 @@ func schemaConfigExternalSecondary() *schema.Resource {
 	}
 }
 
-func flattenConfigExternalSecondary(r *models.ConfigExternalSecondary) []interface{} {
+func flattenConfigExternalSecondary(r *models.ConfigExternalSecondary) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
-	return []interface{}{
-		map[string]interface{}{
-			"address":       r.Address,
-			"fqdn":          r.Fqdn,
-			"protocol_fqdn": r.ProtocolFqdn,
-			"stealth":       r.Stealth,
-			"tsig_enabled":  r.TsigEnabled,
-			"tsig_key":      flattenConfigTSIGKey(r.TsigKey),
-		},
+	return map[string]interface{}{
+		"address":       r.Address,
+		"fqdn":          r.Fqdn,
+		"protocol_fqdn": r.ProtocolFqdn,
+		"stealth":       r.Stealth,
+		"tsig_enabled":  r.TsigEnabled,
+		"tsig_key":      flattenConfigTSIGKey(r.TsigKey),
 	}
 }
 

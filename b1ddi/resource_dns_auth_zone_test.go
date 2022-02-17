@@ -57,11 +57,11 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "comment", ""),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "created_at"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "disabled", "false"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.#", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "gss_tsig_enabled", "false"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.#", "0"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "1"),
 
@@ -70,14 +70,14 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapped_subnet", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapping", "forward"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "notify", "false"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "parent", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "protocol_fqdn", "tf-acc-test.com."),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.#", "0"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.#", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.#", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "updated_at"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "use_forwarders_for_subzones", "true"),
@@ -124,7 +124,10 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 						disabled = true
 
 						#external_primaries {}
-						#external_secondaries {}
+						external_secondaries {
+							address = "192.168.1.50"
+							fqdn = "tf_test_external_secondary."
+						}
 
 						fqdn = "tf-acc-test.com."
 						gss_tsig_enabled = true
@@ -186,13 +189,20 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "created_at"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "disabled", "true"),
 			// ToDo Add check for custom external_primaries
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.%", "0"),
-			// ToDo Add check for custom external_secondaries
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.#", "0"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.address", "192.168.1.50"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.fqdn", "tf_test_external_secondary."),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.protocol_fqdn", "tf_test_external_secondary."),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.stealth", "false"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.tsig_enabled", "false"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.tsig_key"),
+
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "gss_tsig_enabled", "true"),
 			// ToDo Add check for custom inheritance_assigned_hosts
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.#", "0"),
 			// ToDo Add check for custom inheritance_sources
 			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "3"),
@@ -203,7 +213,7 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapping", "forward"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "notify", "true"),
 			// ToDo Add check for custom nsgs
-			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.#", "0"),
 			// ToDo Add check for custom parent
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "parent", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
@@ -267,10 +277,46 @@ func TestAccResourceDnsAuthZone_UpdateFQDNExpectError(t *testing.T) {
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
 					}`, testAccReadInternalSecondary(t),
 				),
-				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
+				ExpectError: regexp.MustCompile("changing the value of 'fqdn' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
+				),
+			},
+			{
+				ResourceName:      "b1ddi_dns_auth_zone.tf_acc_test_auth_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccResourceDnsAuthZone_UpdateInitialSoaSerialExpectError(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			resourceDnsAuthZoneBasicTestStep(t),
+			{
+				Config: fmt.Sprintf(`
+					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
+						name = "tf_acc_test_dns_view"
+					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
+						internal_secondaries {
+							host = "%s"
+						}
+						fqdn = "tf-acc-test.com."
+						initial_soa_serial = 3
+						primary_type = "cloud"
+						view = b1ddi_dns_view.tf_acc_test_dns_view.id
+					}`, testAccReadInternalSecondary(t),
+				),
+				ExpectError: regexp.MustCompile("changing the value of 'initial_soa_serial' field is not allowed"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "1"),
 				),
 			},
 			{
@@ -297,12 +343,12 @@ func TestAccResourceDnsAuthZone_UpdatePrimaryTypeExpectError(t *testing.T) {
 						internal_secondaries {
 							host = "%s"
 						}
-						fqdn = "tf-acc-test2.com."
+						fqdn = "tf-acc-test.com."
 						primary_type = "external"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
 					}`, testAccReadInternalSecondary(t),
 				),
-				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
+				ExpectError: regexp.MustCompile("changing the value of 'primary_type' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
@@ -333,7 +379,10 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 						disabled = true
 
 						#external_primaries {}
-						#external_secondaries {}
+						external_secondaries {
+							address = "192.168.1.50"
+							fqdn = "tf_test_external_secondary."
+						}
 
 						fqdn = "tf-acc-test.com."
 						gss_tsig_enabled = true
@@ -393,13 +442,20 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "created_at"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "disabled", "true"),
 					// ToDo Add check for custom external_primaries
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.%", "0"),
-					// ToDo Add check for custom external_secondaries
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_primaries.#", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.address", "192.168.1.50"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.fqdn", "tf_test_external_secondary."),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.protocol_fqdn", "tf_test_external_secondary."),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.stealth", "false"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.tsig_enabled", "false"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "external_secondaries.0.tsig_key"),
+
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "fqdn", "tf-acc-test.com."),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "gss_tsig_enabled", "true"),
 					// ToDo Add check for custom inheritance_assigned_hosts
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_assigned_hosts.#", "0"),
 					// ToDo Add check for custom inheritance_sources
 					resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "initial_soa_serial", "1"),
@@ -410,7 +466,7 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "mapping", "forward"),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "notify", "true"),
 					// ToDo Add check for custom nsgs
-					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "nsgs.#", "0"),
 					// ToDo Add check for custom parent
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "parent", ""),
 					resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
