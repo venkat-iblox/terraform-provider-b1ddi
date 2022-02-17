@@ -600,7 +600,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	customRootNs := make([]interface{}, 0, len(resp.Payload.Result.CustomRootNs))
+	customRootNs := make([]map[string]interface{}, 0, len(resp.Payload.Result.CustomRootNs))
 	for _, ns := range resp.Payload.Result.CustomRootNs {
 		customRootNs = append(customRootNs, flattenConfigRootNS(ns))
 	}
@@ -624,7 +624,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	dnssecRootKeys := make([]interface{}, 0, len(resp.Payload.Result.DnssecRootKeys))
+	dnssecRootKeys := make([]map[string]interface{}, 0, len(resp.Payload.Result.DnssecRootKeys))
 	for _, drk := range resp.Payload.Result.DnssecRootKeys {
 		dnssecRootKeys = append(dnssecRootKeys, flattenConfigTrustAnchor(drk))
 	}
@@ -632,7 +632,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	dnssecTrustAnchors := make([]interface{}, 0, len(resp.Payload.Result.DnssecTrustAnchors))
+	dnssecTrustAnchors := make([]map[string]interface{}, 0, len(resp.Payload.Result.DnssecTrustAnchors))
 	for _, dta := range resp.Payload.Result.DnssecTrustAnchors {
 		dnssecTrustAnchors = append(dnssecTrustAnchors, flattenConfigTrustAnchor(dta))
 	}
@@ -660,7 +660,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	ecsZones := make([]interface{}, 0, len(resp.Payload.Result.EcsZones))
+	ecsZones := make([]map[string]interface{}, 0, len(resp.Payload.Result.EcsZones))
 	for _, ecsZone := range resp.Payload.Result.EcsZones {
 		ecsZones = append(ecsZones, flattenConfigECSZone(ecsZone))
 	}
@@ -672,7 +672,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	forwarders := make([]interface{}, 0, len(resp.Payload.Result.Forwarders))
+	forwarders := make([]map[string]interface{}, 0, len(resp.Payload.Result.Forwarders))
 	for _, f := range resp.Payload.Result.Forwarders {
 		forwarders = append(forwarders, flattenConfigForwarder(f))
 	}
@@ -700,7 +700,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	matchClientsACL := make([]interface{}, 0, len(resp.Payload.Result.MatchClientsACL))
+	matchClientsACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.MatchClientsACL))
 	for _, aclItem := range resp.Payload.Result.MatchClientsACL {
 		matchClientsACL = append(matchClientsACL, flattenConfigACLItem(aclItem))
 	}
@@ -708,7 +708,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	matchDestinationsACL := make([]interface{}, 0, len(resp.Payload.Result.MatchDestinationsACL))
+	matchDestinationsACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.MatchDestinationsACL))
 	for _, aclItem := range resp.Payload.Result.MatchDestinationsACL {
 		matchDestinationsACL = append(matchDestinationsACL, flattenConfigACLItem(aclItem))
 	}
@@ -744,7 +744,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	queryACL := make([]interface{}, 0, len(resp.Payload.Result.QueryACL))
+	queryACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.QueryACL))
 	for _, aclItem := range resp.Payload.Result.QueryACL {
 		queryACL = append(queryACL, flattenConfigACLItem(aclItem))
 	}
@@ -752,7 +752,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	recursionACL := make([]interface{}, 0, len(resp.Payload.Result.RecursionACL))
+	recursionACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.RecursionACL))
 	for _, aclItem := range resp.Payload.Result.RecursionACL {
 		recursionACL = append(recursionACL, flattenConfigACLItem(aclItem))
 	}
@@ -768,7 +768,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	transferACL := make([]interface{}, 0, len(resp.Payload.Result.TransferACL))
+	transferACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.TransferACL))
 	for _, aclItem := range resp.Payload.Result.TransferACL {
 		transferACL = append(transferACL, flattenConfigACLItem(aclItem))
 	}
@@ -776,7 +776,7 @@ func resourceConfigViewRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	updateACL := make([]interface{}, 0, len(resp.Payload.Result.UpdateACL))
+	updateACL := make([]map[string]interface{}, 0, len(resp.Payload.Result.UpdateACL))
 	for _, aclItem := range resp.Payload.Result.UpdateACL {
 		updateACL = append(updateACL, flattenConfigACLItem(aclItem))
 	}

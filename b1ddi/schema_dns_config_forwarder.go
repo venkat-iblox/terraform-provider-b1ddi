@@ -42,17 +42,15 @@ func schemaConfigForwarder() *schema.Resource {
 	}
 }
 
-func flattenConfigForwarder(r *models.ConfigForwarder) []interface{} {
+func flattenConfigForwarder(r *models.ConfigForwarder) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"address":       r.Address,
-			"fqdn":          r.Fqdn,
-			"protocol_fqdn": r.ProtocolFqdn,
-		},
+	return map[string]interface{}{
+		"address":       r.Address,
+		"fqdn":          r.Fqdn,
+		"protocol_fqdn": r.ProtocolFqdn,
 	}
 }
 

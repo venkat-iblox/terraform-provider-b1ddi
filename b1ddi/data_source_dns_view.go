@@ -67,57 +67,57 @@ func flattenConfigView(r *models.ConfigView) []interface{} {
 		return nil
 	}
 
-	customRootNs := make([]interface{}, 0, len(r.CustomRootNs))
+	customRootNs := make([]map[string]interface{}, 0, len(r.CustomRootNs))
 	for _, ns := range r.CustomRootNs {
 		customRootNs = append(customRootNs, flattenConfigRootNS(ns))
 	}
 
-	dnssecRootKeys := make([]interface{}, 0, len(r.DnssecRootKeys))
+	dnssecRootKeys := make([]map[string]interface{}, 0, len(r.DnssecRootKeys))
 	for _, drk := range r.DnssecRootKeys {
 		dnssecRootKeys = append(dnssecRootKeys, flattenConfigTrustAnchor(drk))
 	}
 
-	dnssecTrustAnchors := make([]interface{}, 0, len(r.DnssecTrustAnchors))
+	dnssecTrustAnchors := make([]map[string]interface{}, 0, len(r.DnssecTrustAnchors))
 	for _, dta := range r.DnssecTrustAnchors {
 		dnssecTrustAnchors = append(dnssecTrustAnchors, flattenConfigTrustAnchor(dta))
 	}
 
-	ecsZones := make([]interface{}, 0, len(r.EcsZones))
+	ecsZones := make([]map[string]interface{}, 0, len(r.EcsZones))
 	for _, ecsZone := range r.EcsZones {
 		ecsZones = append(ecsZones, flattenConfigECSZone(ecsZone))
 	}
 
-	forwarders := make([]interface{}, 0, len(r.Forwarders))
+	forwarders := make([]map[string]interface{}, 0, len(r.Forwarders))
 	for _, f := range r.Forwarders {
 		forwarders = append(forwarders, flattenConfigForwarder(f))
 	}
 
-	matchClientsACL := make([]interface{}, 0, len(r.MatchClientsACL))
+	matchClientsACL := make([]map[string]interface{}, 0, len(r.MatchClientsACL))
 	for _, aclItem := range r.MatchClientsACL {
 		matchClientsACL = append(matchClientsACL, flattenConfigACLItem(aclItem))
 	}
 
-	matchDestinationsACL := make([]interface{}, 0, len(r.MatchDestinationsACL))
+	matchDestinationsACL := make([]map[string]interface{}, 0, len(r.MatchDestinationsACL))
 	for _, aclItem := range r.MatchDestinationsACL {
 		matchDestinationsACL = append(matchDestinationsACL, flattenConfigACLItem(aclItem))
 	}
 
-	queryACL := make([]interface{}, 0, len(r.QueryACL))
+	queryACL := make([]map[string]interface{}, 0, len(r.QueryACL))
 	for _, aclItem := range r.QueryACL {
 		queryACL = append(queryACL, flattenConfigACLItem(aclItem))
 	}
 
-	recursionACL := make([]interface{}, 0, len(r.RecursionACL))
+	recursionACL := make([]map[string]interface{}, 0, len(r.RecursionACL))
 	for _, aclItem := range r.RecursionACL {
 		recursionACL = append(recursionACL, flattenConfigACLItem(aclItem))
 	}
 
-	transferACL := make([]interface{}, 0, len(r.TransferACL))
+	transferACL := make([]map[string]interface{}, 0, len(r.TransferACL))
 	for _, aclItem := range r.TransferACL {
 		transferACL = append(transferACL, flattenConfigACLItem(aclItem))
 	}
 
-	updateACL := make([]interface{}, 0, len(r.UpdateACL))
+	updateACL := make([]map[string]interface{}, 0, len(r.UpdateACL))
 	for _, aclItem := range r.UpdateACL {
 		updateACL = append(updateACL, flattenConfigACLItem(aclItem))
 	}

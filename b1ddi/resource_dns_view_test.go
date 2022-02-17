@@ -35,7 +35,7 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "comment", ""),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "created_at"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns_enabled", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "disabled", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_enable_validation", "true"),
@@ -47,19 +47,19 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.sep", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.zone", "."),
 
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_validate_expiry", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_enabled", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_forwarding", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v4", "24"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v6", "56"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "edns_udp_size", "1232"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "false"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ip_spaces.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ip_spaces.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "lame_ttl", "600"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.#", "1"),
@@ -83,12 +83,12 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "minimal_responses", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "name", "tf_acc_test_dns_view"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "notify", "false"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "query_acl.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_acl.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "query_acl.#", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_acl.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_enabled", "true"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "update_acl.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.#", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "update_acl.#", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "updated_at"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "use_forwarders_for_subzones", "true"),
 
@@ -131,27 +131,42 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						comment = "This DNS View is created by the terraform provider acceptance test"
 
-						#custom_root_ns {}
-						#custom_root_ns_enabled = true
+						custom_root_ns {
+							address = "192.168.1.60"
+							fqdn = "tf_acc_test_custom_root_ns."
+						}
+						custom_root_ns_enabled = true
 
 						disabled = true
 						dnssec_enable_validation = false
 						dnssec_enabled = false
 						
-						#dnssec_trust_anchors {}
+						dnssec_trust_anchors {
+							algorithm = 8
+							zone = "tf_acc_test_zone."
+							# Trust anchor from https://data.iana.org/root-anchors/
+							public_key = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFRydXN0QW5jaG9yIGlkPSIzODBEQzUwRC00ODRFLTQwRDAtQTNBRS02OEYyQjE4RjYxQzciIHNvdXJjZT0iaHR0cDovL2RhdGEuaWFuYS5vcmcvcm9vdC1hbmNob3JzL3Jvb3QtYW5jaG9ycy54bWwiPgo8Wm9uZT4uPC9ab25lPgo8S2V5RGlnZXN0IGlkPSJLanFtdDd2IiB2YWxpZEZyb209IjIwMTAtMDctMTVUMDA6MDA6MDArMDA6MDAiIHZhbGlkVW50aWw9IjIwMTktMDEtMTFUMDA6MDA6MDArMDA6MDAiPgo8S2V5VGFnPjE5MDM2PC9LZXlUYWc+CjxBbGdvcml0aG0+ODwvQWxnb3JpdGhtPgo8RGlnZXN0VHlwZT4yPC9EaWdlc3RUeXBlPgo8RGlnZXN0PjQ5QUFDMTFEN0I2RjY0NDY3MDJFNTRBMTYwNzM3MTYwN0ExQTQxODU1MjAwRkQyQ0UxQ0RERTMyRjI0RThGQjU8L0RpZ2VzdD4KPC9LZXlEaWdlc3Q+CjxLZXlEaWdlc3QgaWQ9IktsYWpleXoiIHZhbGlkRnJvbT0iMjAxNy0wMi0wMlQwMDowMDowMCswMDowMCI+CjxLZXlUYWc+MjAzMjY8L0tleVRhZz4KPEFsZ29yaXRobT44PC9BbGdvcml0aG0+CjxEaWdlc3RUeXBlPjI8L0RpZ2VzdFR5cGU+CjxEaWdlc3Q+RTA2RDQ0QjgwQjhGMUQzOUE5NUMwQjBEN0M2NUQwODQ1OEU4ODA0MDlCQkM2ODM0NTcxMDQyMzdDN0Y4RUM4RDwvRGlnZXN0Pgo8L0tleURpZ2VzdD4KPC9UcnVzdEFuY2hvcj4K"
+							sep = true
+						}
 
 						dnssec_validate_expiry = false
-						ecs_enabled = false
+						ecs_enabled = true
 						ecs_forwarding = true
 						ecs_prefix_v4 = 12
 						ecs_prefix_v6 = 28
 						
-						#ecs_zones {}
+						ecs_zones {
+							access = "allow"
+							fqdn = "tf_acc_test_ecs_zone."
+						}
 						
 						edns_udp_size = 1024
 
-						#forwarders {}
-						#forwarders_only = true
+						forwarders {
+							address = "192.168.1.70"
+							fqdn = "tf_acc_test_forwarder.infolbox.com."
+						}
+						forwarders_only = true
 
 						gss_tsig_enabled = true
 
@@ -223,9 +238,11 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 			testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "comment", "This DNS View is created by the terraform provider acceptance test"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "created_at"),
-			// ToDo add check for custom root ns
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns_enabled", "false"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.0.address", "192.168.1.60"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.0.fqdn", "tf_acc_test_custom_root_ns."),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns_enabled", "true"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "disabled", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_enable_validation", "false"),
@@ -237,22 +254,30 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.sep", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.zone", "."),
 
-			// ToDo add check for custom dnssec trust anchors
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.%", "0"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.algorithm", "8"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.protocol_zone", "tf_acc_test_zone."),
+			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.public_key"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.sep", "true"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.zone", "tf_acc_test_zone."),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_validate_expiry", "false"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_enabled", "false"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_enabled", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_forwarding", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v4", "12"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v6", "28"),
-			// ToDo add check for custom ecs_zones and ecs_enabled=true
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.%", "0"),
+
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.access", "allow"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.fqdn", "tf_acc_test_ecs_zone."),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.protocol_fqdn", "tf_acc_test_ecs_zone."),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "edns_udp_size", "1024"),
 
-			// ToDo add check for custom forwarders list
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.%", "0"),
-			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "false"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.0.address", "192.168.1.70"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.0.fqdn", "tf_acc_test_forwarder.infolbox.com."),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "true"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "true"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),
@@ -336,27 +361,42 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						comment = "This DNS View is created by the terraform provider acceptance test"
 
-						#custom_root_ns {}
-						#custom_root_ns_enabled = true
+						custom_root_ns {
+							address = "192.168.1.60"
+							fqdn = "tf_acc_test_custom_root_ns."
+						}
+						custom_root_ns_enabled = true
 
 						disabled = true
 						dnssec_enable_validation = false
 						dnssec_enabled = false
 						
-						#dnssec_trust_anchors {}
+						dnssec_trust_anchors {
+							algorithm = 8
+							zone = "tf_acc_test_zone."
+							# Trust anchor from https://data.iana.org/root-anchors/
+							public_key = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFRydXN0QW5jaG9yIGlkPSIzODBEQzUwRC00ODRFLTQwRDAtQTNBRS02OEYyQjE4RjYxQzciIHNvdXJjZT0iaHR0cDovL2RhdGEuaWFuYS5vcmcvcm9vdC1hbmNob3JzL3Jvb3QtYW5jaG9ycy54bWwiPgo8Wm9uZT4uPC9ab25lPgo8S2V5RGlnZXN0IGlkPSJLanFtdDd2IiB2YWxpZEZyb209IjIwMTAtMDctMTVUMDA6MDA6MDArMDA6MDAiIHZhbGlkVW50aWw9IjIwMTktMDEtMTFUMDA6MDA6MDArMDA6MDAiPgo8S2V5VGFnPjE5MDM2PC9LZXlUYWc+CjxBbGdvcml0aG0+ODwvQWxnb3JpdGhtPgo8RGlnZXN0VHlwZT4yPC9EaWdlc3RUeXBlPgo8RGlnZXN0PjQ5QUFDMTFEN0I2RjY0NDY3MDJFNTRBMTYwNzM3MTYwN0ExQTQxODU1MjAwRkQyQ0UxQ0RERTMyRjI0RThGQjU8L0RpZ2VzdD4KPC9LZXlEaWdlc3Q+CjxLZXlEaWdlc3QgaWQ9IktsYWpleXoiIHZhbGlkRnJvbT0iMjAxNy0wMi0wMlQwMDowMDowMCswMDowMCI+CjxLZXlUYWc+MjAzMjY8L0tleVRhZz4KPEFsZ29yaXRobT44PC9BbGdvcml0aG0+CjxEaWdlc3RUeXBlPjI8L0RpZ2VzdFR5cGU+CjxEaWdlc3Q+RTA2RDQ0QjgwQjhGMUQzOUE5NUMwQjBEN0M2NUQwODQ1OEU4ODA0MDlCQkM2ODM0NTcxMDQyMzdDN0Y4RUM4RDwvRGlnZXN0Pgo8L0tleURpZ2VzdD4KPC9UcnVzdEFuY2hvcj4K"
+							sep = true
+						}
 
 						dnssec_validate_expiry = false
-						ecs_enabled = false
+						ecs_enabled = true
 						ecs_forwarding = true
 						ecs_prefix_v4 = 12
 						ecs_prefix_v6 = 28
 						
-						#ecs_zones {}
+						ecs_zones {
+							access = "allow"
+							fqdn = "tf_acc_test_ecs_zone."
+						}
 						
 						edns_udp_size = 1024
 
-						#forwarders {}
-						#forwarders_only = true
+						forwarders {
+							address = "192.168.1.70"
+							fqdn = "tf_acc_test_forwarder.infolbox.com."
+						}
+						forwarders_only = true
 
 						gss_tsig_enabled = true
 
@@ -427,9 +467,11 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "comment", "This DNS View is created by the terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "created_at"),
-					// ToDo add check for custom root ns
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.%", "0"),
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns_enabled", "false"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.0.address", "192.168.1.60"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns.0.fqdn", "tf_acc_test_custom_root_ns."),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "custom_root_ns_enabled", "true"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "disabled", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_enable_validation", "false"),
@@ -441,22 +483,30 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.sep", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_root_keys.0.zone", "."),
 
-					// ToDo add check for custom dnssec trust anchors
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.%", "0"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.algorithm", "8"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.protocol_zone", "tf_acc_test_zone."),
+					resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.public_key"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.sep", "true"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_trust_anchors.0.zone", "tf_acc_test_zone."),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "dnssec_validate_expiry", "false"),
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_enabled", "false"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_enabled", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_forwarding", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v4", "12"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_prefix_v6", "28"),
-					// ToDo add check for custom ecs_zones and ecs_enabled=true
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.%", "0"),
+
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.access", "allow"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.fqdn", "tf_acc_test_ecs_zone."),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ecs_zones.0.protocol_fqdn", "tf_acc_test_ecs_zone."),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "edns_udp_size", "1024"),
 
-					// ToDo add check for custom forwarders list
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.%", "0"),
-					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "false"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.#", "1"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.0.address", "192.168.1.70"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.0.fqdn", "tf_acc_test_forwarder.infolbox.com."),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "true"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "true"),
 					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),

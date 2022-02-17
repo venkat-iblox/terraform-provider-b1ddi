@@ -46,17 +46,15 @@ func schemaConfigECSZone() *schema.Resource {
 	}
 }
 
-func flattenConfigECSZone(r *models.ConfigECSZone) []interface{} {
+func flattenConfigECSZone(r *models.ConfigECSZone) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"access":        r.Access,
-			"fqdn":          r.Fqdn,
-			"protocol_fqdn": r.ProtocolFqdn,
-		},
+	return map[string]interface{}{
+		"access":        r.Access,
+		"fqdn":          r.Fqdn,
+		"protocol_fqdn": r.ProtocolFqdn,
 	}
 }
 

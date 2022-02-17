@@ -37,7 +37,7 @@ func flattenConfigCustomRootNSBlock(r *models.ConfigCustomRootNSBlock) []interfa
 		return []interface{}{}
 	}
 
-	customRootNs := make([]interface{}, 0, len(r.CustomRootNs))
+	customRootNs := make([]map[string]interface{}, 0, len(r.CustomRootNs))
 	for _, ns := range r.CustomRootNs {
 		customRootNs = append(customRootNs, flattenConfigRootNS(ns))
 	}

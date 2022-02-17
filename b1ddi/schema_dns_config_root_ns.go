@@ -42,16 +42,14 @@ func schemaConfigRootNS() *schema.Resource {
 	}
 }
 
-func flattenConfigRootNS(r *models.ConfigRootNS) []interface{} {
+func flattenConfigRootNS(r *models.ConfigRootNS) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
-	return []interface{}{
-		map[string]interface{}{
-			"address":       r.Address,
-			"fqdn":          r.Fqdn,
-			"protocol_fqdn": r.ProtocolFqdn,
-		},
+	return map[string]interface{}{
+		"address":       r.Address,
+		"fqdn":          r.Fqdn,
+		"protocol_fqdn": r.ProtocolFqdn,
 	}
 }
 
