@@ -63,6 +63,8 @@ func Provider() *schema.Provider {
 			"b1ddi_dns_views":       dataSourceConfigView(),
 			"b1ddi_dns_auth_zones":  dataSourceConfigAuthZone(),
 			"b1ddi_dns_records":     dataSourceDataRecord(),
+			"b1ddi_dhcp_hosts":      dataSourceIpamsvcDhcpHost(),
+			"b1ddi_dns_hosts":       dataSourceDnsHost(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

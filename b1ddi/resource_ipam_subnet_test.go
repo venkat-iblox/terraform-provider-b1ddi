@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
+	"os"
 	"regexp"
 	"testing"
 )
@@ -113,7 +114,7 @@ func TestAccResourceSubnet_FullConfig(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
-			resourceSubnetFullConfigTestStep(),
+			resourceSubnetFullConfigTestStep(t),
 			{
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
@@ -124,7 +125,7 @@ func TestAccResourceSubnet_FullConfig(t *testing.T) {
 	})
 }
 
-func resourceSubnetFullConfigTestStep() resource.TestStep {
+func resourceSubnetFullConfigTestStep(t *testing.T) resource.TestStep {
 	return resource.TestStep{
 		Config: fmt.Sprintf(`
 					resource "b1ddi_ip_space" "tf_acc_test_space" {
@@ -134,6 +135,11 @@ func resourceSubnetFullConfigTestStep() resource.TestStep {
 					data "b1ddi_option_codes" "tf_acc_option_code" {
 						filters = {
 							"name" = "routers"
+						}
+					}
+					data "b1ddi_dhcp_hosts" "dhcp_host" {
+						filters = {
+							"name" = "%s"
 						}
 					}
 					resource "b1ddi_subnet" "tf_acc_test_subnet" {
@@ -162,7 +168,7 @@ func resourceSubnetFullConfigTestStep() resource.TestStep {
 							#filters = ["filter1"]
 							lease_time = 1800
 						}
-						#dhcp_host = "dhcp_host"
+						dhcp_host = data.b1ddi_dhcp_hosts.dhcp_host.results.0.id
 						
 						dhcp_options {
 							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
@@ -183,7 +189,7 @@ func resourceSubnetFullConfigTestStep() resource.TestStep {
 							TestType = "Acceptance"
 						}
 						#threshold {}
-					}`),
+					}`, testAccReadDhcpHost(t)),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 			testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
@@ -217,8 +223,8 @@ func resourceSubnetFullConfigTestStep() resource.TestStep {
 			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
 			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
-			// ToDo Add dhcp_host parameter
-			//resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", "dhcp_host"),
+
+			resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host"),
 
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.0.option_value", "192.168.1.20"),
@@ -352,6 +358,11 @@ func TestAccResourceSubnet_update(t *testing.T) {
 							"name" = "routers"
 						}
 					}
+					data "b1ddi_dhcp_hosts" "dhcp_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_subnet" "tf_acc_test_subnet" {
 						address = "192.168.1.0"
 						asm_config {
@@ -378,7 +389,7 @@ func TestAccResourceSubnet_update(t *testing.T) {
 							#filters = ["filter1"]
 							lease_time = 1800
 						}
-						#dhcp_host = "dhcp_host"
+						dhcp_host = data.b1ddi_dhcp_hosts.dhcp_host.results.0.id
 						dhcp_options {
 							option_code = data.b1ddi_option_codes.tf_acc_option_code.results.0.id
 							option_value = "192.168.1.20"
@@ -398,7 +409,7 @@ func TestAccResourceSubnet_update(t *testing.T) {
 							TestType = "Acceptance"
 						}
 						#threshold {}
-					}`),
+					}`, testAccReadDhcpHost(t)),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
 					testCheckSubnetInSpace("b1ddi_subnet.tf_acc_test_subnet", "b1ddi_ip_space.tf_acc_test_space"),
@@ -553,4 +564,15 @@ func testCheckSubnetInSpace(subnetPath, spacePath string) resource.TestCheckFunc
 
 		return nil
 	}
+}
+
+// Read Dhcp Host name from the env. If env is not specified, skip the test.
+func testAccReadDhcpHost(t *testing.T) string {
+	internalSecondary := os.Getenv("DHCP_HOST")
+
+	if internalSecondary == "" {
+		t.Skipf("No DHCP_HOST env is set for the %s acceptance test", t.Name())
+	}
+
+	return internalSecondary
 }

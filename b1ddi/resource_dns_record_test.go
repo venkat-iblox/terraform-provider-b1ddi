@@ -32,9 +32,14 @@ func resourceDnsRecordBasicTestStep(t *testing.T) resource.TestStep {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "cloud"
@@ -47,7 +52,7 @@ func resourceDnsRecordBasicTestStep(t *testing.T) resource.TestStep {
 							"address" = "192.168.1.15"
 						}
 						type = "A"
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 		),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
@@ -87,9 +92,14 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "cloud"
@@ -111,7 +121,7 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 						ttl = 24400
 						type = "A"
 						zone = b1ddi_dns_auth_zone.tf_acc_test_auth_zone.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
@@ -162,9 +172,14 @@ func TestAccResourceDnsRecord_update(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "cloud"
@@ -186,7 +201,7 @@ func TestAccResourceDnsRecord_update(t *testing.T) {
 						ttl = 24400
 						type = "A"
 						zone = b1ddi_dns_auth_zone.tf_acc_test_auth_zone.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
@@ -237,9 +252,14 @@ func TestAccResourceDnsRecord_UpdateTypeExpectError(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "cloud"
@@ -254,7 +274,7 @@ func TestAccResourceDnsRecord_UpdateTypeExpectError(t *testing.T) {
 						}
 						type = "PTR"
 						zone = b1ddi_dns_auth_zone.tf_acc_test_auth_zone.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
@@ -282,9 +302,14 @@ func TestAccResourceDnsRecord_UpdateViewExpectError(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "cloud"
@@ -292,7 +317,7 @@ func TestAccResourceDnsRecord_UpdateViewExpectError(t *testing.T) {
 					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_new_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-new-acc-test.com."
 						primary_type = "cloud"
@@ -307,7 +332,7 @@ func TestAccResourceDnsRecord_UpdateViewExpectError(t *testing.T) {
 						}
 						type = "PTR"
 						zone = b1ddi_dns_auth_zone.tf_acc_test_new_auth_zone.id
-					}`, testAccReadInternalSecondary(t), testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),

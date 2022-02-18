@@ -12,17 +12,6 @@ import (
 	"testing"
 )
 
-// Read internal secondary from the env. If env is not specified, skip the test.
-func testAccReadInternalSecondary(t *testing.T) string {
-	internalSecondary := os.Getenv("INTERNAL_SECONDARY")
-
-	if internalSecondary == "" {
-		t.Skip("No INTERNAL_SECONDARY env is set for the DNS Auth Zone acceptance test")
-	}
-
-	return internalSecondary
-}
-
 func TestAccResourceDnsAuthZone_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -44,14 +33,19 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 		resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 			name = "tf_acc_test_dns_view"
 		}
+		data "b1ddi_dns_hosts" "dns_host" {
+			filters = {
+				"name" = "%s"
+			}
+		}
 		resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 			internal_secondaries {
-				host = "%s"
+				host = data.b1ddi_dns_hosts.dns_host.results.0.id
 			}
 			fqdn = "tf-acc-test.com."
 			primary_type = "cloud"
 			view = b1ddi_dns_view.tf_acc_test_dns_view.id
-		}`, testAccReadInternalSecondary(t)),
+		}`, testAccReadDnsHost(t)),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "comment", ""),
@@ -119,6 +113,11 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						comment = "This Auth Zone is created by the terraform provider acceptance test"
 						disabled = true
@@ -138,7 +137,7 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 						initial_soa_serial = 3
 
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 
 						notify = true
@@ -181,7 +180,7 @@ func resourceDnsAuthZoneFullConfigTestStep(t *testing.T) resource.TestStep {
 							use_default_mname = false
 						}
 						
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 		),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
@@ -268,14 +267,19 @@ func TestAccResourceDnsAuthZone_UpdateFQDNExpectError(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test2.com."
 						primary_type = "cloud"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				ExpectError: regexp.MustCompile("changing the value of 'fqdn' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -303,15 +307,20 @@ func TestAccResourceDnsAuthZone_UpdateInitialSoaSerialExpectError(t *testing.T) 
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						initial_soa_serial = 3
 						primary_type = "cloud"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				ExpectError: regexp.MustCompile("changing the value of 'initial_soa_serial' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -339,14 +348,19 @@ func TestAccResourceDnsAuthZone_UpdatePrimaryTypeExpectError(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 						fqdn = "tf-acc-test.com."
 						primary_type = "external"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				ExpectError: regexp.MustCompile("changing the value of 'primary_type' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -374,6 +388,11 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
 					}
+					data "b1ddi_dns_hosts" "dns_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
 					resource "b1ddi_dns_auth_zone" "tf_acc_test_auth_zone" {
 						comment = "This Auth Zone is created by the terraform provider acceptance test"
 						disabled = true
@@ -391,7 +410,7 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 						#inheritance_sources {}
 
 						internal_secondaries {
-							host = "%s"
+							host = data.b1ddi_dns_hosts.dns_host.results.0.id
 						}
 
 						notify = true
@@ -434,7 +453,7 @@ func TestAccResourceDnsAuthZone_Update(t *testing.T) {
 							use_default_mname = false
 						}
 						
-					}`, testAccReadInternalSecondary(t),
+					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_test_auth_zone"),
@@ -544,4 +563,15 @@ func testAccDnsAuthZoneExists(resPath string) resource.TestCheckFunc {
 		}
 		return nil
 	}
+}
+
+// Read Dhcp Host name from the env. If env is not specified, skip the test.
+func testAccReadDnsHost(t *testing.T) string {
+	internalSecondary := os.Getenv("DNS_HOST")
+
+	if internalSecondary == "" {
+		t.Skipf("No DNS_HOST env is set for the %s acceptance test", t.Name())
+	}
+
+	return internalSecondary
 }

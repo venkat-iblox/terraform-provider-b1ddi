@@ -41,7 +41,7 @@ func TestAccDataSourceIpamsvcSubnet_FullConfig(t *testing.T) {
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			// Create Subnet resource
-			resourceSubnetFullConfigTestStep(),
+			resourceSubnetFullConfigTestStep(t),
 			// Check Subnet data source
 			{
 				Config: fmt.Sprintf(`
