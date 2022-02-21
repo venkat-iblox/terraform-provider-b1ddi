@@ -88,7 +88,7 @@ func resourceAddressBlockBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_filename", ""),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_address", ""),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_name", ""),
-			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "_"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "-"),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_enabled", "false"),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
 
@@ -223,7 +223,7 @@ func resourceAddressBlockFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_filename", ""),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_address", ""),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_name", ""),
-			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "_"),
+			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "-"),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_enabled", "false"),
 			resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
 
@@ -421,7 +421,7 @@ func TestAccResourceAddressBlock_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_filename", ""),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_address", ""),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "header_option_server_name", ""),
-					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "_"),
+					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_char", "-"),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_enabled", "false"),
 					resource.TestCheckResourceAttr("b1ddi_address_block.tf_acc_test_address_block", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
 
