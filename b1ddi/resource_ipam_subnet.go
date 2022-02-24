@@ -362,7 +362,6 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
 		DhcpHost:                  d.Get("dhcp_host").(string),
 		DhcpOptions:               dhcpOptions,
-		DhcpUtilization:           expandIpamsvcDHCPUtilization(d.Get("dhcp_utilization").([]interface{})),
 		HeaderOptionFilename:      d.Get("header_option_filename").(string),
 		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
 		HeaderOptionServerName:    d.Get("header_option_server_name").(string),

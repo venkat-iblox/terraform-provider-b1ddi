@@ -65,17 +65,3 @@ func flattenIpamsvcDHCPUtilization(r *models.IpamsvcDHCPUtilization) []interface
 		},
 	}
 }
-
-func expandIpamsvcDHCPUtilization(d []interface{}) *models.IpamsvcDHCPUtilization {
-	if len(d) == 0 || d[0] == nil {
-		return nil
-	}
-	in := d[0].(map[string]interface{})
-
-	return &models.IpamsvcDHCPUtilization{
-		DhcpFree:        in["dhcp_free"].(string),
-		DhcpTotal:       in["dhcp_total"].(string),
-		DhcpUsed:        in["dhcp_total"].(string),
-		DhcpUtilization: int64(in["dhcp_utilization"].(int)),
-	}
-}
