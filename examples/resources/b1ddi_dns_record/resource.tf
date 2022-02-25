@@ -19,7 +19,6 @@ data "b1ddi_dns_hosts" "dns_host_by_name" {
   }
 }
 
-
 resource "b1ddi_dns_view" "tf_example_dns_view" {
   name = "example_tf_dns_view"
 }
@@ -63,7 +62,7 @@ resource "b1ddi_dns_record" "cname_record" {
 resource "b1ddi_dns_record" "ns_record" {
   zone = b1ddi_dns_auth_zone.tf_example_auth_zone.id
   rdata = {
-    "dname" = "ns1.tf-example.com."
+    "dname" = "ns.tf-example.b1ddi.tf-example.com."
   }
   type = "NS"
 }
