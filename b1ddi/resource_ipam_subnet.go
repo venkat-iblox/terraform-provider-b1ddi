@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
@@ -347,6 +348,12 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		}
 	}
 
+	inheritanceSources, err := expandIpamsvcDHCPInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
+		return diag.FromErr(err)
+	}
+
 	s := &models.IpamsvcSubnet{
 		Address:                   swag.String(d.Get("address").(string)),
 		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
@@ -368,7 +375,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
 		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
 		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
-		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		InheritanceSources:        inheritanceSources,
 		Name:                      d.Get("name").(string),
 		Space:                     swag.String(d.Get("space").(string)),
 		Tags:                      d.Get("tags"),
@@ -572,6 +579,12 @@ func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m 
 		}
 	}
 
+	inheritanceSources, err := expandIpamsvcDHCPInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
+		return diag.FromErr(err)
+	}
+
 	body := &models.IpamsvcSubnet{
 		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
 		Cidr:                      int64(d.Get("cidr").(int)),
@@ -592,7 +605,7 @@ func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m 
 		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
 		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
 		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
-		InheritanceSources:        expandIpamsvcDHCPInheritance(d.Get("inheritance_sources").([]interface{})),
+		InheritanceSources:        inheritanceSources,
 		Name:                      d.Get("name").(string),
 		Tags:                      d.Get("tags"),
 		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),

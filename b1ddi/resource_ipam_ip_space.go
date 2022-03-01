@@ -3,6 +3,7 @@ package b1ddi
 import (
 	"context"
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -290,6 +291,12 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 		}
 	}
 
+	inheritanceSources, err := expandIpamsvcIPSpaceInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
+		return diag.FromErr(err)
+	}
+
 	s := &b1models.IpamsvcIPSpace{
 		AsmConfig:                       expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
 		Comment:                         d.Get("comment").(string),
@@ -308,7 +315,7 @@ func resourceIpamsvcIPSpaceCreate(ctx context.Context, d *schema.ResourceData, m
 		HostnameRewriteChar:             d.Get("hostname_rewrite_char").(string),
 		HostnameRewriteEnabled:          d.Get("hostname_rewrite_enabled").(bool),
 		HostnameRewriteRegex:            d.Get("hostname_rewrite_regex").(string),
-		InheritanceSources:              expandIpamsvcIPSpaceInheritance(d.Get("inheritance_sources").([]interface{})),
+		InheritanceSources:              inheritanceSources,
 		Name:                            swag.String(d.Get("name").(string)),
 		Tags:                            d.Get("tags"),
 		VendorSpecificOptionOptionSpace: d.Get("vendor_specific_option_option_space").(string),
@@ -487,6 +494,12 @@ func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m
 		}
 	}
 
+	inheritanceSources, err := expandIpamsvcIPSpaceInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
+		return diag.FromErr(err)
+	}
+
 	body := &b1models.IpamsvcIPSpace{
 		AsmConfig:                       expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
 		Comment:                         d.Get("comment").(string),
@@ -505,7 +518,7 @@ func resourceIpamsvcIPSpaceUpdate(ctx context.Context, d *schema.ResourceData, m
 		HostnameRewriteChar:             d.Get("hostname_rewrite_char").(string),
 		HostnameRewriteEnabled:          d.Get("hostname_rewrite_enabled").(bool),
 		HostnameRewriteRegex:            d.Get("hostname_rewrite_regex").(string),
-		InheritanceSources:              expandIpamsvcIPSpaceInheritance(d.Get("inheritance_sources").([]interface{})),
+		InheritanceSources:              inheritanceSources,
 		Name:                            swag.String(d.Get("name").(string)),
 		Tags:                            d.Get("tags"),
 		VendorSpecificOptionOptionSpace: d.Get("vendor_specific_option_option_space").(string),

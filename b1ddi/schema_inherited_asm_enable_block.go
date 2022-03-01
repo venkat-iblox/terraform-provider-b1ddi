@@ -3,6 +3,8 @@
 package b1ddi
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -71,16 +73,22 @@ func flattenIpamsvcInheritedAsmEnableBlock(r *models.IpamsvcInheritedAsmEnableBl
 	}
 }
 
-func expandIpamsvcInheritedAsmEnableBlock(d []interface{}) *models.IpamsvcInheritedAsmEnableBlock {
+func expandIpamsvcInheritedAsmEnableBlock(ctx context.Context, d []interface{}) (*models.IpamsvcInheritedAsmEnableBlock, error) {
 	if len(d) == 0 || d[0] == nil {
-		return nil
+		return nil, nil
 	}
 	in := d[0].(map[string]interface{})
+
+	value, err := expandIpamsvcAsmEnableBlock(ctx, in["value"].([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'value' field. The underlying expand function returned an error.")
+		return nil, err
+	}
 
 	return &models.IpamsvcInheritedAsmEnableBlock{
 		Action:      in["action"].(string),
 		DisplayName: in["display_name"].(string),
 		Source:      in["source"].(string),
-		Value:       expandIpamsvcAsmEnableBlock(in["value"].([]interface{})),
-	}
+		Value:       value,
+	}, nil
 }

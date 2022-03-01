@@ -3,6 +3,8 @@
 package b1ddi
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -100,19 +102,25 @@ func flattenIpamsvcInheritedASMConfig(r *models.IpamsvcInheritedASMConfig) []int
 	}
 }
 
-func expandIpamsvcInheritedASMConfig(d []interface{}) *models.IpamsvcInheritedASMConfig {
+func expandIpamsvcInheritedASMConfig(ctx context.Context, d []interface{}) (*models.IpamsvcInheritedASMConfig, error) {
 	if len(d) == 0 || d[0] == nil {
-		return nil
+		return nil, nil
 	}
 	in := d[0].(map[string]interface{})
 
+	asmEnableBlock, err := expandIpamsvcInheritedAsmEnableBlock(ctx, in["asm_enable_block"].([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'asm_enable_block' field. The underlying expand function returned an error.")
+		return nil, err
+	}
+
 	return &models.IpamsvcInheritedASMConfig{
-		AsmEnableBlock: expandIpamsvcInheritedAsmEnableBlock(in["asm_enable_block"].([]interface{})),
+		AsmEnableBlock: asmEnableBlock,
 		AsmGrowthBlock: expandIpamsvcInheritedAsmGrowthBlock(in["asm_growth_block"].([]interface{})),
 		AsmThreshold:   expandInheritanceInheritedUInt32(in["asm_threshold"].([]interface{})),
 		ForecastPeriod: expandInheritanceInheritedUInt32(in["forecast_period"].([]interface{})),
 		History:        expandInheritanceInheritedUInt32(in["history"].([]interface{})),
 		MinTotal:       expandInheritanceInheritedUInt32(in["min_total"].([]interface{})),
 		MinUnused:      expandInheritanceInheritedUInt32(in["min_unused"].([]interface{})),
-	}
+	}, nil
 }

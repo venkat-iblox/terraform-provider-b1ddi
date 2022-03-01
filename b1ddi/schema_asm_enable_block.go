@@ -3,7 +3,9 @@
 package b1ddi
 
 import (
+	"context"
 	"github.com/go-openapi/strfmt"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/infobloxopen/b1ddi-go-client/models"
@@ -53,22 +55,26 @@ func flattenIpamsvcAsmEnableBlock(r *models.IpamsvcAsmEnableBlock) []interface{}
 		map[string]interface{}{
 			"enable":              r.Enable,
 			"enable_notification": r.EnableNotification,
-			"reenable_date":       r.ReenableDate,
+			"reenable_date":       r.ReenableDate.String(),
 		},
 	}
 }
 
-func expandIpamsvcAsmEnableBlock(d []interface{}) *models.IpamsvcAsmEnableBlock {
+func expandIpamsvcAsmEnableBlock(ctx context.Context, d []interface{}) (*models.IpamsvcAsmEnableBlock, error) {
 	if len(d) == 0 || d[0] == nil {
-		return nil
+		return nil, nil
 	}
 	in := d[0].(map[string]interface{})
 
-	reenableDate, _ := strfmt.ParseDateTime(in["reenable_date"].(string))
+	reenableDate, err := strfmt.ParseDateTime(in["reenable_date"].(string))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'reenable_date' field")
+		return nil, err
+	}
 
 	return &models.IpamsvcAsmEnableBlock{
 		Enable:             in["enable"].(bool),
 		EnableNotification: in["enable_notification"].(bool),
 		ReenableDate:       reenableDate,
-	}
+	}, nil
 }

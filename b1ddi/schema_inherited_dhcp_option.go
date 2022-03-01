@@ -56,31 +56,28 @@ func schemaIpamsvcInheritedDHCPOption() *schema.Resource {
 	}
 }
 
-func flattenIpamsvcInheritedDHCPOption(r *models.IpamsvcInheritedDHCPOption) []interface{} {
+func flattenIpamsvcInheritedDHCPOption(r *models.IpamsvcInheritedDHCPOption) map[string]interface{} {
 	if r == nil {
-		return []interface{}{}
+		return nil
 	}
 
-	return []interface{}{
-		map[string]interface{}{
-			"action":       r.Action,
-			"display_name": r.DisplayName,
-			"source":       r.Source,
-			"value":        flattenIpamsvcOptionItem(r.Value),
-		},
+	return map[string]interface{}{
+		"action":       r.Action,
+		"display_name": r.DisplayName,
+		"source":       r.Source,
+		"value":        []interface{}{flattenIpamsvcOptionItem(r.Value)},
 	}
 }
 
-func expandIpamsvcInheritedDHCPOption(d []interface{}) *models.IpamsvcInheritedDHCPOption {
-	if len(d) == 0 || d[0] == nil {
+func expandIpamsvcInheritedDHCPOption(d map[string]interface{}) *models.IpamsvcInheritedDHCPOption {
+	if len(d) == 0 || d == nil {
 		return nil
 	}
-	in := d[0].(map[string]interface{})
 
 	return &models.IpamsvcInheritedDHCPOption{
-		Action:      in["action"].(string),
-		DisplayName: in["display_name"].(string),
-		Source:      in["source"].(string),
-		Value:       expandIpamsvcOptionItem(in["value"].(map[string]interface{})),
+		Action:      d["action"].(string),
+		DisplayName: d["display_name"].(string),
+		Source:      d["source"].(string),
+		Value:       expandIpamsvcOptionItem(d["value"].([]interface{})[0].(map[string]interface{})),
 	}
 }

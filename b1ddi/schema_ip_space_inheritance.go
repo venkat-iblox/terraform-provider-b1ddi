@@ -1,6 +1,8 @@
 package b1ddi
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -168,14 +170,20 @@ func flattenIpamsvcIPSpaceInheritance(r *models.IpamsvcIPSpaceInheritance) []int
 	}
 }
 
-func expandIpamsvcIPSpaceInheritance(d []interface{}) *models.IpamsvcIPSpaceInheritance {
+func expandIpamsvcIPSpaceInheritance(ctx context.Context, d []interface{}) (*models.IpamsvcIPSpaceInheritance, error) {
 	if len(d) == 0 || d[0] == nil {
-		return nil
+		return nil, nil
 	}
 	in := d[0].(map[string]interface{})
 
+	asmConfig, err := expandIpamsvcInheritedASMConfig(ctx, in["asm_config"].([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'asm_config' field. The underlying expand function returned an error.")
+		return nil, err
+	}
+
 	return &models.IpamsvcIPSpaceInheritance{
-		AsmConfig:                       expandIpamsvcInheritedASMConfig(in["asm_config"].([]interface{})),
+		AsmConfig:                       asmConfig,
 		DdnsClientUpdate:                expandInheritanceInheritedString(in["ddns_client_update"].([]interface{})),
 		DdnsEnabled:                     expandInheritanceInheritedBool(in["ddns_enabled"].([]interface{})),
 		DdnsHostnameBlock:               expandIpamsvcInheritedDDNSHostnameBlock(in["ddns_hostname_block"].([]interface{})),
@@ -189,5 +197,5 @@ func expandIpamsvcIPSpaceInheritance(d []interface{}) *models.IpamsvcIPSpaceInhe
 		HeaderOptionServerName:          expandInheritanceInheritedString(in["header_option_server_name"].([]interface{})),
 		HostnameRewriteBlock:            expandIpamsvcInheritedHostnameRewriteBlock(in["hostname_rewrite_block"].([]interface{})),
 		VendorSpecificOptionOptionSpace: expandInheritanceInheritedIdentifier(in["vendor_specific_option_option_space"].([]interface{})),
-	}
+	}, nil
 }

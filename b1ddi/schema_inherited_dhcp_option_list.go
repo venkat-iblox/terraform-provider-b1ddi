@@ -43,7 +43,7 @@ func flattenIpamsvcInheritedDHCPOptionList(r *models.IpamsvcInheritedDHCPOptionL
 		return []interface{}{}
 	}
 
-	values := make([]interface{}, 0, len(r.Value))
+	values := make([]map[string]interface{}, 0, len(r.Value))
 	for _, value := range r.Value {
 		values = append(values, flattenIpamsvcInheritedDHCPOption(value))
 	}
@@ -63,8 +63,8 @@ func expandIpamsvcInheritedDHCPOptionList(d []interface{}) *models.IpamsvcInheri
 	in := d[0].(map[string]interface{})
 
 	values := make([]*models.IpamsvcInheritedDHCPOption, 0)
-	for _, value := range in["value"].([]interface{}) {
-		values = append(values, expandIpamsvcInheritedDHCPOption(value.([]interface{})))
+	for _, value := range in["value"].([]map[string]interface{}) {
+		values = append(values, expandIpamsvcInheritedDHCPOption(value))
 	}
 
 	return &models.IpamsvcInheritedDHCPOptionList{
