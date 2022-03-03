@@ -51,6 +51,7 @@ func Provider() *schema.Provider {
 			"b1ddi_dns_view":      resourceConfigView(),
 			"b1ddi_dns_auth_zone": resourceConfigAuthZone(),
 			"b1ddi_dns_record":    resourceDataRecord(),
+			"b1ddi_dns_auth_nsg":  resourceConfigAuthNSG(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"b1ddi_ip_spaces":       dataSourceIpamsvcIPSpace(),
@@ -65,6 +66,7 @@ func Provider() *schema.Provider {
 			"b1ddi_dns_records":     dataSourceDataRecord(),
 			"b1ddi_dhcp_hosts":      dataSourceIpamsvcDhcpHost(),
 			"b1ddi_dns_hosts":       dataSourceDnsHost(),
+			"b1ddi_dns_auth_nsgs":   dataSourceConfigAuthNSG(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
