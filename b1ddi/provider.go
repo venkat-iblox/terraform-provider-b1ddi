@@ -29,7 +29,7 @@ func Provider() *schema.Provider {
 			},
 			"api_key": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("B1DDI_API_KEY", nil),
 				Description: "API token for authentication against the Infoblox BloxOne DDI platform.",
@@ -85,7 +85,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if host == "" {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Unable to initialise B1DDI client without API host",
+			Summary:  "Unable to initialise B1DDI client without the API host",
 		})
 		return nil, diags
 	}
@@ -93,15 +93,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if apiKey == "" {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Unable to initialise B1DDI client without API key",
-		})
-		return nil, diags
-	}
-
-	if basePath == "" {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Unable to initialise B1DDI client without API base path",
+			Summary:  "Unable to initialise B1DDI client without the API key. Export the B1DDI_API_KEY environment variable to set the API key.",
 		})
 		return nil, diags
 	}
