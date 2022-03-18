@@ -8,6 +8,6 @@ require (
 	github.com/go-openapi/swag v0.19.15
 	github.com/hashicorp/terraform-plugin-log v0.2.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.9.0
-	github.com/infobloxopen/b1ddi-go-client v0.1.0
+	github.com/infobloxopen/b1ddi-go-client v0.1.1
 	github.com/stretchr/testify v1.7.0
 )
