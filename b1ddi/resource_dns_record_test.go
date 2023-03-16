@@ -66,7 +66,7 @@ func resourceDnsRecordBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_absolute_zone_name", "tf-acc-test.com."),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
 			resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
@@ -137,7 +137,7 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
 					// ToDo Add check for custom inheritance_sources
-					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
@@ -161,7 +161,7 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 	})
 }
 
-func TestAccResourceDnsRecord_update(t *testing.T) {
+func TestAccResourceDnsRecord_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -217,9 +217,9 @@ func TestAccResourceDnsRecord_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
 					// ToDo Add check for custom inheritance_sources
-					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options.%"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "source.0", "STATIC"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags.%", "1"),

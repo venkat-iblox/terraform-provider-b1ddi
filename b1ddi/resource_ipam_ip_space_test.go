@@ -64,8 +64,8 @@ func resourceIPSpaceBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_use_conflict_resolution", "true"),
 
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "true"),
-			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
-			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list"),
+			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters.#"),
+			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.#"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "3600"),
 
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_options.%", "0"),
@@ -213,7 +213,7 @@ func resourceIPSpaceFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_use_conflict_resolution", "false"),
 
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
-			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
+			resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters.#"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.type", "hardware"),
@@ -347,7 +347,7 @@ func TestAccResourceIPSpace_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "ddns_use_conflict_resolution", "false"),
 
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.allow_unknown", "false"),
-					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters"),
+					resource.TestCheckNoResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.filters.#"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.lease_time", "1800"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.#", "1"),
 					resource.TestCheckResourceAttr("b1ddi_ip_space.tf_acc_test_space", "dhcp_config.0.ignore_list.0.type", "hardware"),

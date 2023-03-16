@@ -58,7 +58,7 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "false"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "ip_spaces.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "lame_ttl", "600"),
 
@@ -67,14 +67,14 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.acl", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.address", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.element", "any"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key.#"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.access", "allow"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.acl", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.address", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.element", "any"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key.#"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_recursive_only", "false"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "max_cache_ttl", "604800"),
@@ -280,7 +280,7 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "true"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "true"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources.#"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "ip_spaces.0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "lame_ttl", "1200"),
 
@@ -289,14 +289,14 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.acl", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.address", "192.168.1.15"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.element", "ip"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key.#"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.access", "allow"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.acl", ""),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.address", "192.168.1.20"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.element", "ip"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key"),
+			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key.#"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_recursive_only", "true"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "max_cache_ttl", "302400"),
@@ -317,7 +317,7 @@ func resourceDnsViewFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_acl.0.element", "ip"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_enabled", "false"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags.TestType", "Acceptance"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.0.access", "deny"),
@@ -509,7 +509,7 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "forwarders_only", "true"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "gss_tsig_enabled", "true"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "inheritance_sources.#"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "ip_spaces.0"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "lame_ttl", "1200"),
 
@@ -518,14 +518,14 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.acl", ""),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.element", "ip"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_clients_acl.0.tsig_key.#"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.#", "1"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.access", "allow"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.acl", ""),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.address", "192.168.1.20"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.element", "ip"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key"),
+					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_destinations_acl.0.tsig_key.#"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "match_recursive_only", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "max_cache_ttl", "302400"),
@@ -546,7 +546,7 @@ func TestAccResourceDnsView_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_acl.0.element", "ip"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_enabled", "false"),
-					resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags"),
+					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags.TestType", "Acceptance"),
 
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.#", "1"),
 					resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.0.access", "deny"),

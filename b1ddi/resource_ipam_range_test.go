@@ -63,7 +63,7 @@ func resourceRangeBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.%", "0"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "inheritance_parent"),
-			resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "name", "tf_acc_test_range"),
 			resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "parent"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "protocol", "ip4"),
@@ -163,7 +163,7 @@ func resourceRangeFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.start", "192.168.1.20"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "inheritance_parent"),
-			resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "name", "tf_acc_test_range"),
 			resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "parent"),
 			resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "protocol", "ip4"),
@@ -231,7 +231,7 @@ func TestAccResourceRange_UpdateSpaceExpectError(t *testing.T) {
 	})
 }
 
-func TestAccResourceRange_update(t *testing.T) {
+func TestAccResourceRange_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -304,7 +304,7 @@ func TestAccResourceRange_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "exclusion_ranges.0.start", "192.168.1.20"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_assigned_hosts.%", "0"),
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "inheritance_parent"),
-					resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_range.tf_acc_test_range", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "name", "tf_acc_test_range"),
 					resource.TestCheckResourceAttrSet("b1ddi_range.tf_acc_test_range", "parent"),
 					resource.TestCheckResourceAttr("b1ddi_range.tf_acc_test_range", "protocol", "ip4"),

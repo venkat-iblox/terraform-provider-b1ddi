@@ -93,7 +93,7 @@ func resourceDnsForwardNsgFullConfigTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_forward_nsg.tf_acc_test_forward_nsg", "internal_forwarders.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_forward_nsg.tf_acc_test_forward_nsg", "name", "tf_acc_test_forward_nsg"),
 			resource.TestCheckResourceAttr("b1ddi_dns_forward_nsg.tf_acc_test_forward_nsg", "nsgs.#", "0"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_forward_nsg.tf_acc_test_forward_nsg", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_forward_nsg.tf_acc_test_forward_nsg", "tags.TestType", "Acceptance"),
 		),
 	}
 }

@@ -73,8 +73,8 @@ func resourceSubnetBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_use_conflict_resolution", "true"),
 
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.allow_unknown", "true"),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters.#"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list.#"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "3600"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", ""),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_options.%", "0"),
@@ -89,11 +89,11 @@ func resourceSubnetBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "header_option_server_name", ""),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_char", "-"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_enabled", "false"),
-			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_regex", "[^a-zA-Z0-9_.]"),
+			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "hostname_rewrite_regex", "[^a-zA-Z0-9.-]"),
 
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_parent", ""),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "name", "tf_acc_test_subnet"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "parent", ""),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "protocol", "ip4"),
@@ -220,8 +220,8 @@ func resourceSubnetFullConfigTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_use_conflict_resolution", "false"),
 
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.allow_unknown", "false"),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters.#"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list.#"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
 
 			resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host"),
@@ -244,7 +244,7 @@ func resourceSubnetFullConfigTestStep(t *testing.T) resource.TestStep {
 
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_parent", ""),
-			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources.#"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "name", "tf_acc_test_subnet"),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "parent", ""),
 			resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "protocol", "ip4"),
@@ -341,7 +341,7 @@ func TestAccResourceSubnet_UpdateSpaceExpectError(t *testing.T) {
 	})
 }
 
-func TestAccResourceSubnet_update(t *testing.T) {
+func TestAccResourceSubnet_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -440,8 +440,8 @@ func TestAccResourceSubnet_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "ddns_use_conflict_resolution", "false"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.allow_unknown", "false"),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters"),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list"),
+					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.filters.#"),
+					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.ignore_list.#"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_config.0.lease_time", "1800"),
 					// ToDo Add dhcp_host parameter
 					//resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "dhcp_host", "dhcp_host"),
@@ -464,7 +464,7 @@ func TestAccResourceSubnet_update(t *testing.T) {
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_assigned_hosts.%", "0"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_parent", ""),
-					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "name", "tf_acc_test_subnet"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "parent", ""),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet", "protocol", "ip4"),

@@ -60,7 +60,7 @@ func resourceFixedAddressBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "hostname", ""),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_parent"),
-			resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources.#"),
 			resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "ip_space"),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_type", "mac"),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_value", "00:00:00:00:00:00"),
@@ -150,7 +150,7 @@ func resourceFixedAddressFullConfigTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "hostname", ""),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_assigned_hosts.%", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_parent"),
-			resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources"),
+			resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources.#"),
 			resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "ip_space"),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_type", "client_text"),
 			resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_value", "Client Text"),
@@ -163,7 +163,7 @@ func resourceFixedAddressFullConfigTestStep() resource.TestStep {
 	}
 }
 
-func TestAccResourceFixedAddress_update(t *testing.T) {
+func TestAccResourceFixedAddress_Update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -229,7 +229,7 @@ func TestAccResourceFixedAddress_update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "hostname", ""),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_assigned_hosts.%", "0"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_parent"),
-					resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources"),
+					resource.TestCheckNoResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "inheritance_sources.#"),
 					resource.TestCheckResourceAttrSet("b1ddi_fixed_address.tf_acc_test_fixed_address", "ip_space"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_type", "client_text"),
 					resource.TestCheckResourceAttr("b1ddi_fixed_address.tf_acc_test_fixed_address", "match_value", "Client Text"),

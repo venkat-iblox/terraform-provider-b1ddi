@@ -54,7 +54,7 @@ func resourceAddressBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.15"),
 			resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 			resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-			resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+			resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info.#"),
 			resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
 			resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", ""),
 			resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", ""),
@@ -113,7 +113,7 @@ func TestAccResourceAddress_FullConfig(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info.#"),
 					// ToDo Add check for the custom host
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
 
@@ -227,7 +227,7 @@ func TestAccResourceAddress_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info.#"),
 					// ToDo Add check for the custom host
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
 
@@ -291,7 +291,7 @@ func TestAccResourceAddress_NextAvailableIP(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.1"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info.#"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", ""),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", ""),
@@ -357,7 +357,7 @@ func TestAccResourceAddress_NextAvailableIP_FullConfig(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "address", "192.168.1.1"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "comment", "This Address is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttrSet("b1ddi_address.tf_acc_test_address", "created_at"),
-					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info"),
+					resource.TestCheckNoResourceAttr("b1ddi_address.tf_acc_test_address", "dhcp_info.#"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "host", ""),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "hwaddr", "00:00:00:00:00:00"),
 					resource.TestCheckResourceAttr("b1ddi_address.tf_acc_test_address", "interface", "eth0"),
