@@ -1,6 +1,6 @@
 module terraform-provider-b1ddi
 
-go 1.17
+go 1.18
 
 require (
 	github.com/go-openapi/runtime v0.21.0
