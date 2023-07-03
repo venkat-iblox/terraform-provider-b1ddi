@@ -6,10 +6,12 @@ import (
 	"terraform-provider-b1ddi/b1ddi"
 )
 
+var terraformVersion string
+
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: func() *schema.Provider {
-			return b1ddi.Provider()
+			return b1ddi.Provider(terraformVersion)
 		},
 	})
 }

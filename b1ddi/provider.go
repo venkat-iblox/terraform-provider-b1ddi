@@ -3,13 +3,19 @@ package b1ddi
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-	"strconv"
-	"strings"
+
+	"terraform-provider-b1ddi/b1ddi/util"
 )
 
 const (
@@ -18,7 +24,7 @@ const (
 	errRecordNotFound                = "response status code indicates client error (status 404): \n{\"error\":[{\"message\":\"record not found\"}]}"
 )
 
-func Provider() *schema.Provider {
+func Provider(terraformVersion string) *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"host": {
@@ -39,6 +45,12 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Default:     "api/ddi/v1",
 				Description: "The base path is to indicate the API version and the product name.",
+			},
+			"provider_version": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     terraformVersion,
+				Description: "Terraform provider version, used in the API call headers",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -78,6 +90,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	host := d.Get("host").(string)
 	apiKey := d.Get("api_key").(string)
 	basePath := d.Get("base_path").(string)
+	version := d.Get("provider_version").(string)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
@@ -98,9 +111,13 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diags
 	}
 
+	httpClient := &http.Client{
+		Timeout:   time.Second * 10,
+		Transport: newTransport(version),
+	}
 	// create the transport
-	transport := httptransport.New(
-		host, basePath, nil,
+	transport := httptransport.NewWithClient(
+		host, basePath, nil, httpClient,
 	)
 
 	// Create default auth header for all API requests
@@ -109,7 +126,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	// create the API client
 	c := b1ddiclient.NewClient(transport, strfmt.Default)
-
 	return c, diags
 }
 
@@ -142,4 +158,32 @@ func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Reso
 	return &schema.Resource{
 		Schema: resultSchema,
 	}
+}
+
+func newTransport(version string) *customTransport {
+	return &customTransport{
+		originalTransport: http.DefaultTransport,
+		terraformVersion:  version,
+	}
+}
+
+type customTransport struct {
+	originalTransport http.RoundTripper
+	terraformVersion  string
+}
+
+func (c *customTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform/version#%s", c.terraformVersion))
+	// read sdk version from build - https://pkg.go.dev/runtime/debug#BuildInfo
+	build, err := util.GetGoSDKBuild()
+	if err == nil {
+		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang/version#%s", build))
+	}
+
+	resp, err := c.originalTransport.RoundTrip(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

@@ -9,15 +9,18 @@ import (
 	"testing"
 )
 
-var testAccProvider *schema.Provider
-var testAccProviderFactories map[string]func() (*schema.Provider, error)
+var (
+	testAccProvider          *schema.Provider
+	testAccProviderFactories map[string]func() (*schema.Provider, error)
+	testVersion              = "0.1"
+)
 
 func init() {
-	testAccProvider = Provider()
+	testAccProvider = Provider(testVersion)
 
 	testAccProviderFactories = map[string]func() (*schema.Provider, error){
 		"b1ddi": func() (*schema.Provider, error) {
-			return Provider(), nil
+			return Provider(testVersion), nil
 		},
 	}
 }
