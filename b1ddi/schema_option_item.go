@@ -62,6 +62,22 @@ func flattenIpamsvcOptionItem(r *models.IpamsvcOptionItem) map[string]interface{
 	}
 }
 
+func expandIpamsvcInheritedDHCPOptionItem(d map[string]interface{}) *models.IpamsvcInheritedDHCPOptionItem {
+	if d == nil || len(d) == 0 {
+		return nil
+	}
+	var s models.IpamsvcOptionItem
+
+	if opts, ok := d["options"]; ok {
+		s = opts.(models.IpamsvcOptionItem)
+	}
+
+	return &models.IpamsvcInheritedDHCPOptionItem{
+		Option:          &s,
+		OverridingGroup: d["OverridingGroup"].(string),
+	}
+}
+
 func expandIpamsvcOptionItem(d map[string]interface{}) *models.IpamsvcOptionItem {
 	if d == nil || len(d) == 0 {
 		return nil

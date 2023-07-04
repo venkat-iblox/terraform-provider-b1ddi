@@ -65,7 +65,7 @@ func flattenIpamsvcInheritedDHCPOption(r *models.IpamsvcInheritedDHCPOption) map
 		"action":       r.Action,
 		"display_name": r.DisplayName,
 		"source":       r.Source,
-		"value":        []interface{}{flattenIpamsvcOptionItem(r.Value)},
+		"value":        []interface{}{flattenIpamsvcOptionItem(r.Value.Option)},
 	}
 }
 
@@ -78,6 +78,6 @@ func expandIpamsvcInheritedDHCPOption(d map[string]interface{}) *models.IpamsvcI
 		Action:      d["action"].(string),
 		DisplayName: d["display_name"].(string),
 		Source:      d["source"].(string),
-		Value:       expandIpamsvcOptionItem(d["value"].([]interface{})[0].(map[string]interface{})),
+		Value:       expandIpamsvcInheritedDHCPOptionItem(d["value"].([]interface{})[0].(map[string]interface{})),
 	}
 }
