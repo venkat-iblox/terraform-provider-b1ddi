@@ -9,19 +9,11 @@ OS_ARCH=linux_amd64
 default: install
 
 build:
-	go build -o ${BINARY}
+	go build -ldflags "-X main.terraformVersion=${VERSION}" -o ${BINARY}
 
 install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
-
-build-local:
-	go build -ldflags "-X main.terraformVersion=${VERSION}" -o ${BINARY}
-
-install-local: build-local
-	rm -rf ~/.terraform.d/plugins/registry.terraform.io/${NAMESPACE}/${NAME}/${VERSION}/darwin_amd64
-	mkdir -p ~/.terraform.d/plugins/registry.terraform.io/${NAMESPACE}/${NAME}/${VERSION}/darwin_amd64
-	mv ${BINARY} ~/.terraform.d/plugins/registry.terraform.io/${NAMESPACE}/${NAME}/${VERSION}/darwin_amd64/
 
 test:
 	go test -i $(TEST) || exit 1

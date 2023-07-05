@@ -173,11 +173,10 @@ type customTransport struct {
 }
 
 func (c *customTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform/version#%s", c.terraformVersion))
-	// read sdk version from build - https://pkg.go.dev/runtime/debug#BuildInfo
-	build, err := util.GetGoSDKBuild()
+	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform-provider/version#%s", c.terraformVersion))
+	goVersion, err := util.GetGoSDKBuild()
 	if err == nil {
-		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang/version#%s", build))
+		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang-sdk/version#%s", goVersion))
 	}
 
 	resp, err := c.originalTransport.RoundTrip(r)
