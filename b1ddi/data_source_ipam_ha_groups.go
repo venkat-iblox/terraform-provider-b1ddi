@@ -24,7 +24,7 @@ func dataSourceHAGroup() *schema.Resource {
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Elem:        dataSourceSchemaFromResource(resourceDataRecord),
+				Elem:        dataSourceSchemaFromResource(resourceHAGroups),
 				Description: "List of HA Groups matching filters. The schema of each element is identical to the b1ddi_ipam_ha_group resource schema.",
 			},
 		},
@@ -79,6 +79,7 @@ func flattenHAGroup(r *models.IpamsvcHAGroup) []interface{} {
 			"name":       r.Name,
 			"ip_space":   r.IPSpace,
 			"hosts":      flattenHAGroupsHosts(r.Hosts),
+			"status":     r.Status,
 		},
 	}
 }

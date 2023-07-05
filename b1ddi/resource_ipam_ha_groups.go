@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/ha_group"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
@@ -135,12 +134,12 @@ func resourceHAGroupCreate(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
+	fmt.Printf("Create respone: %+v\n", resp.Payload.Result)
 	d.SetId(resp.Payload.Result.ID)
 
 	time.Sleep(time.Second)
 
-	return resourceDataRecordRead(ctx, d, m)
+	return resourceHAGroupRead(ctx, d, m)
 }
 
 func resourceHAGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -155,6 +154,8 @@ func resourceHAGroupRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	fmt.Printf("Read respone: %+v\n", flattenHAGroupsHosts(resp.Payload.Result.Hosts))
 
 	err = d.Set("name", resp.Payload.Result.Name)
 	if err != nil {
@@ -188,49 +189,36 @@ func resourceHAGroupRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("hosts", resp.Payload.Result.Hosts)
+	err = d.Set("hosts", flattenHAGroupsHosts(resp.Payload.Result.Hosts))
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("status", resp.Payload.Result.Status)
-	if err != nil {
-		diags = append(diags, diag.FromErr(err)...)
-	}
+
 	return diags
 }
 
 func resourceHAGroupUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	if d.HasChange("type") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'type' field is not allowed"))
+	hosts := make([]*models.IpamsvcHAGroupHost, 0)
+	for _, o := range d.Get("hosts").([]interface{}) {
+		if o != nil {
+			hosts = append(hosts, expandHAGroupsHosts(o.(map[string]interface{})))
+		}
 	}
 
-	if d.HasChange("view") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'view' field is not allowed"))
+	body := &models.IpamsvcHAGroup{
+		AnycastConfigID: d.Get("anycast_config_id").(string),
+		Comment:         d.Get("comment").(string),
+		Hosts:           hosts,
+		IPSpace:         d.Get("ip_space").(string),
+		Mode:            d.Get("mode").(string),
+		Name:            swag.String(d.Get("name").(string)),
+		Tags:            d.Get("tags").(string),
 	}
 
-	if d.HasChange("zone") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'zone' field is not allowed"))
-	}
-
-	body := &models.DataRecord{
-		Comment:            d.Get("comment").(string),
-		Delegation:         d.Get("delegation").(string),
-		Disabled:           d.Get("disabled").(bool),
-		InheritanceSources: expandDataRecordInheritance(d.Get("inheritance_sources").([]interface{})),
-		NameInZone:         d.Get("name_in_zone").(string),
-		Options:            d.Get("options"),
-		Rdata:              d.Get("rdata"),
-		Tags:               d.Get("tags"),
-		TTL:                int64(d.Get("ttl").(int)),
-	}
-
-	resp, err := c.DNSDataAPI.Record.RecordUpdate(
-		&record.RecordUpdateParams{ID: d.Id(), Body: body, Context: ctx},
+	resp, err := c.IPAddressManagementAPI.HaGroup.HaGroupUpdate(
+		&ha_group.HaGroupUpdateParams{ID: d.Id(), Body: body, Context: ctx},
 		nil,
 	)
 	if err != nil {
@@ -239,13 +227,13 @@ func resourceHAGroupUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 	d.SetId(resp.Payload.Result.ID)
 
-	return resourceDataRecordRead(ctx, d, m)
+	return resourceHAGroupRead(ctx, d, m)
 }
 
 func resourceHAGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
-	_, err := c.DNSDataAPI.Record.RecordDelete(
-		&record.RecordDeleteParams{ID: d.Id(), Context: ctx},
+	_, err := c.IPAddressManagementAPI.HaGroup.HaGroupDelete(
+		&ha_group.HaGroupDeleteParams{ID: d.Id(), Context: ctx},
 		nil,
 	)
 	if err != nil {
