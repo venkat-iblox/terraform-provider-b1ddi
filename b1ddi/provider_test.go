@@ -13,14 +13,15 @@ var (
 	testAccProvider          *schema.Provider
 	testAccProviderFactories map[string]func() (*schema.Provider, error)
 	testVersion              = "0.1"
+	testCommit               = "ascde"
 )
 
 func init() {
-	testAccProvider = Provider(testVersion)
+	testAccProvider = Provider(testVersion, testCommit)
 
 	testAccProviderFactories = map[string]func() (*schema.Provider, error){
 		"b1ddi": func() (*schema.Provider, error) {
-			return Provider(testVersion), nil
+			return Provider(testVersion, testCommit), nil
 		},
 	}
 }

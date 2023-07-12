@@ -4,7 +4,11 @@ import (
 	"terraform-provider-b1ddi/b1ddi/util"
 )
 
-func deepUpdateDataRecordRData(d interface{}, recordType string) (interface{}, error) {
+/*
+	updateDataRecordRData helps convert rDATA record fields of type integer from string value
+    Introduced to fix issues where terraform converts integer values to string in rendered config
+*/
+func updateDataRecordRData(d interface{}, recordType string) (interface{}, error) {
 	if d == nil {
 		return nil, nil
 	}
@@ -12,73 +16,73 @@ func deepUpdateDataRecordRData(d interface{}, recordType string) (interface{}, e
 	in := d.(map[string]interface{})
 	switch recordType {
 	case "MX":
-		toInt, fieldExists, err := util.ToInt(in, "preference")
+		toInt, exists, err := util.ToInt(in, "preference")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["preference"] = toInt
 		}
+
 	case "CAA":
-		flags, fieldExists, err := util.ToInt(in, "flags")
+		flags, exists, err := util.ToInt(in, "flags")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["flags"] = flags
 		}
 
 	case "NAPTR":
-		order, fieldExists, err := util.ToInt(in, "order")
+		order, exists, err := util.ToInt(in, "order")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["order"] = order
 		}
 
-		toInt, fieldExists, err := util.ToInt(in, "preference")
+		toInt, exists, err := util.ToInt(in, "preference")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["preference"] = toInt
 		}
 
 	case "SOA":
-		serial, fieldExists, err := util.ToInt(in, "serial")
+		serial, exists, err := util.ToInt(in, "serial")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["serial"] = serial
 		}
 
 	case "SRV":
-		port, fieldExists, err := util.ToInt(in, "port")
+		port, exists, err := util.ToInt(in, "port")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["port"] = port
 		}
 
-		priority, fieldExists, err := util.ToInt(in, "priority")
+		priority, exists, err := util.ToInt(in, "priority")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["priority"] = priority
 		}
 
-		weight, fieldExists, err := util.ToInt(in, "weight")
+		weight, exists, err := util.ToInt(in, "weight")
 		if err != nil {
 			return nil, err
 		}
-		if fieldExists {
+		if exists {
 			in["weight"] = weight
 		}
-
 	default:
 		return d, nil
 	}

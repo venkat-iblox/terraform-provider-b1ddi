@@ -3,11 +3,10 @@ package b1ddi
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test_DeepUpdateDataRecordOptions(t *testing.T) {
-	rq := require.New(t)
+func Test_UpdateDataRecordOptions(t *testing.T) {
 	testData := map[string]struct {
 		input       map[string]interface{}
 		output      map[string]interface{}
@@ -54,26 +53,27 @@ func Test_DeepUpdateDataRecordOptions(t *testing.T) {
 			errExpected: false,
 		},
 		"Valid Options - 2": {
+			// Fake message w/o the optional message to test the integrity of the code
 			input: map[string]interface{}{
 				"address": "10.0.0.1",
 			},
 			output: map[string]interface{}{
 				"address": "10.0.0.1",
 			},
-			recordType:  "PTR",
+			recordType:  "A",
 			errExpected: false,
 		},
 	}
 
 	for tn, tc := range testData {
 		t.Run(tn, func(t *testing.T) {
-			options, err := deepUpdateDataRecordOptions(tc.input, tc.recordType)
+			options, err := updateDataRecordOptions(tc.input, tc.recordType)
 			if tc.errExpected {
-				rq.Error(err)
-				rq.Nil(options)
+				assert.Error(t, err)
+				assert.Nil(t, options)
 			} else {
-				rq.NoError(err)
-				rq.Equal(tc.output, options)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.output, options)
 			}
 		})
 	}

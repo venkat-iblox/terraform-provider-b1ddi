@@ -3,11 +3,10 @@ package b1ddi
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test_DeepUpdateDataRecordRData(t *testing.T) {
-	rq := require.New(t)
+func Test_UpdateDataRecordRData(t *testing.T) {
 	testData := map[string]struct {
 		input       map[string]interface{}
 		output      map[string]interface{}
@@ -110,13 +109,13 @@ func Test_DeepUpdateDataRecordRData(t *testing.T) {
 
 	for tn, tc := range testData {
 		t.Run(tn, func(t *testing.T) {
-			output, err := deepUpdateDataRecordRData(tc.input, tc.recordType)
+			output, err := updateDataRecordRData(tc.input, tc.recordType)
 			if tc.errExpected {
-				rq.Error(err)
-				rq.Nil(output)
+				assert.Error(t, err)
+				assert.Nil(t, output)
 			} else {
-				rq.NoError(err)
-				rq.Equal(tc.output, output)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.output, output)
 			}
 		})
 	}

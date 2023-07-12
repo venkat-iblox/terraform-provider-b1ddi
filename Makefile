@@ -9,7 +9,7 @@ OS_ARCH=linux_amd64
 default: install
 
 build:
-	go build -ldflags "-X main.terraformVersion=${VERSION}" -o ${BINARY}
+	go build -o ${BINARY}
 
 install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}

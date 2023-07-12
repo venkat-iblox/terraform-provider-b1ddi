@@ -24,7 +24,7 @@ const (
 	errRecordNotFound                = "response status code indicates client error (status 404): \n{\"error\":[{\"message\":\"record not found\"}]}"
 )
 
-func Provider(terraformVersion string) *schema.Provider {
+func Provider(terraformVersion, commit string) *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"host": {
@@ -51,6 +51,12 @@ func Provider(terraformVersion string) *schema.Provider {
 				Optional:    true,
 				Default:     terraformVersion,
 				Description: "Terraform provider version, used in the API call headers",
+			},
+			"provider_commit_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     commit,
+				Description: "Terraform provider version commit ID, used in the API call headers",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -91,6 +97,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	apiKey := d.Get("api_key").(string)
 	basePath := d.Get("base_path").(string)
 	version := d.Get("provider_version").(string)
+	commit := d.Get("provider_commit_id").(string)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
@@ -113,7 +120,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	httpClient := &http.Client{
 		Timeout:   time.Second * 10,
-		Transport: newTransport(version),
+		Transport: newTransport(version, commit),
 	}
 	// create the transport
 	transport := httptransport.NewWithClient(
@@ -160,23 +167,25 @@ func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Reso
 	}
 }
 
-func newTransport(version string) *customTransport {
+func newTransport(version, commit string) *customTransport {
 	return &customTransport{
 		originalTransport: http.DefaultTransport,
 		terraformVersion:  version,
+		terraformCommitID: commit,
 	}
 }
 
 type customTransport struct {
 	originalTransport http.RoundTripper
 	terraformVersion  string
+	terraformCommitID string
 }
 
 func (c *customTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform-provider/version#%s", c.terraformVersion))
+	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform/v%s#%s", c.terraformVersion, c.terraformCommitID))
 	goVersion, err := util.GetGoSDKBuild()
 	if err == nil {
-		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang-sdk/version#%s", goVersion))
+		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang-sdk/v%s", goVersion))
 	}
 
 	resp, err := c.originalTransport.RoundTrip(r)

@@ -366,11 +366,11 @@ func resourceDataRecord() *schema.Resource {
 func resourceDataRecordCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	opts, err := deepUpdateDataRecordOptions(d.Get("options"), d.Get("type").(string))
+	opts, err := updateDataRecordOptions(d.Get("options"), d.Get("type").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	rData, err := deepUpdateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
+	rData, err := updateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -515,11 +515,11 @@ func resourceDataRecordRead(ctx context.Context, d *schema.ResourceData, m inter
 func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	opts, err := deepUpdateDataRecordOptions(d.Get("options"), d.Get("type").(string))
+	opts, err := updateDataRecordOptions(d.Get("options"), d.Get("type").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	rData, err := deepUpdateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
+	rData, err := updateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
