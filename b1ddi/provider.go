@@ -71,6 +71,7 @@ func Provider(terraformVersion, commit string) *schema.Provider {
 			"b1ddi_dns_record":      resourceDataRecord(),
 			"b1ddi_dns_auth_nsg":    resourceConfigAuthNSG(),
 			"b1ddi_dns_forward_nsg": resourceConfigForwardNSG(),
+			"b1ddi_ipam_host":       resourceIpamHost(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"b1ddi_ip_spaces":        dataSourceIpamsvcIPSpace(),
@@ -87,6 +88,7 @@ func Provider(terraformVersion, commit string) *schema.Provider {
 			"b1ddi_dns_hosts":        dataSourceDnsHost(),
 			"b1ddi_dns_auth_nsgs":    dataSourceConfigAuthNSG(),
 			"b1ddi_dns_forward_nsgs": dataSourceConfigForwardNSG(),
+			"b1ddi_ipam_host":        dataSourceIpamHost(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
