@@ -163,15 +163,6 @@ func resourceConfigForwardZone() *schema.Resource {
 				Optional:    true,
 				Description: "The resource identifier.",
 			},
-
-			// The list of a forward zone warnings.
-			// Read Only: true
-			"warnings": {
-				Type:        schema.TypeList,
-				Elem:        schemaConfigWarning(),
-				Computed:    true,
-				Description: "The list of a forward zone warnings.",
-			},
 		},
 	}
 }
@@ -211,6 +202,11 @@ func resourceConfigForwardZoneRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
+	externalForwarders := make([]map[string]interface{}, 0, len(resp.Payload.Result.ExternalForwarders))
+	for _, ef := range resp.Payload.Result.ExternalForwarders {
+		externalForwarders = append(externalForwarders, flattenConfigForwarder(ef))
+	}
+
 	err = d.Set("comment", resp.Payload.Result.Comment)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
@@ -223,7 +219,7 @@ func resourceConfigForwardZoneRead(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("external_forwarders", flattenConfigForwarder(resp.Payload.Result.ExternalForwarders))
+	err = d.Set("external_forwarders", externalForwarders)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
@@ -271,10 +267,6 @@ func resourceConfigForwardZoneRead(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("warnings", flattenConfigWarning(resp.Payload.Result.Warnings))
-	if err != nil {
-		diags = append(diags, diag.FromErr(err)...)
-	}
 	err = d.Set("mapping", resp.Payload.Result.Mapping)
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
@@ -291,12 +283,17 @@ func flattenConfigForwardZone(r *models.ConfigForwardZone) []interface{} {
 		return nil
 	}
 
+	externalForwarders := make([]map[string]interface{}, 0, len(r.ExternalForwarders))
+	for _, ef := range r.ExternalForwarders {
+		externalForwarders = append(externalForwarders, flattenConfigForwarder(ef))
+	}
+
 	return []interface{}{
 		map[string]interface{}{
 			"comment":             r.Comment,
 			"created_at":          r.CreatedAt.String(),
 			"disabled":            r.Disabled,
-			"external_forwarders": flattenConfigForwarder(r.ExternalForwarders),
+			"external_forwarders": externalForwarders,
 			"forward_only":        r.ForwardOnly,
 			"hosts":               r.Hosts,
 			"internal_forwarders": r.InternalForwarders,
@@ -306,7 +303,6 @@ func flattenConfigForwardZone(r *models.ConfigForwardZone) []interface{} {
 			"tags":                r.Tags,
 			"updated_at":          r.UpdatedAt.String(),
 			"view":                r.View,
-			"warnings":            flattenConfigWarning(r.Warnings),
 		},
 	}
 }

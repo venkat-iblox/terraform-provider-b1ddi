@@ -13,9 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-
-	"terraform-provider-b1ddi/b1ddi/util"
+	b1client "github.com/infobloxopen/b1ddi-go-client/client"
 )
 
 const (
@@ -60,39 +58,41 @@ func Provider(terraformVersion, commit string) *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"b1ddi_ip_space":         resourceIpamsvcIPSpace(),
-			"b1ddi_subnet":           resourceIpamsvcSubnet(),
-			"b1ddi_fixed_address":    resourceIpamsvcFixedAddress(),
-			"b1ddi_address_block":    resourceIpamsvcAddressBlock(),
-			"b1ddi_range":            resourceIpamsvcRange(),
-			"b1ddi_address":          resourceIpamsvcAddress(),
-			"b1ddi_dns_view":         resourceConfigView(),
-			"b1ddi_dns_auth_zone":    resourceConfigAuthZone(),
-			"b1ddi_dns_record":       resourceDataRecord(),
-			"b1ddi_dns_auth_nsg":     resourceConfigAuthNSG(),
-			"b1ddi_dns_forward_nsg":  resourceConfigForwardNSG(),
-			"b1ddi_ipam_host":        resourceIpamHost(),
-			"b1ddi_dhcp_option_code": resourceDhcpOptionCodeResponse(),
-			"b1ddi_dns_delegation":   resourceDNSDelegation(),
+			"b1ddi_ip_space":                   resourceIpamsvcIPSpace(),
+			"b1ddi_subnet":                     resourceIpamsvcSubnet(),
+			"b1ddi_fixed_address":              resourceIpamsvcFixedAddress(),
+			"b1ddi_address_block":              resourceIpamsvcAddressBlock(),
+			"b1ddi_range":                      resourceIpamsvcRange(),
+			"b1ddi_address":                    resourceIpamsvcAddress(),
+			"b1ddi_dns_view":                   resourceConfigView(),
+			"b1ddi_dns_auth_zone":              resourceConfigAuthZone(),
+			"b1ddi_dns_record":                 resourceDataRecord(),
+			"b1ddi_dns_auth_nsg":               resourceConfigAuthNSG(),
+			"b1ddi_dns_forward_nsg":            resourceConfigForwardNSG(),
+			"b1ddi_ipam_host":                  resourceIpamHost(),
+			"b1ddi_dhcp_option_code":           resourceDhcpOptionCodeResponse(),
+			"b1ddi_dns_delegation":             resourceDNSDelegation(),
+			"b1ddi_ipam_next_available_subnet": resourceIpamNextAvailableSubnet(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"b1ddi_ip_spaces":        dataSourceIpamsvcIPSpace(),
-			"b1ddi_subnets":          dataSourceIpamsvcSubnet(),
-			"b1ddi_fixed_addresses":  dataSourceIpamsvcFixedAddress(),
-			"b1ddi_address_blocks":   dataSourceIpamsvcAddressBlock(),
-			"b1ddi_ranges":           dataSourceIpamsvcRange(),
-			"b1ddi_addresses":        dataSourceIpamsvcAddress(),
-			"b1ddi_option_codes":     dataSourceIpamsvcOptionCode(),
-			"b1ddi_dns_views":        dataSourceConfigView(),
-			"b1ddi_dns_auth_zones":   dataSourceConfigAuthZone(),
-			"b1ddi_dns_records":      dataSourceDataRecord(),
-			"b1ddi_dhcp_hosts":       dataSourceIpamsvcDhcpHost(),
-			"b1ddi_dns_hosts":        dataSourceDnsHost(),
-			"b1ddi_dns_auth_nsgs":    dataSourceConfigAuthNSG(),
-			"b1ddi_dns_forward_nsgs": dataSourceConfigForwardNSG(),
-			"b1ddi_ipam_host":        dataSourceIpamHost(),
-			"b1ddi_dhcp_option_code": dataSourceDhcpOptionCodeResponse(),
-			"b1ddi_dns_delegation":   dataSourceDNSDelegation(),
+			"b1ddi_ip_spaces":                  dataSourceIpamsvcIPSpace(),
+			"b1ddi_subnets":                    dataSourceIpamsvcSubnet(),
+			"b1ddi_fixed_addresses":            dataSourceIpamsvcFixedAddress(),
+			"b1ddi_address_blocks":             dataSourceIpamsvcAddressBlock(),
+			"b1ddi_ranges":                     dataSourceIpamsvcRange(),
+			"b1ddi_addresses":                  dataSourceIpamsvcAddress(),
+			"b1ddi_option_codes":               dataSourceIpamsvcOptionCode(),
+			"b1ddi_dns_views":                  dataSourceConfigView(),
+			"b1ddi_dns_auth_zones":             dataSourceConfigAuthZone(),
+			"b1ddi_dns_records":                dataSourceDataRecord(),
+			"b1ddi_dhcp_hosts":                 dataSourceIpamsvcDhcpHost(),
+			"b1ddi_dns_hosts":                  dataSourceDnsHost(),
+			"b1ddi_dns_auth_nsgs":              dataSourceConfigAuthNSG(),
+			"b1ddi_dns_forward_nsgs":           dataSourceConfigForwardNSG(),
+			"b1ddi_ipam_host":                  dataSourceIpamHost(),
+			"b1ddi_dhcp_option_code":           dataSourceDhcpOptionCodeResponse(),
+			"b1ddi_dns_delegation":             dataSourceDNSDelegation(),
+			"b1ddi_ipam_next_available_subnet": dataSourceIpamNextAvailableSubnet(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -124,9 +124,13 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diags
 	}
 
+	headers := map[string]string{
+		"x-infoblox-client": fmt.Sprintf("terraform/%s#%s", version, commit),
+	}
+
 	httpClient := &http.Client{
 		Timeout:   time.Second * 10,
-		Transport: newTransport(version, commit),
+		Transport: b1client.NewTransport(headers),
 	}
 	// create the transport
 	transport := httptransport.NewWithClient(
@@ -134,11 +138,11 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	)
 
 	// Create default auth header for all API requests
-	tokenAuth := b1ddiclient.B1DDIAPIKey(apiKey)
+	tokenAuth := b1client.BloxOneAPIKey(apiKey)
 	transport.DefaultAuthentication = tokenAuth
 
 	// create the API client
-	c := b1ddiclient.NewClient(transport, strfmt.Default)
+	c := b1client.NewClient(transport, strfmt.Default)
 	return c, diags
 }
 
@@ -171,33 +175,4 @@ func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Reso
 	return &schema.Resource{
 		Schema: resultSchema,
 	}
-}
-
-func newTransport(version, commit string) *customTransport {
-	return &customTransport{
-		originalTransport: http.DefaultTransport,
-		terraformVersion:  version,
-		terraformCommitID: commit,
-	}
-}
-
-type customTransport struct {
-	originalTransport http.RoundTripper
-	terraformVersion  string
-	terraformCommitID string
-}
-
-func (c *customTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Add("x-infoblox-client", fmt.Sprintf("terraform/v%s#%s", c.terraformVersion, c.terraformCommitID))
-	goVersion, err := util.GetGoSDKBuild()
-	if err == nil {
-		r.Header.Add("x-infoblox-sdk", fmt.Sprintf("golang-sdk/v%s", goVersion))
-	}
-
-	resp, err := c.originalTransport.RoundTrip(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }

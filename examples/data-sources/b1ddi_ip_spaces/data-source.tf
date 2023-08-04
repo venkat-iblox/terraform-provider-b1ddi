@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     b1ddi = {
-      version = "0.1"
+      version = "0.1.4"
       source  = "infobloxopen/b1ddi"
     }
   }
@@ -10,7 +10,7 @@ terraform {
 # Select IP Space with specified name
 data "b1ddi_ip_spaces" "example_tf_space" {
   filters = {
-    "name" = "example_tf_space"
+    "name" = "Test1"
   }
 }
 

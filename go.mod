@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/infobloxopen/b1ddi-go-client v0.1.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 )
 
 require (
@@ -82,4 +82,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/infobloxopen/b1ddi-go-client => github.com/venkat-iblox/b1ddi-go-client v0.0.0-20230704013709-5836ee863b32
+replace github.com/infobloxopen/b1ddi-go-client => github.com/venkat-iblox/b1ddi-go-client v0.0.0-20230722005249-11d64cc68a0e

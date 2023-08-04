@@ -42,20 +42,15 @@ func schemaConfigForwarder() *schema.Resource {
 	}
 }
 
-func flattenConfigForwarder(r []*models.ConfigForwarder) []interface{} {
+func flattenConfigForwarder(r *models.ConfigForwarder) map[string]interface{} {
 	if r == nil {
 		return nil
 	}
-	var cf []interface{}
-
-	for _, forwarder := range r {
-		cf = append(cf, map[string]interface{}{
-			"address":       forwarder.Address,
-			"fqdn":          forwarder.Fqdn,
-			"protocol_fqdn": forwarder.ProtocolFqdn,
-		})
+	return map[string]interface{}{
+		"address":       r.Address,
+		"fqdn":          r.Fqdn,
+		"protocol_fqdn": r.ProtocolFqdn,
 	}
-	return cf
 }
 
 func expandConfigForwarder(d map[string]interface{}) *models.ConfigForwarder {

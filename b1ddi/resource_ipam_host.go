@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -29,13 +28,6 @@ func resourceIpamHost() *schema.Resource {
 				Description: "The list of all addresses associated with the IPAM host, which may be in different IP spaces.",
 			},
 
-			// This flag specifies if resource records have to be auto generated for the host.
-			"auto_generate_records": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Description: "This flag specifies if resource records have to be auto generated for the host.",
-			},
-
 			// The description for the IPAM host. May contain 0 to 1024 characters. Can include UTF-8.
 			"comment": {
 				Type:        schema.TypeString,
@@ -50,16 +42,6 @@ func resourceIpamHost() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Time when the object has been created.",
-			},
-
-			// The name records to be generated for the host.
-			//
-			// This field is required if _auto_generate_records_ is true.
-			"host_names": {
-				Type:        schema.TypeList,
-				Elem:        schemaIpamsvcHostName(),
-				Optional:    true,
-				Description: "The name records to be generated for the host.\n\nThis field is required if _auto_generate_records_ is true.",
 			},
 
 			// The name of the IPAM host. Must contain 1 to 256 characters. Can include UTF-8.
@@ -99,20 +81,11 @@ func resourceIpamHostCreate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
-	hnames := make([]*models.IpamsvcHostName, 0)
-	for _, a := range d.Get("host_names").([]interface{}) {
-		if a != nil {
-			addrs = append(addrs, expandIpamHostAddress(a.(map[string]interface{})))
-		}
-	}
-
 	body := &models.IpamsvcIpamHost{
-		Addresses:           addrs,
-		AutoGenerateRecords: d.Get("auto_generated_records").(bool),
-		Comment:             d.Get("comment").(string),
-		HostNames:           hnames,
-		Name:                swag.String(d.Get("name").(string)),
-		Tags:                d.Get("tags").(string),
+		Addresses: addrs,
+		Comment:   d.Get("comment").(string),
+		Name:      d.Get("name").(string),
+		Tags:      d.Get("tags").(string),
 	}
 	resp, err := c.IPAddressManagementAPI.IpamHost.IpamHostCreate(&ipam_host.IpamHostCreateParams{
 		Body:    body,
@@ -153,10 +126,6 @@ func resourceIpamHostRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("auto_generate_records", resp.Payload.Result.AutoGenerateRecords)
-	if err != nil {
-		diags = append(diags, diag.FromErr(err)...)
-	}
 	err = d.Set("created_at", resp.Payload.Result.CreatedAt.String())
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
@@ -177,10 +146,6 @@ func resourceIpamHostRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("host_names", flattenIpamHostName(resp.Payload.Result.HostNames))
-	if err != nil {
-		diags = append(diags, diag.FromErr(err)...)
-	}
 
 	return diags
 }
@@ -195,19 +160,11 @@ func resourceIpamHostUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
-	hnames := make([]*models.IpamsvcHostName, 0)
-	for _, a := range d.Get("host_names").([]interface{}) {
-		if a != nil {
-			addrs = append(addrs, expandIpamHostAddress(a.(map[string]interface{})))
-		}
-	}
 	body := &models.IpamsvcIpamHost{
-		Addresses:           addrs,
-		AutoGenerateRecords: d.Get("auto_generated_records").(bool),
-		Comment:             d.Get("comment").(string),
-		HostNames:           hnames,
-		Name:                swag.String(d.Get("name").(string)),
-		Tags:                d.Get("tags").(string),
+		Addresses: addrs,
+		Comment:   d.Get("comment").(string),
+		Name:      d.Get("name").(string),
+		Tags:      d.Get("tags").(string),
 	}
 
 	resp, err := c.IPAddressManagementAPI.IpamHost.IpamHostUpdate(
@@ -246,15 +203,13 @@ func flattenIpamsvcIpamHost(r *models.IpamsvcIpamHost) []interface{} {
 
 	return []interface{}{
 		map[string]interface{}{
-			"addresses":             flattenIpamHostAddress(r.Addresses),
-			"auto_generate_records": r.AutoGenerateRecords,
-			"comment":               r.Comment,
-			"created_at":            r.CreatedAt.String(),
-			"host_names":            flattenIpamHostName(r.HostNames),
-			"id":                    r.ID,
-			"name":                  r.Name,
-			"tags":                  r.Tags,
-			"updated_at":            r.UpdatedAt.String(),
+			"addresses":  flattenIpamHostAddress(r.Addresses),
+			"comment":    r.Comment,
+			"created_at": r.CreatedAt.String(),
+			"id":         r.ID,
+			"name":       r.Name,
+			"tags":       r.Tags,
+			"updated_at": r.UpdatedAt.String(),
 		},
 	}
 }

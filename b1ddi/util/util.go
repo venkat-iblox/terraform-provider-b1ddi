@@ -3,13 +3,11 @@ package util
 import (
 	"errors"
 	"fmt"
-	"runtime/debug"
 	"strconv"
 )
 
 var (
 	ParseError = "unable to parse key '%s': %v"
-	goSDKPath  = "github.com/infobloxopen/b1ddi-go-client"
 )
 
 func ToInt(d map[string]interface{}, key string) (int, bool, error) {
@@ -42,20 +40,4 @@ func ToBool(d map[string]interface{}, key string) (bool, bool, error) {
 		}
 	}
 	return b, ok, err
-}
-
-func GetGoSDKBuild() (string, error) {
-	var version string
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
-		return version, errors.New("failed to read build info")
-	}
-
-	for _, dep := range bi.Deps {
-		if dep.Path == goSDKPath {
-			version = dep.Version
-			break
-		}
-	}
-	return version, nil
 }
