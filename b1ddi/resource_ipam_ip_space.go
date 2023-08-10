@@ -271,6 +271,15 @@ func resourceIpamsvcIPSpace() *schema.Resource {
 				Description: "The utilization of IP addresses in the IP space.",
 			},
 
+			// The utilization of IP v6 addresses in the IP space.
+			// Read Only: true
+			/*"utilization_v6": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcUtilizationV6(),
+				Computed:    true,
+				Description: "The utilization of IP addresses in the IP space.",
+			},*/
+
 			// The resource identifier.
 			"vendor_specific_option_option_space": {
 				Type:        schema.TypeString,
@@ -475,6 +484,11 @@ func resourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
+
+	/*err = d.Set("utilization_v6", flattenIpamsvcUtilizationV6(s.Payload.Result.UtilizationV6))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}*/
 
 	err = d.Set("vendor_specific_option_option_space", s.Payload.Result.VendorSpecificOptionOptionSpace)
 	if err != nil {

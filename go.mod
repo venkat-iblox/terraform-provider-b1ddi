@@ -82,4 +82,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/infobloxopen/b1ddi-go-client => github.com/venkat-iblox/b1ddi-go-client v0.0.0-20230722005249-11d64cc68a0e
+replace github.com/infobloxopen/b1ddi-go-client => github.com/venkat-iblox/b1ddi-go-client v0.0.0-20230809201001-324de7b6477d

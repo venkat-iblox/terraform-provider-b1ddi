@@ -23,11 +23,14 @@ func TestFlattenIpamsvcInheritedDHCPOptionList(t *testing.T) {
 						Action:      "inherit",
 						DisplayName: "unit-test-display-name",
 						Source:      "unit-test-source",
-						Value: &models.IpamsvcOptionItem{
-							Group:       "unit-test-group",
-							OptionCode:  "unit-test-option-code",
-							OptionValue: "unit-test-option-value",
-							Type:        "option",
+						Value: &models.IpamsvcInheritedDHCPOptionItem{
+							Option: &models.IpamsvcOptionItem{
+								Group:       "unit-test-group",
+								OptionCode:  "unit-test-option-code",
+								OptionValue: "unit-test-option-value",
+								Type:        "option",
+							},
+							OverridingGroup: "",
 						},
 					},
 				},
@@ -40,13 +43,14 @@ func TestFlattenIpamsvcInheritedDHCPOptionList(t *testing.T) {
 							"action":       "inherit",
 							"display_name": "unit-test-display-name",
 							"source":       "unit-test-source",
-							"value": []interface{}{
-								map[string]interface{}{
+							"value": map[string]interface{}{
+								"option": map[string]interface{}{
 									"group":        "unit-test-group",
 									"option_code":  "unit-test-option-code",
 									"option_value": "unit-test-option-value",
 									"type":         "option",
 								},
+								"overriding_group": "",
 							},
 						},
 					},
@@ -82,13 +86,14 @@ func TestExpandIpamsvcInheritedDHCPOptionList(t *testing.T) {
 							"action":       "inherit",
 							"display_name": "unit-test-display-name",
 							"source":       "unit-test-source",
-							"value": []interface{}{
-								map[string]interface{}{
+							"value": map[string]interface{}{
+								"option": map[string]interface{}{
 									"group":        "unit-test-group",
 									"option_code":  "unit-test-option-code",
 									"option_value": "unit-test-option-value",
 									"type":         "option",
 								},
+								"overriding_group": "",
 							},
 						},
 					},
@@ -101,11 +106,14 @@ func TestExpandIpamsvcInheritedDHCPOptionList(t *testing.T) {
 						Action:      "inherit",
 						DisplayName: "unit-test-display-name",
 						Source:      "unit-test-source",
-						Value: &models.IpamsvcOptionItem{
-							Group:       "unit-test-group",
-							OptionCode:  "unit-test-option-code",
-							OptionValue: "unit-test-option-value",
-							Type:        "option",
+						Value: &models.IpamsvcInheritedDHCPOptionItem{
+							Option: &models.IpamsvcOptionItem{
+								Group:       "unit-test-group",
+								OptionCode:  "unit-test-option-code",
+								OptionValue: "unit-test-option-value",
+								Type:        "option",
+							},
+							OverridingGroup: "",
 						},
 					},
 				},

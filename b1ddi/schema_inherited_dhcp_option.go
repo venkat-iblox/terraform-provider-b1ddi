@@ -48,7 +48,7 @@ func schemaIpamsvcInheritedDHCPOption() *schema.Resource {
 			// Read Only: true
 			"value": {
 				Type:        schema.TypeList,
-				Elem:        schemaIpamsvcOptionItem(),
+				Elem:        schemaIpamsvcInheritedDHCPOptionItem(),
 				Computed:    true,
 				Description: "The inherited value for the DHCP option.",
 			},
@@ -65,7 +65,7 @@ func flattenIpamsvcInheritedDHCPOption(r *models.IpamsvcInheritedDHCPOption) map
 		"action":       r.Action,
 		"display_name": r.DisplayName,
 		"source":       r.Source,
-		"value":        []interface{}{flattenIpamsvcOptionItem(r.Value)},
+		"value":        flattenIpamsvcInheritedDHCPOptionItem(r.Value),
 	}
 }
 
@@ -78,6 +78,6 @@ func expandIpamsvcInheritedDHCPOption(d map[string]interface{}) *models.IpamsvcI
 		Action:      d["action"].(string),
 		DisplayName: d["display_name"].(string),
 		Source:      d["source"].(string),
-		Value:       expandIpamsvcOptionItem(d["value"].([]interface{})[0].(map[string]interface{})),
+		Value:       expandIpamsvcInheritedDHCPOptionItem(d["value"].(map[string]interface{})),
 	}
 }

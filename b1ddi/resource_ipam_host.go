@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"github.com/go-openapi/swag"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -67,6 +68,20 @@ func resourceIpamHost() *schema.Resource {
 				Computed:    true,
 				Description: "Time when the object has been updated. Equals to _created_at_ if not updated after creation.",
 			},
+
+			// The list of all host names associated with the IPAM host
+			"host_names": {
+				Type:        schema.TypeList,
+				Elem:        schemaIpamsvcHostNames(),
+				Optional:    true,
+				Description: "The list of all host names associated with the IPAM host",
+			},
+
+			"auto_generate_records": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Auto generate DNS records for this host",
+			},
 		},
 	}
 }
@@ -81,11 +96,19 @@ func resourceIpamHostCreate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
+	hnames := make([]*models.IpamsvcHostName, 0)
+	for _, hn := range d.Get("host_names").([]interface{}) {
+		if hn != nil {
+			hnames = append(hnames, expandIpamHostName(hn.(map[string]interface{})))
+		}
+	}
 	body := &models.IpamsvcIpamHost{
-		Addresses: addrs,
-		Comment:   d.Get("comment").(string),
-		Name:      d.Get("name").(string),
-		Tags:      d.Get("tags").(string),
+		Addresses:           addrs,
+		Comment:             d.Get("comment").(string),
+		Name:                swag.String(d.Get("name").(string)),
+		Tags:                d.Get("tags"),
+		AutoGenerateRecords: d.Get("auto_generate_records").(bool),
+		HostNames:           hnames,
 	}
 	resp, err := c.IPAddressManagementAPI.IpamHost.IpamHostCreate(&ipam_host.IpamHostCreateParams{
 		Body:    body,
@@ -146,6 +169,14 @@ func resourceIpamHostRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
+	err = d.Set("host_names", flattenIpamHostHostNames(resp.Payload.Result.HostNames))
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
+	err = d.Set("auto_generated_records", resp.Payload.Result.AutoGenerateRecords)
+	if err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
 
 	return diags
 }
@@ -160,11 +191,20 @@ func resourceIpamHostUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
+	hnames := make([]*models.IpamsvcHostName, 0)
+	for _, hn := range d.Get("host_names").([]interface{}) {
+		if hn != nil {
+			hnames = append(hnames, expandIpamHostName(hn.(map[string]interface{})))
+		}
+	}
+
 	body := &models.IpamsvcIpamHost{
-		Addresses: addrs,
-		Comment:   d.Get("comment").(string),
-		Name:      d.Get("name").(string),
-		Tags:      d.Get("tags").(string),
+		Addresses:           addrs,
+		Comment:             d.Get("comment").(string),
+		Name:                swag.String(d.Get("name").(string)),
+		Tags:                d.Get("tags"),
+		AutoGenerateRecords: d.Get("auto_generate_records").(bool),
+		HostNames:           hnames,
 	}
 
 	resp, err := c.IPAddressManagementAPI.IpamHost.IpamHostUpdate(
@@ -203,13 +243,15 @@ func flattenIpamsvcIpamHost(r *models.IpamsvcIpamHost) []interface{} {
 
 	return []interface{}{
 		map[string]interface{}{
-			"addresses":  flattenIpamHostAddress(r.Addresses),
-			"comment":    r.Comment,
-			"created_at": r.CreatedAt.String(),
-			"id":         r.ID,
-			"name":       r.Name,
-			"tags":       r.Tags,
-			"updated_at": r.UpdatedAt.String(),
+			"addresses":              flattenIpamHostAddress(r.Addresses),
+			"comment":                r.Comment,
+			"created_at":             r.CreatedAt.String(),
+			"id":                     r.ID,
+			"name":                   r.Name,
+			"tags":                   r.Tags,
+			"updated_at":             r.UpdatedAt.String(),
+			"auto_generated_records": r.AutoGenerateRecords,
+			"host_names":             flattenIpamHostHostNames(r.HostNames),
 		},
 	}
 }

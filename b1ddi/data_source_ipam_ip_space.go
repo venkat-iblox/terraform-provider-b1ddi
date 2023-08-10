@@ -101,6 +101,7 @@ func flattenIpamsvcIPSpace(r *b1models.IpamsvcIPSpace) []interface{} {
 			"threshold":                           flattenIpamsvcUtilizationThreshold(r.Threshold),
 			"updated_at":                          r.UpdatedAt.String(),
 			"utilization":                         flattenIpamsvcUtilization(r.Utilization),
+			"utilization_v6":                      flattenIpamsvcUtilizationV6(r.UtilizationV6),
 			"vendor_specific_option_option_space": r.VendorSpecificOptionOptionSpace,
 		},
 	}
