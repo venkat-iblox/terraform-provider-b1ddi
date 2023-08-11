@@ -3,14 +3,15 @@ package b1ddi
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/swag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_data/record"
 	"github.com/infobloxopen/b1ddi-go-client/models"
-	"time"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // DataRecord Record
@@ -365,6 +366,15 @@ func resourceDataRecord() *schema.Resource {
 func resourceDataRecordCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	opts, diags := updateDataRecordOptions(d.Get("options"), d.Get("type").(string))
+	if diags.HasError() {
+		return diags
+	}
+	rData, diags := updateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
+	if diags.HasError() {
+		return diags
+	}
+
 	r := &models.DataRecord{
 		AbsoluteNameSpec:   d.Get("absolute_name_spec").(string),
 		AbsoluteZoneName:   d.Get("absolute_zone_name").(string),
@@ -373,8 +383,8 @@ func resourceDataRecordCreate(ctx context.Context, d *schema.ResourceData, m int
 		Disabled:           d.Get("disabled").(bool),
 		InheritanceSources: expandDataRecordInheritance(d.Get("inheritance_sources").([]interface{})),
 		NameInZone:         d.Get("name_in_zone").(string),
-		Options:            d.Get("options"),
-		Rdata:              d.Get("rdata"),
+		Options:            opts,
+		Rdata:              rData,
 		Tags:               d.Get("tags"),
 		TTL:                int64(d.Get("ttl").(int)),
 		Type:               swag.String(d.Get("type").(string)),
@@ -505,6 +515,11 @@ func resourceDataRecordRead(ctx context.Context, d *schema.ResourceData, m inter
 func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
+	rData, diags := updateDataRecordRData(d.Get("rdata"), d.Get("type").(string))
+	if diags.HasError() {
+		return diags
+	}
+
 	if d.HasChange("type") {
 		d.Partial(true)
 		return diag.FromErr(fmt.Errorf("changing the value of 'type' field is not allowed"))
@@ -526,8 +541,7 @@ func resourceDataRecordUpdate(ctx context.Context, d *schema.ResourceData, m int
 		Disabled:           d.Get("disabled").(bool),
 		InheritanceSources: expandDataRecordInheritance(d.Get("inheritance_sources").([]interface{})),
 		NameInZone:         d.Get("name_in_zone").(string),
-		Options:            d.Get("options"),
-		Rdata:              d.Get("rdata"),
+		Rdata:              rData,
 		Tags:               d.Get("tags"),
 		TTL:                int64(d.Get("ttl").(int)),
 	}

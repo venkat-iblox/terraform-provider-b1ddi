@@ -3,13 +3,15 @@ package b1ddi
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -109,7 +111,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	// create the API client
 	c := b1ddiclient.NewClient(transport, strfmt.Default)
-
 	return c, diags
 }
 
