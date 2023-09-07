@@ -245,8 +245,8 @@ github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d h1:kJCB4vdITiW1eC1
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
-github.com/infobloxopen/b1ddi-go-client v0.1.1 h1:Q3hWZaFuwc6mJuL1JT9zH0BybStGHTpDTXKJ/fSMZhQ=
-github.com/infobloxopen/b1ddi-go-client v0.1.1/go.mod h1:PiVUVEyW01EDRGdYoi0kmv4Da1RpcJL12NtEjsZsN+g=
+github.com/infobloxopen/b1ddi-go-client v0.1.2-0.20230906164116-a93d9085f887 h1:xoInFEw0n4d4FFCRjR9wPiIEr4mbgKvlXfIoH9JCyL4=
+github.com/infobloxopen/b1ddi-go-client v0.1.2-0.20230906164116-a93d9085f887/go.mod h1:PiVUVEyW01EDRGdYoi0kmv4Da1RpcJL12NtEjsZsN+g=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jhump/protoreflect v1.6.0 h1:h5jfMVslIg6l29nsMs0D8Wj17RDVdNYti0vDN/PZZoE=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=

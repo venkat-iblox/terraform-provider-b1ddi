@@ -9,6 +9,7 @@ import (
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
 	"github.com/infobloxopen/b1ddi-go-client/models"
+	"reflect"
 	"time"
 )
 
@@ -361,11 +362,15 @@ func resourceConfigAuthZoneCreate(ctx context.Context, d *schema.ResourceData, m
 
 func resourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
-
 	var diags diag.Diagnostics
 
+	is := "partial"
 	resp, err := c.DNSConfigurationAPI.AuthZone.AuthZoneRead(
-		&auth_zone.AuthZoneReadParams{ID: d.Id(), Context: ctx},
+		&auth_zone.AuthZoneReadParams{
+			ID:      d.Id(),
+			Context: ctx,
+			Inherit: &is,
+		},
 		nil,
 	)
 	if err != nil {
@@ -416,7 +421,7 @@ func resourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	err = d.Set("inheritance_sources", flattenConfigAuthZoneInheritance(resp.Payload.Result.InheritanceSources))
+	err = d.Set("inheritance_sources", flattenConfigAuthZoneInheritance(inheritanceSourceObjUpdater(d.Get("inheritance_sources").([]interface{}), resp.Payload.Result.InheritanceSources)))
 	if err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
@@ -623,4 +628,41 @@ func resourceConfigAuthZoneDelete(ctx context.Context, d *schema.ResourceData, m
 	}
 	d.SetId("")
 	return nil
+}
+
+func inheritanceSourceObjUpdater(d []interface{}, r *models.ConfigAuthZoneInheritance) *models.ConfigAuthZoneInheritance {
+	if d == nil || len(d) == 0 || r == nil {
+		return nil
+	}
+	authZoneInheritance := new(models.ConfigAuthZoneInheritance)
+
+	for _, v := range d {
+		inheritanceSources, ok := v.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		for key, value := range inheritanceSources {
+			if reflect.ValueOf(value).Len() > 0 {
+				switch key {
+				case "gss_tsig_enabled":
+					authZoneInheritance.GssTsigEnabled = r.GssTsigEnabled
+				case "notify":
+					authZoneInheritance.Notify = r.Notify
+				case "query_acl":
+					authZoneInheritance.QueryACL = r.QueryACL
+				case "transfer_acl":
+					authZoneInheritance.TransferACL = r.TransferACL
+				case "update_acl":
+					authZoneInheritance.UpdateACL = r.UpdateACL
+				case "use_forwarders_for_subzones":
+					authZoneInheritance.UseForwardersForSubzones = r.UseForwardersForSubzones
+				case "zone_authority":
+					authZoneInheritance.ZoneAuthority = r.ZoneAuthority
+				default:
+				}
+			}
+		}
+	}
+
+	return authZoneInheritance
 }

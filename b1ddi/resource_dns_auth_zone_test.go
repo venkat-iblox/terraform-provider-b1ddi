@@ -3,13 +3,15 @@ package b1ddi
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
 	"os"
 	"regexp"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
+	"github.com/infobloxopen/b1ddi-go-client/dns_config/auth_zone"
 )
 
 func TestAccResourceDnsAuthZone_Basic(t *testing.T) {
@@ -179,6 +181,19 @@ func resourceDnsAuthZoneFullConfigCloudTestStep(t *testing.T) resource.TestStep 
 							use_default_mname = false
 						}
 						
+					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_auth_zone_with_is" {
+  						internal_secondaries {
+    						host = data.b1ddi_dns_hosts.dns_host.results.0.id
+  						}
+  						fqdn = "tf-example.com."
+  						primary_type = "cloud"
+  						view = b1ddi_dns_view.tf_example_dns_view.id
+  						inheritance_sources {
+    						update_acl {
+      							action = "override"
+    						}
+  						} 
 					}`, testAccReadDnsHost(t),
 		),
 		Check: resource.ComposeAggregateTestCheckFunc(
@@ -251,6 +266,11 @@ func resourceDnsAuthZoneFullConfigCloudTestStep(t *testing.T) resource.TestStep 
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.retry", "1800"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.rname", "rname@tf-acc-test.com"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "zone_authority.0.use_default_mname", "false"),
+
+			testAccDnsAuthZoneExists("b1ddi_dns_auth_zone.tf_acc_auth_zone_with_is"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources.#", "1"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "inheritance_sources.update_acl.action", "override"),
 		),
 	}
 }

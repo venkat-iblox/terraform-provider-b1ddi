@@ -39,8 +39,11 @@ func dataSourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m
 	filtersMap := d.Get("filters").(map[string]interface{})
 	filterStr := filterFromMap(filtersMap)
 
+	is := "partial"
+
 	resp, err := c.DNSConfigurationAPI.AuthZone.AuthZoneList(&auth_zone.AuthZoneListParams{
 		Filter:  swag.String(filterStr),
+		Inherit: &is,
 		Context: ctx,
 	}, nil)
 	if err != nil {

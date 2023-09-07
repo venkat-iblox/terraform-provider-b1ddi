@@ -83,16 +83,31 @@ func flattenConfigAuthZoneInheritance(r *models.ConfigAuthZoneInheritance) []int
 		return []interface{}{}
 	}
 
+	m := map[string]interface{}{}
+
+	if r.GssTsigEnabled != nil {
+		m["gss_tsig_enabled"] = flattenInheritanceInheritedBool(r.GssTsigEnabled)
+	}
+	if r.Notify != nil {
+		m["notify"] = flattenInheritanceInheritedBool(r.Notify)
+	}
+	if r.QueryACL != nil {
+		m["query_acl"] = flattenConfigInheritedACLItems(r.QueryACL)
+	}
+	if r.TransferACL != nil {
+		m["transfer_acl"] = flattenConfigInheritedACLItems(r.TransferACL)
+	}
+	if r.UpdateACL != nil {
+		m["update_acl"] = flattenConfigInheritedACLItems(r.UpdateACL)
+	}
+	if r.UseForwardersForSubzones != nil {
+		m["use_forwarders_for_subzones"] = flattenInheritanceInheritedBool(r.UseForwardersForSubzones)
+	}
+	if r.ZoneAuthority != nil {
+		m["zone_authority"] = flattenConfigInheritedZoneAuthority(r.ZoneAuthority)
+	}
 	return []interface{}{
-		map[string]interface{}{
-			"gss_tsig_enabled":            flattenInheritanceInheritedBool(r.GssTsigEnabled),
-			"notify":                      flattenInheritanceInheritedBool(r.Notify),
-			"query_acl":                   flattenConfigInheritedACLItems(r.QueryACL),
-			"transfer_acl":                flattenConfigInheritedACLItems(r.TransferACL),
-			"update_acl":                  flattenConfigInheritedACLItems(r.UpdateACL),
-			"use_forwarders_for_subzones": flattenInheritanceInheritedBool(r.UseForwardersForSubzones),
-			"zone_authority":              flattenConfigInheritedZoneAuthority(r.ZoneAuthority),
-		},
+		m,
 	}
 }
 
