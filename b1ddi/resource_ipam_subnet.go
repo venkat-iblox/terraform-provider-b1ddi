@@ -3,7 +3,6 @@ package b1ddi
 import (
 	"context"
 	"fmt"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
 	"strings"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
+	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
