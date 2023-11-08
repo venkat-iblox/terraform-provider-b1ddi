@@ -2,6 +2,7 @@ package b1ddi
 
 import (
 	"context"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -75,6 +76,14 @@ func flattenIpamsvcSubnet(r *models.IpamsvcSubnet) []interface{} {
 	inheritanceAssignedHosts := make([]interface{}, 0, len(r.InheritanceAssignedHosts))
 	for _, inheritanceAssignedHost := range r.InheritanceAssignedHosts {
 		inheritanceAssignedHosts = append(inheritanceAssignedHosts, flattenInheritanceAssignedHost(inheritanceAssignedHost))
+	}
+
+	if r.CreatedAt == nil {
+		r.CreatedAt = &strfmt.DateTime{}
+	}
+
+	if r.UpdatedAt == nil {
+		r.UpdatedAt = &strfmt.DateTime{}
 	}
 
 	return []interface{}{

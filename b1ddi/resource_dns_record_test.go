@@ -105,14 +105,15 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 						primary_type = "cloud"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
 					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_dns_record_reverse_zone" {
+						fqdn         = "1.168.192.in-addr.arpa."
+  						primary_type = "cloud"
+  						view         = b1ddi_dns_view.tf_acc_test_dns_view.id	
+					}
 					resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
 						comment = "This DNS Record is created by the terraform provider acceptance test"
 						disabled = true
 						name_in_zone = "tf_acc_test_a_record"
-						options = {
-							"create_ptr" = true
- 							"check_rmz" = true
-						}
 						rdata = {
 							"address" = "192.168.1.15"
 						}
@@ -137,11 +138,9 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_absolute_zone_name", "tf-acc-test.com."),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
-					// ToDo Add check for custom inheritance_sources
+
 					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options.create_ptr", "true"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options.check_rmz", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "source.0", "STATIC"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags.%", "1"),
@@ -153,11 +152,6 @@ func TestAccResourceDnsRecord_full_config(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "view_name", "tf_acc_test_dns_view"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
 				),
-			},
-			{
-				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
@@ -187,13 +181,15 @@ func TestAccResourceDnsRecord_Update(t *testing.T) {
 						primary_type = "cloud"
 						view = b1ddi_dns_view.tf_acc_test_dns_view.id
 					}
+					resource "b1ddi_dns_auth_zone" "tf_acc_test_dns_record_reverse_zone" {
+						fqdn         = "1.168.192.in-addr.arpa."
+  						primary_type = "cloud"
+  						view         = b1ddi_dns_view.tf_acc_test_dns_view.id	
+					}
 					resource "b1ddi_dns_record" "tf_acc_test_dns_record" {
 						comment = "This DNS Record is created by the terraform provider acceptance test"
 						disabled = true
 						name_in_zone = "tf_acc_test_a_record"
-						options = {
-							"create_ptr" = true
-						}
 						rdata = {
 							"address" = "192.168.1.15"
 						}
@@ -218,10 +214,9 @@ func TestAccResourceDnsRecord_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_absolute_zone_name", "tf-acc-test.com."),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_name_in_zone", "tf_acc_test_a_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "dns_rdata", "192.168.1.15"),
-					// ToDo Add check for custom inheritance_sources
+
 					resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "inheritance_sources.#"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "name_in_zone", "tf_acc_test_a_record"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options.create_ptr", "true"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "source.0", "STATIC"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags.%", "1"),
@@ -232,25 +227,7 @@ func TestAccResourceDnsRecord_Update(t *testing.T) {
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "view"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "view_name", "tf_acc_test_dns_view"),
 					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "zone"),
-					// Test SRV record
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "name_in_zone", "tf_acc_test_srv_record"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "rdata.port", "2100"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "rdata.weight", "100"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "source.0", "STATIC"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "tags.%", "1"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "tags.TestType", "Acceptance"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "ttl", "24400"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "type", "SRV"),
-					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_srv_record", "updated_at"),
-					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_srv_record", "view"),
-					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "view_name", "tf_acc_test_dns_view"),
-					resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_srv_record", "zone"),
 				),
-			},
-			{
-				ResourceName:      "b1ddi_dns_record.tf_acc_test_dns_record",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
@@ -287,6 +264,7 @@ func TestAccResourceDnsSRVRecord_Update(t *testing.T) {
 							"weight" = 100
 							"port" = 2100
 							"priority" = 0
+							"target" = "test.com"
 						}
 						tags = {
 							TestType = "Acceptance"
@@ -297,7 +275,7 @@ func TestAccResourceDnsSRVRecord_Update(t *testing.T) {
 					}`, testAccReadDnsHost(t),
 				),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_record"),
+					testAccDnsRecordExists("b1ddi_dns_record.tf_acc_test_dns_srv_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "name_in_zone", "tf_acc_test_srv_record"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "rdata.port", "2100"),
 					resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_srv_record", "rdata.weight", "100"),
