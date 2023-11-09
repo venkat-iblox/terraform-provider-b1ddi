@@ -60,5 +60,5 @@ resource "b1ddi_subnet" "example_tf_subnet" {
   cidr       = 28
   space      = b1ddi_ip_space.space.id
   comment    = "subnet created through Terraform"
-  depends_on = [data.b1ddi_subnets.nas]
+  depends_on = [b1ddi_ip_space.space]
 }
