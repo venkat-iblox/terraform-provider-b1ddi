@@ -606,7 +606,7 @@ func TestAccResourceSubnet_NextAvailableSubnetInAddressBlock(t *testing.T) {
 					resource "b1ddi_subnet" "tf_acc_test_subnet_nas" {
 						address = b1ddi_address_block.tf_acc_test_address_block.id
 						cidr = 25
-						comment = "This Subnet is updated by terraform provider acceptance test"
+						comment = "This Subnet is created by terraform provider acceptance test"
 						dhcp_host = data.b1ddi_dhcp_hosts.dhcp_host.results.0.id
 						name = "tf_acc_test_subnet"
 						space = b1ddi_ip_space.tf_acc_test_space.id	
@@ -618,8 +618,9 @@ func TestAccResourceSubnet_NextAvailableSubnetInAddressBlock(t *testing.T) {
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet_nas"),
 
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "cidr", "25"),
-					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "comment", "This Subnet is updated by terraform provider acceptance test"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "comment", "This Subnet is created by terraform provider acceptance test"),
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "name", "tf_acc_test_subnet"),
+					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "dhcp_host"),
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "address"),
 				),
 			},
