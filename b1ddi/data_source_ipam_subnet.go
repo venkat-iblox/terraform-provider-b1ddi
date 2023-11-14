@@ -25,7 +25,7 @@ func dataSourceIpamsvcSubnet() *schema.Resource {
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Elem:        dataSourceSchemaFromResource(resourceIpamsvcSubnet),
+				Elem:        dataSourceSchemaSubnetFromResource(resourceIpamsvcSubnet),
 				Description: "List of Subnets matching filters. The schema of each element is identical to the b1ddi_subnet resource schema.",
 			},
 		},

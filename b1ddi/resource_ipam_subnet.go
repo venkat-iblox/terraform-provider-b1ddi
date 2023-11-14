@@ -34,11 +34,20 @@ func resourceIpamsvcSubnet() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 
 			// The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.
-			// Required: true
+			// Optional: true
 			"address": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ExactlyOneOf: []string{"parent", "address"},
+				Description:  "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
+			},
+
+			// The resource identifier.
+			"parent": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ExactlyOneOf: []string{"parent", "address"},
+				Description:  "The resource identifier.",
 			},
 
 			// The Automated Scope Management configuration for the subnet.
@@ -282,13 +291,6 @@ func resourceIpamsvcSubnet() *schema.Resource {
 				Description: "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8.",
 			},
 
-			// The resource identifier.
-			"parent": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The resource identifier.",
-			},
-
 			// The type of protocol of the subnet (_ipv4_ or _ipv6_).
 			// Read Only: true
 			"protocol": {
@@ -345,13 +347,12 @@ func resourceIpamsvcSubnet() *schema.Resource {
 
 func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
-	var id, address string
 
-	address = d.Get("address").(string)
+	parent := d.Get("parent").(string)
 
-	if strings.HasPrefix(address, "ipam/address_block") {
+	if d.HasChanges("parent") && strings.HasPrefix(parent, "ipam/address_block") {
 		params := &address_block.AddressBlockCreateNextAvailableSubnetParams{
-			ID:       address,
+			ID:       parent,
 			Cidr:     swag.Int32(int32(d.Get("cidr").(int))),
 			Name:     swag.String(d.Get("name").(string)),
 			Comment:  swag.String(d.Get("comment").(string)),
@@ -367,7 +368,15 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 			return diag.FromErr(err)
 		}
 
-		id = resp.Payload.Results[0].ID
+		d.SetId(resp.Payload.Results[0].ID)
+
+		/*var diags diag.Diagnostics
+		if diags = resourceIpamsvcSubnetRead(ctx, d, m); diags.HasError() {
+			return diags
+		}*/
+		if diags := resourceIpamsvcSubnetUpdate(ctx, d, m); diags.HasError() {
+			return diags
+		}
 
 	} else {
 		dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
@@ -384,7 +393,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 		}
 
 		s := &models.IpamsvcSubnet{
-			Address:                   swag.String(address),
+			Address:                   swag.String(d.Get("address").(string)),
 			AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
 			Cidr:                      int64(d.Get("cidr").(int)),
 			Comment:                   d.Get("comment").(string),
@@ -416,11 +425,9 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 			return diag.FromErr(err)
 		}
 
-		id = resp.Payload.Result.ID
-
+		d.SetId(resp.Payload.Result.ID)
 	}
 	time.Sleep(time.Second)
-	d.SetId(id)
 
 	return resourceIpamsvcSubnetRead(ctx, d, m)
 }
@@ -595,14 +602,16 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	if d.HasChange("address") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'address' field is not allowed"))
-	}
+	if !d.IsNewResource() {
+		if d.HasChange("address") || d.HasChange("parent") {
+			d.Partial(true)
+			return diag.FromErr(fmt.Errorf("changing the value of 'address' or 'parent' field is not allowed"))
+		}
 
-	if d.HasChange("space") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+		if d.HasChange("space") {
+			d.Partial(true)
+			return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+		}
 	}
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)

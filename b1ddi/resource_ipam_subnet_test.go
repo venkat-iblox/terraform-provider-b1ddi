@@ -280,7 +280,7 @@ func TestAccResourceSubnet_UpdateAddressExpectError(t *testing.T) {
 						cidr = 24
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
-				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
+				ExpectError: regexp.MustCompile("changing the value of 'address' or 'parent' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
@@ -604,14 +604,14 @@ func TestAccResourceSubnet_NextAvailableSubnetInAddressBlock(t *testing.T) {
 						}
 					}
 					resource "b1ddi_subnet" "tf_acc_test_subnet_nas" {
-						address = b1ddi_address_block.tf_acc_test_address_block.id
+						parent = b1ddi_address_block.tf_acc_test_address_block.id
 						cidr = 25
 						comment = "This Subnet is created by terraform provider acceptance test"
 						dhcp_host = data.b1ddi_dhcp_hosts.dhcp_host.results.0.id
 						name = "tf_acc_test_subnet"
 						space = b1ddi_ip_space.tf_acc_test_space.id	
 						lifecycle {
-    						ignore_changes = all
+    						ignore_changes = [address, parent, cidr]
   						}
 					}`, testAccReadDhcpHost(t)),
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -622,6 +622,7 @@ func TestAccResourceSubnet_NextAvailableSubnetInAddressBlock(t *testing.T) {
 					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "name", "tf_acc_test_subnet"),
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "dhcp_host"),
 					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "address"),
+					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "parent"),
 				),
 			},
 		},
