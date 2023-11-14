@@ -14,17 +14,6 @@ import (
 )
 
 func dataSourceIpamsvcNextAvailableSubnet() *schema.Resource {
-	subSchema := dataSourceSchemaFromResource(resourceIpamsvcSubnet)
-	subSchema.Schema["parent"] = &schema.Schema{
-		Type:        schema.TypeString,
-		Computed:    true,
-		Description: "The resource identifier.",
-	}
-	subSchema.Schema["address"] = &schema.Schema{
-		Type:        schema.TypeString,
-		Computed:    true,
-		Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
-	}
 	return &schema.Resource{
 		ReadContext: dataSourceIpamsvcNextAvailableSubnetList,
 		Schema: map[string]*schema.Schema{

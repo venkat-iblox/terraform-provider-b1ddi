@@ -30,37 +30,6 @@ resource "b1ddi_subnet" "example_tf_subnet_1" {
     "TestType" = "Acceptance"
     "Cluster"  = "stg-1"
   }
-  # This ignore is required as address changes each time during `terraform apply`
-  # Prevents updates to the created Subnet
-  lifecycle {
-    ignore_changes = [address]
-  }
-}
-
-// List the subnets available in the above address block
-// subnet_count = number of subnets to be created
-// cidr = size of subnet
-data "b1ddi_ipam_next_available_subnets" "nas" {
-  id           = b1ddi_address_block.tf_example_address_block.id
-  cidr         = 27
-  subnet_count = 3
-  depends_on   = [b1ddi_subnet.example_tf_subnet_1]
-}
-
-// Create the subnet dynamically listed from the above data source
-resource "b1ddi_subnet" "example_tf_subnet_nas" {
-  count   = data.b1ddi_ipam_next_available_subnets.nas.subnet_count
-  name    = "tf_subnet-${count.index}"
-  address = data.b1ddi_ipam_next_available_subnets.nas.results[count.index].address
-  cidr    = data.b1ddi_ipam_next_available_subnets.nas.results[count.index].cidr
-  space   = b1ddi_ip_space.space.id
-  comment = "subnet created through Terraform using Next available subnet"
-  depends_on = [data.b1ddi_ipam_next_available_subnets.nas]
-  # This ignore is required as address, parent and cidr change each time during `terraform apply`
-  # Prevents updates to the created Subnet
-  lifecycle {
-    ignore_changes = [address, parent, cidr]
-  }
 }
 
 // Create a static subnet

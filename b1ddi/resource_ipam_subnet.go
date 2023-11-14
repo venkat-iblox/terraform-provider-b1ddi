@@ -37,6 +37,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"address": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ExactlyOneOf: []string{"parent", "address"},
 				Description:  "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 			},
@@ -45,6 +46,7 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			"parent": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ExactlyOneOf: []string{"parent", "address"},
 				Description:  "The resource identifier.",
 			},
