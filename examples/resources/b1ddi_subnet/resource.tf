@@ -56,7 +56,7 @@ resource "b1ddi_subnet" "example_tf_subnet_nas" {
   space   = b1ddi_ip_space.space.id
   comment = "subnet created through Terraform using Next available subnet"
   depends_on = [data.b1ddi_ipam_next_available_subnets.nas]
-  # This ignore is required as address, parent and cidr changes each time during `terraform apply`
+  # This ignore is required as address, parent and cidr change each time during `terraform apply`
   # Prevents updates to the created Subnet
   lifecycle {
     ignore_changes = [address, parent, cidr]

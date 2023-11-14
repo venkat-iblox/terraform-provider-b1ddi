@@ -149,12 +149,14 @@ func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Reso
 }
 
 // dataSourceSchemaSubnetFromResource -- generates schema for results field in the subnet and next_available_subnet data source
-// This function gets the original resource, schema
+// This function gets the original resource schema
 // - updates the parent and address field schema to remove 'ExactlyOneOf'
 // - injects the ID field in it.
 func dataSourceSchemaSubnetFromResource(resource func() *schema.Resource) *schema.Resource {
 	// Get the resource schema
 	resultSchema := dataSourceSchemaFromResource(resource).Schema
+	// Change the 'parent' and 'address' Subnet Resource schema fields to computed.
+	// Terraform runs validation on Schema, if we use the original schema, we will need to define one of 'parent' or 'address'
 	resultSchema["parent"] = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
@@ -166,12 +168,6 @@ func dataSourceSchemaSubnetFromResource(resource func() *schema.Resource) *schem
 		Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
 	}
 
-	// Inject id field into the resource schema
-	resultSchema["id"] = &schema.Schema{
-		Type:        schema.TypeString,
-		Computed:    true,
-		Description: "The resource identifier.",
-	}
 	return &schema.Resource{
 		Schema: resultSchema,
 	}

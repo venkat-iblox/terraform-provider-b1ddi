@@ -2,7 +2,6 @@ package b1ddi
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -370,10 +369,6 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 
 		d.SetId(resp.Payload.Results[0].ID)
 
-		/*var diags diag.Diagnostics
-		if diags = resourceIpamsvcSubnetRead(ctx, d, m); diags.HasError() {
-			return diags
-		}*/
 		if diags := resourceIpamsvcSubnetUpdate(ctx, d, m); diags.HasError() {
 			return diags
 		}
@@ -605,12 +600,12 @@ func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m 
 	if !d.IsNewResource() {
 		if d.HasChange("address") || d.HasChange("parent") {
 			d.Partial(true)
-			return diag.FromErr(fmt.Errorf("changing the value of 'address' or 'parent' field is not allowed"))
+			return diag.Errorf("changing the value of 'address' or 'parent' field is not allowed")
 		}
 
 		if d.HasChange("space") {
 			d.Partial(true)
-			return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+			return diag.Errorf("changing the value of 'space' field is not allowed")
 		}
 	}
 
