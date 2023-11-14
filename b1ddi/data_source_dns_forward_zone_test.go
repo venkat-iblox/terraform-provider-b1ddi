@@ -14,13 +14,13 @@ func TestAccDataSourceConfigForwardZone_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			resourceDnsForwardZoneBasicTestStep(t),
 			{
-				Config: fmt.Sprintf(`
+				Config: `
 					data "b1ddi_dns_forward_zones" "tf_acc_forward_zones" {
 						filters = {
 							fqdn = "tf-acc-test.com."
 						}
 					}
-				`),
+				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_zones.tf_acc_forward_zones", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_forward_zones.tf_acc_forward_zones", "results.0.id"),
