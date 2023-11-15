@@ -30,6 +30,9 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 		Config: fmt.Sprintf(`
 					resource "b1ddi_dns_view" "tf_acc_test_dns_view" {
 						name = "tf_acc_test_dns_view"
+						tags = {
+							TestType = "Acceptance"
+						}
 					}`),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testAccDnsViewExists("b1ddi_dns_view.tf_acc_test_dns_view"),
@@ -86,7 +89,7 @@ func resourceDnsViewBasicTestStep() resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "query_acl.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_acl.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "recursion_enabled", "true"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "tags.TestType", "Acceptance"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "transfer_acl.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_view.tf_acc_test_dns_view", "update_acl.#", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_view.tf_acc_test_dns_view", "updated_at"),

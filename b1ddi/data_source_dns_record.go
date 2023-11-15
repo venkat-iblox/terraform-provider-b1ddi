@@ -27,6 +27,11 @@ func dataSourceDataRecord() *schema.Resource {
 				Elem:        dataSourceSchemaFromResource(resourceDataRecord),
 				Description: "List of DNS Records matching filters. The schema of each element is identical to the b1ddi_dns_record resource schema.",
 			},
+			"tfilters": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of tag filters to be applied on the search result.",
+			},
 		},
 	}
 }
@@ -39,8 +44,12 @@ func dataSourceDataRecordRead(ctx context.Context, d *schema.ResourceData, m int
 	filtersMap := d.Get("filters").(map[string]interface{})
 	filterStr := filterFromMap(filtersMap)
 
+	tfilterMap := d.Get("tfilters").(map[string]interface{})
+	tfilterStr := filterFromMap(tfilterMap)
+
 	resp, err := c.DNSDataAPI.Record.RecordList(&record.RecordListParams{
 		Filter:  swag.String(filterStr),
+		Tfilter: swag.String(tfilterStr),
 		Context: ctx,
 	}, nil)
 	if err != nil {

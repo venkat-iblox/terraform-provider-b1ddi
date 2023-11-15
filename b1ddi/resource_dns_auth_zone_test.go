@@ -44,6 +44,9 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 			internal_secondaries {
 				host = data.b1ddi_dns_hosts.dns_host.results.0.id
 			}
+			tags = {
+				TestType = "Acceptance"
+			}
 			fqdn = "tf-acc-test.com."
 			primary_type = "cloud"
 			view = b1ddi_dns_view.tf_acc_test_dns_view.id
@@ -71,7 +74,7 @@ func resourceDnsAuthZoneBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "primary_type", "cloud"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "protocol_fqdn", "tf-acc-test.com."),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.#", "0"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags.TestType", "Acceptance"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.#", "0"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "update_acl.#", "0"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "updated_at"),
@@ -238,7 +241,7 @@ func resourceDnsAuthZoneFullConfigCloudTestStep(t *testing.T) resource.TestStep 
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.address", "192.168.1.10"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "query_acl.0.element", "ip"),
 
-			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags.#"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "tags.TestType", "Acceptance"),
 
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_zone.tf_acc_test_auth_zone", "transfer_acl.0.access", "allow"),

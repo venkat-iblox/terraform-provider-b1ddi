@@ -1,7 +1,6 @@
 terraform {
   required_providers {
     b1ddi = {
-      version = "0.1"
       source  = "infobloxopen/b1ddi"
     }
   }
@@ -16,3 +15,10 @@ data "b1ddi_dns_auth_nsgs" "tf_example_auth_nsg" {
 
 # Get all DNS Auth NSGs
 data "b1ddi_dns_auth_nsgs" "all_dns_auth_nsgs" {}
+
+# Get DNS Auth NSGs with the specified tags
+data "b1ddi_dns_auth_nsgs" "all_dns_auth_nsgs_with_tags" {
+  tfilters = {
+    location = "site1"
+  }
+}

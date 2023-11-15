@@ -1,7 +1,6 @@
 terraform {
   required_providers {
     b1ddi = {
-      version = "0.1"
       source  = "infobloxopen/b1ddi"
     }
   }
@@ -30,3 +29,10 @@ data "b1ddi_dns_records" "tf_example_a_dns_record" {
 
 # Get all DNS Records
 data "b1ddi_dns_records" "all_dns_records" {}
+
+# Get all DNS Records with specific tags
+data "b1ddi_dns_records" "all_dns_records_with_tags" {
+  tfilters = {
+    location = "site1"
+  }
+}

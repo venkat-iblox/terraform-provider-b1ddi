@@ -52,6 +52,9 @@ func resourceDnsRecordBasicTestStep(t *testing.T) resource.TestStep {
 							"address" = "192.168.1.15"
 						}
 						type = "A"
+				        tags = {
+					         TestType = "Acceptance"
+				        }
 					}`, testAccReadDnsHost(t),
 		),
 		Check: resource.ComposeAggregateTestCheckFunc(
@@ -71,7 +74,7 @@ func resourceDnsRecordBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "options"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "rdata.address", "192.168.1.15"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "source.0", "STATIC"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "tags.TestType", "Acceptance"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "ttl", "28800"),
 			resource.TestCheckResourceAttr("b1ddi_dns_record.tf_acc_test_dns_record", "type", "A"),
 			resource.TestCheckResourceAttrSet("b1ddi_dns_record.tf_acc_test_dns_record", "updated_at"),
