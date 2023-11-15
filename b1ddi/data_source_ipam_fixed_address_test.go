@@ -43,11 +43,20 @@ func TestAccDataSourceIpamsvcFixedAddress_FullConfig(t *testing.T) {
 							"name" = "tf_acc_test_fixed_address_full_config"
 						}
 					}
+					data "b1ddi_fixed_addresses" "tf_acc_fixed_addresses_by_tag" {
+						tfilters = {
+							# Search by Tag
+							"TestType" = "Acceptance"
+						}
+					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses", "results.0.comment", "This Fixed Address is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses_by_tag", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses_by_tag", "results.0.id"),
+					resource.TestCheckResourceAttr("data.b1ddi_fixed_addresses.tf_acc_fixed_addresses_by_tag", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},

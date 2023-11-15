@@ -10,6 +10,9 @@ terraform {
 resource "b1ddi_ip_space" "example_tf_space" {
   name = "example_tf_space"
   comment = "Example IP space for the terraform provider"
+  tags = {
+    location   = "site1"
+  }
 }
 
 resource "b1ddi_subnet" "example_tf_subnet" {
@@ -18,4 +21,7 @@ resource "b1ddi_subnet" "example_tf_subnet" {
   address = "192.168.1.0"
   cidr = 24
   comment = "Example Subnet created by the terraform provider"
+  tags = {
+    location   = "site1"
+  }
 }
