@@ -2,12 +2,14 @@ package b1ddi
 
 import (
 	"context"
+	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
@@ -18,9 +20,10 @@ func dataSourceIpamsvcNextAvailableSubnet() *schema.Resource {
 		ReadContext: dataSourceIpamsvcNextAvailableSubnetList,
 		Schema: map[string]*schema.Schema{
 			"id": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "An application specific resource identity of a resource.",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^ipam\/address_block\/[0-9a-f-].*$`), ""),
+				Description:  "An application specific resource identity of a resource.",
 			},
 			"cidr": {
 				Type:        schema.TypeInt,
@@ -51,7 +54,7 @@ func dataSourceIpamsvcNextAvailableSubnet() *schema.Resource {
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Elem:        dataSourceSchemaSubnetFromResource(resourceIpamsvcSubnet),
+				Elem:        dataSourceSchemaOverrideFromResource(resourceIpamsvcSubnet),
 				Description: "No. of Subnets that can be created under the resource matching the 'id'. The schema of each element is identical to the b1ddi_subnet resource schema.",
 			},
 		},

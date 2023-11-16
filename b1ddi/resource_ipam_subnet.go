@@ -2,19 +2,22 @@ package b1ddi
 
 import (
 	"context"
-	"strings"
+	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
-	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/address_block"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
+
+const NASUBNET_PATH = "nextavailablesubnet"
 
 // IpamsvcSubnet Subnet
 //
@@ -31,24 +34,31 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
+			// Defined for Terraform usage. This field won't be used in the API call
+			"next_available_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ExactlyOneOf: []string{"address", "next_available_id"},
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^ipam\/address_block\/[0-9a-f-].*$`), "invalid resource ID specified"),
+				Description:  "The resource ID in the form \"ipam/[address_block]/<UUID>\". This will create the next available resource in the given address block",
+			},
 
-			// The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.
 			// Optional: true
 			"address": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
-				ExactlyOneOf: []string{"parent", "address"},
-				Description:  "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
+				ExactlyOneOf: []string{"address", "next_available_id"},
+				Description:  "The address of the subnet in the form 'a.b.c.d/n' where the '/n' may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form 'a.b.c.d'.",
 			},
 
 			// The resource identifier.
 			"parent": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ExactlyOneOf: []string{"parent", "address"},
-				Description:  "The resource identifier.",
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The resource identifier.",
 			},
 
 			// The Automated Scope Management configuration for the subnet.
@@ -349,81 +359,53 @@ func resourceIpamsvcSubnet() *schema.Resource {
 func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	parent := d.Get("parent").(string)
-
-	if d.HasChanges("parent") && strings.HasPrefix(parent, "ipam/address_block") {
-		params := &address_block.AddressBlockCreateNextAvailableSubnetParams{
-			ID:       parent,
-			Cidr:     swag.Int32(int32(d.Get("cidr").(int))),
-			Name:     swag.String(d.Get("name").(string)),
-			Comment:  swag.String(d.Get("comment").(string)),
-			DhcpHost: swag.String(d.Get("dhcp_host").(string)),
-			Context:  ctx,
+	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
+	for _, o := range d.Get("dhcp_options").([]interface{}) {
+		if o != nil {
+			dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
 		}
-
-		resp, err := c.IPAddressManagementAPI.AddressBlock.AddressBlockCreateNextAvailableSubnet(
-			params,
-			nil,
-		)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		d.SetId(resp.Payload.Results[0].ID)
-
-		if diags := resourceIpamsvcSubnetUpdate(ctx, d, m); diags.HasError() {
-			return diags
-		}
-
-	} else {
-		dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
-		for _, o := range d.Get("dhcp_options").([]interface{}) {
-			if o != nil {
-				dhcpOptions = append(dhcpOptions, expandIpamsvcOptionItem(o.(map[string]interface{})))
-			}
-		}
-
-		inheritanceSources, err := expandIpamsvcDHCPInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
-		if err != nil {
-			tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
-			return diag.FromErr(err)
-		}
-
-		s := &models.IpamsvcSubnet{
-			Address:                   swag.String(d.Get("address").(string)),
-			AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
-			Cidr:                      int64(d.Get("cidr").(int)),
-			Comment:                   d.Get("comment").(string),
-			DdnsClientUpdate:          d.Get("ddns_client_update").(string),
-			DdnsDomain:                d.Get("ddns_domain").(string),
-			DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
-			DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
-			DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
-			DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
-			DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
-			DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
-			DhcpHost:                  d.Get("dhcp_host").(string),
-			DhcpOptions:               dhcpOptions,
-			HeaderOptionFilename:      d.Get("header_option_filename").(string),
-			HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
-			HeaderOptionServerName:    d.Get("header_option_server_name").(string),
-			HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
-			HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
-			HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
-			InheritanceSources:        inheritanceSources,
-			Name:                      d.Get("name").(string),
-			Space:                     swag.String(d.Get("space").(string)),
-			Tags:                      d.Get("tags"),
-			Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
-		}
-
-		resp, err := c.IPAddressManagementAPI.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		d.SetId(resp.Payload.Result.ID)
 	}
+
+	inheritanceSources, err := expandIpamsvcDHCPInheritance(ctx, d.Get("inheritance_sources").([]interface{}))
+	if err != nil {
+		tflog.Error(ctx, "Failed to parse 'inheritance_sources' field. The underlying expand function returned an error.")
+		return diag.FromErr(err)
+	}
+
+	s := &models.IpamsvcSubnet{
+		Address:                   swag.String(generateAddressPath(d, NASUBNET_PATH)),
+		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
+		Cidr:                      int64(d.Get("cidr").(int)),
+		Comment:                   d.Get("comment").(string),
+		DdnsClientUpdate:          d.Get("ddns_client_update").(string),
+		DdnsDomain:                d.Get("ddns_domain").(string),
+		DdnsGenerateName:          d.Get("ddns_generate_name").(bool),
+		DdnsGeneratedPrefix:       d.Get("ddns_generated_prefix").(string),
+		DdnsSendUpdates:           swag.Bool(d.Get("ddns_send_updates").(bool)),
+		DdnsUpdateOnRenew:         d.Get("ddns_update_on_renew").(bool),
+		DdnsUseConflictResolution: swag.Bool(d.Get("ddns_use_conflict_resolution").(bool)),
+		DhcpConfig:                expandIpamsvcDHCPConfig(d.Get("dhcp_config").([]interface{})),
+		DhcpHost:                  d.Get("dhcp_host").(string),
+		DhcpOptions:               dhcpOptions,
+		HeaderOptionFilename:      d.Get("header_option_filename").(string),
+		HeaderOptionServerAddress: d.Get("header_option_server_address").(string),
+		HeaderOptionServerName:    d.Get("header_option_server_name").(string),
+		HostnameRewriteChar:       d.Get("hostname_rewrite_char").(string),
+		HostnameRewriteEnabled:    d.Get("hostname_rewrite_enabled").(bool),
+		HostnameRewriteRegex:      d.Get("hostname_rewrite_regex").(string),
+		InheritanceSources:        inheritanceSources,
+		Name:                      d.Get("name").(string),
+		Space:                     swag.String(d.Get("space").(string)),
+		Tags:                      d.Get("tags"),
+		Threshold:                 expandIpamsvcUtilizationThreshold(d.Get("threshold").([]interface{})),
+	}
+
+	resp, err := c.IPAddressManagementAPI.Subnet.SubnetCreate(&subnet.SubnetCreateParams{Body: s, Context: ctx}, nil)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(resp.Payload.Result.ID)
 	time.Sleep(time.Second)
 
 	return resourceIpamsvcSubnetRead(ctx, d, m)
@@ -674,4 +656,11 @@ func resourceIpamsvcSubnetDelete(ctx context.Context, d *schema.ResourceData, m 
 	d.SetId("")
 
 	return nil
+}
+
+func generateAddressPath(d *schema.ResourceData, path string) string {
+	if d.HasChange("next_available_id") {
+		return fmt.Sprintf("%s/%s", d.Get("next_available_id"), path)
+	}
+	return d.Get("address").(string)
 }
