@@ -18,12 +18,16 @@ func TestAccDataSourceConfigAuthZone_Basic(t *testing.T) {
 						filters = {
 							fqdn = "tf-acc-test.com."
 						}
+						tfilters = {
+							TestType = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.fqdn", "tf-acc-test.com."),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},
@@ -42,12 +46,16 @@ func TestAccDataSourceConfigAuthZone_FullConfigCloud(t *testing.T) {
 						filters = {
 							fqdn = "tf-acc-test.com."
 						}
+						tfilters = {
+							TestType = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.fqdn", "tf-acc-test.com."),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},
@@ -66,12 +74,16 @@ func TestAccDataSourceConfigAuthZone_FullConfigExternal(t *testing.T) {
 						filters = {
 							fqdn = "tf-acc-test.com."
 						}
+						tfilters = {
+							TestType = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.fqdn", "tf-acc-test.com."),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_auth_zones.tf_acc_auth_zones", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},

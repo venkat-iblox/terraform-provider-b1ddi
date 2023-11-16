@@ -41,3 +41,25 @@ func TestAccDataSourceDnsHostByName(t *testing.T) {
 		},
 	})
 }
+
+func TestAccDataSourceDnsHostByTags(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			//As there are no host with corresponding filters , we expect a null value for the result
+			{
+				Config: `
+					data "b1ddi_dns_hosts" "dns_host" {
+						tfilters = {
+							TestType = "Acceptance"
+						}
+					}
+						`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.b1ddi_dns_hosts.dns_host", "results.#", "0"),
+				),
+			},
+		},
+	})
+}
