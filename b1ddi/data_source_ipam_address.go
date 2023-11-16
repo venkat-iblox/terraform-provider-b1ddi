@@ -24,7 +24,7 @@ func dataSourceIpamsvcAddress() *schema.Resource {
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Elem:        dataSourceSchemaFromResource(resourceIpamsvcAddress),
+				Elem:        dataSourceSchemaOverrideFromResource(resourceIpamsvcAddress),
 				Description: "List of Addresses matching filters. The schema of each element is identical to the b1ddi_address resource schema.",
 			},
 		},

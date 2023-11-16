@@ -3,14 +3,21 @@ package b1ddi
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"time"
+
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
 	b1ddiclient "github.com/infobloxopen/b1ddi-go-client/client"
 	"github.com/infobloxopen/b1ddi-go-client/ipamsvc/subnet"
 	"github.com/infobloxopen/b1ddi-go-client/models"
 )
+
+const NASUBNET_PATH = "nextavailablesubnet"
 
 // IpamsvcSubnet Subnet
 //
@@ -27,13 +34,31 @@ func resourceIpamsvcSubnet() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
+			// Defined for Terraform usage. This field won't be used in the API call
+			"next_available_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ExactlyOneOf: []string{"address", "next_available_id"},
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^ipam\/address_block\/[0-9a-f-].*$`), "invalid resource ID specified"),
+				Description:  "The resource ID in the form \"ipam/[address_block]/<UUID>\". This will create the next available resource in the given address block",
+			},
 
-			// The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.
-			// Required: true
+			// Optional: true
 			"address": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ExactlyOneOf: []string{"address", "next_available_id"},
+				Description:  "The address of the subnet in the form 'a.b.c.d/n' where the '/n' may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form 'a.b.c.d'.",
+			},
+
+			// The resource identifier.
+			"parent": {
 				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The address of the subnet in the form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
+				Computed:    true,
+				Description: "The resource identifier.",
 			},
 
 			// The Automated Scope Management configuration for the subnet.
@@ -277,13 +302,6 @@ func resourceIpamsvcSubnet() *schema.Resource {
 				Description: "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8.",
 			},
 
-			// The resource identifier.
-			"parent": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The resource identifier.",
-			},
-
 			// The type of protocol of the subnet (_ipv4_ or _ipv6_).
 			// Read Only: true
 			"protocol": {
@@ -355,7 +373,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	s := &models.IpamsvcSubnet{
-		Address:                   swag.String(d.Get("address").(string)),
+		Address:                   swag.String(generateAddressPath(d, NASUBNET_PATH)),
 		AsmConfig:                 expandIpamsvcASMConfig(d.Get("asm_config").([]interface{})),
 		Cidr:                      int64(d.Get("cidr").(int)),
 		Comment:                   d.Get("comment").(string),
@@ -388,6 +406,7 @@ func resourceIpamsvcSubnetCreate(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	d.SetId(resp.Payload.Result.ID)
+	time.Sleep(time.Second)
 
 	return resourceIpamsvcSubnetRead(ctx, d, m)
 }
@@ -562,14 +581,16 @@ func resourceIpamsvcSubnetRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceIpamsvcSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*b1ddiclient.Client)
 
-	if d.HasChange("address") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'address' field is not allowed"))
-	}
+	if !d.IsNewResource() {
+		if d.HasChange("address") || d.HasChange("parent") {
+			d.Partial(true)
+			return diag.Errorf("changing the value of 'address' or 'parent' field is not allowed")
+		}
 
-	if d.HasChange("space") {
-		d.Partial(true)
-		return diag.FromErr(fmt.Errorf("changing the value of 'space' field is not allowed"))
+		if d.HasChange("space") {
+			d.Partial(true)
+			return diag.Errorf("changing the value of 'space' field is not allowed")
+		}
 	}
 
 	dhcpOptions := make([]*models.IpamsvcOptionItem, 0)
@@ -635,4 +656,11 @@ func resourceIpamsvcSubnetDelete(ctx context.Context, d *schema.ResourceData, m 
 	d.SetId("")
 
 	return nil
+}
+
+func generateAddressPath(d *schema.ResourceData, path string) string {
+	if d.HasChange("next_available_id") {
+		return fmt.Sprintf("%s/%s", d.Get("next_available_id"), path)
+	}
+	return d.Get("address").(string)
 }

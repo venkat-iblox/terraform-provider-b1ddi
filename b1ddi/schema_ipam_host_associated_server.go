@@ -11,7 +11,13 @@ import (
 func schemaIpamsvcHostAssociatedServer() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-
+			// The resource identifier.
+			// Read Only: true
+			"id": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The resource identifier.",
+			},
 			// The DHCP Config Profile name.
 			// Read Only: true
 			"name": {
@@ -25,7 +31,7 @@ func schemaIpamsvcHostAssociatedServer() *schema.Resource {
 
 func flattenIpamsvcHostAssociatedServer(r *models.IpamsvcHostAssociatedServer) []interface{} {
 	if r == nil {
-		return nil
+		return []interface{}{}
 	}
 
 	return []interface{}{

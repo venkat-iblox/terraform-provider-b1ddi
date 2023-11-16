@@ -58,21 +58,23 @@ func Provider() *schema.Provider {
 			"b1ddi_dns_forward_zone": resourceConfigForwardZone(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"b1ddi_ip_spaces":         dataSourceIpamsvcIPSpace(),
-			"b1ddi_subnets":           dataSourceIpamsvcSubnet(),
-			"b1ddi_fixed_addresses":   dataSourceIpamsvcFixedAddress(),
-			"b1ddi_address_blocks":    dataSourceIpamsvcAddressBlock(),
-			"b1ddi_ranges":            dataSourceIpamsvcRange(),
-			"b1ddi_addresses":         dataSourceIpamsvcAddress(),
-			"b1ddi_option_codes":      dataSourceIpamsvcOptionCode(),
-			"b1ddi_dns_views":         dataSourceConfigView(),
-			"b1ddi_dns_auth_zones":    dataSourceConfigAuthZone(),
-			"b1ddi_dns_records":       dataSourceDataRecord(),
-			"b1ddi_dhcp_hosts":        dataSourceIpamsvcDhcpHost(),
-			"b1ddi_dns_hosts":         dataSourceDnsHost(),
-			"b1ddi_dns_auth_nsgs":     dataSourceConfigAuthNSG(),
-			"b1ddi_dns_forward_nsgs":  dataSourceConfigForwardNSG(),
-			"b1ddi_dns_forward_zones": dataSourceConfigForwardZone(),
+			"b1ddi_ip_spaces":                   dataSourceIpamsvcIPSpace(),
+			"b1ddi_subnets":                     dataSourceIpamsvcSubnet(),
+			"b1ddi_fixed_addresses":             dataSourceIpamsvcFixedAddress(),
+			"b1ddi_address_blocks":              dataSourceIpamsvcAddressBlock(),
+			"b1ddi_ranges":                      dataSourceIpamsvcRange(),
+			"b1ddi_addresses":                   dataSourceIpamsvcAddress(),
+			"b1ddi_option_codes":                dataSourceIpamsvcOptionCode(),
+			"b1ddi_dns_views":                   dataSourceConfigView(),
+			"b1ddi_dns_auth_zones":              dataSourceConfigAuthZone(),
+			"b1ddi_dns_records":                 dataSourceDataRecord(),
+			"b1ddi_dhcp_hosts":                  dataSourceIpamsvcDhcpHost(),
+			"b1ddi_dns_hosts":                   dataSourceDnsHost(),
+			"b1ddi_dns_auth_nsgs":               dataSourceConfigAuthNSG(),
+			"b1ddi_dns_forward_nsgs":            dataSourceConfigForwardNSG(),
+			"b1ddi_dns_forward_zones":           dataSourceConfigForwardZone(),
+			"b1ddi_ipam_next_available_subnets": dataSourceIpamsvcNextAvailableSubnet(),
+			"b1ddi_next_available_ip":           dataSourceIpamsvcNaIP(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -142,6 +144,28 @@ func dataSourceSchemaFromResource(resource func() *schema.Resource) *schema.Reso
 		Computed:    true,
 		Description: "The resource identifier.",
 	}
+	return &schema.Resource{
+		Schema: resultSchema,
+	}
+}
+
+// dataSourceSchemaOverrideFromResource -- generates schema for results field in the subnet, address, next_available_ip and next_available_subnet data source
+// This function gets the original resource schema
+// - updates the parent and address field schema to remove 'ExactlyOneOf'
+// - injects the ID field in it.
+func dataSourceSchemaOverrideFromResource(resource func() *schema.Resource) *schema.Resource {
+	// Get the resource schema
+	resultSchema := dataSourceSchemaFromResource(resource).Schema
+	// Change the 'next_available_id' and 'address' in Address and Subnet Resource schema fields as computed.
+	// Terraform runs validation on Schema, if we use the original schema, we will need to define one of 'next_available_id' or 'address'
+	delete(resultSchema, "next_available_id")
+
+	resultSchema["address"] = &schema.Schema{
+		Type:        schema.TypeString,
+		Computed:    true,
+		Description: "The address in the form 'a.b.c.d'.",
+	}
+
 	return &schema.Resource{
 		Schema: resultSchema,
 	}

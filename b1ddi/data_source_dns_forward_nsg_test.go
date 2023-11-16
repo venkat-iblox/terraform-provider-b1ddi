@@ -18,12 +18,16 @@ func TestAccDataSourceConfigForwardNsg_Basic(t *testing.T) {
 						filters = {
 							name = "tf_acc_test_forward_nsg"
 						}
+						tfilters = {
+							TestType = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.name", "tf_acc_test_forward_nsg"),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},
@@ -42,12 +46,16 @@ func TestAccDataSourceConfigForwardNsg_FullConfig(t *testing.T) {
 						filters = {
 							name = "tf_acc_test_forward_nsg"
 						}
+						tfilters = {
+							TestType = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.name", "tf_acc_test_forward_nsg"),
+					resource.TestCheckResourceAttr("data.b1ddi_dns_forward_nsgs.tf_acc_forward_nsg", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},

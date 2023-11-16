@@ -22,7 +22,7 @@ func TestAccResourceSubnet_basic(t *testing.T) {
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+				ImportStateVerifyIgnore: []string{"next_available_id", "updated_at", "utilization"},
 			},
 		},
 	})
@@ -119,7 +119,7 @@ func TestAccResourceSubnet_FullConfig(t *testing.T) {
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+				ImportStateVerifyIgnore: []string{"next_available_id", "updated_at", "utilization"},
 			},
 		},
 	})
@@ -280,7 +280,7 @@ func TestAccResourceSubnet_UpdateAddressExpectError(t *testing.T) {
 						cidr = 24
   						comment = "This Subnet is created by terraform provider acceptance test"
 					}`),
-				ExpectError: regexp.MustCompile("changing the value of '[a-z]*' field is not allowed"),
+				ExpectError: regexp.MustCompile("changing the value of 'address' or 'parent' field is not allowed"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testCheckIPSpaceExists("b1ddi_ip_space.tf_acc_test_space"),
 					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet"),
@@ -292,7 +292,7 @@ func TestAccResourceSubnet_UpdateAddressExpectError(t *testing.T) {
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+				ImportStateVerifyIgnore: []string{"next_available_id", "updated_at", "utilization"},
 			},
 		},
 	})
@@ -335,7 +335,7 @@ func TestAccResourceSubnet_UpdateSpaceExpectError(t *testing.T) {
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+				ImportStateVerifyIgnore: []string{"next_available_id", "updated_at", "utilization"},
 			},
 		},
 	})
@@ -483,7 +483,7 @@ func TestAccResourceSubnet_Update(t *testing.T) {
 				ResourceName:            "b1ddi_subnet.tf_acc_test_subnet",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"updated_at", "utilization"},
+				ImportStateVerifyIgnore: []string{"next_available_id", "updated_at", "utilization"},
 			},
 		},
 	})
@@ -575,4 +575,66 @@ func testAccReadDhcpHost(t *testing.T) string {
 	}
 
 	return internalSecondary
+}
+
+func TestAccResourceSubnet_NextAvailableSubnetInAddressBlock(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					resource "b1ddi_subnet" "tf_acc_test_subnet_nas" {
+						next_available_id = "/test/address_block/123455678"
+						cidr = 25
+						comment = "This Subnet is created by terraform provider acceptance test"
+						dhcp_host = "/abc/dhcp_host/12345"
+						name = "tf_acc_test_subnet"
+						space = "/space/12345"
+					}	
+				`,
+				ExpectError: regexp.MustCompile("invalid resource ID specified"),
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "b1ddi_ip_space" "tf_acc_test_space" {
+  						name = "tf_acc_test_space"
+  						comment = "This IP Space is created by terraform provider acceptance test"
+					}
+					resource "b1ddi_address_block" "tf_acc_test_address_block" {
+						address = "192.168.1.0"
+  						name = "tf_acc_test_address_block"
+						cidr = 24
+						space = b1ddi_ip_space.tf_acc_test_space.id 
+  						comment = "This Address Block is created by terraform provider acceptance test"
+						tags = {
+							TestType = "Acceptance"
+						}
+					}
+					data "b1ddi_dhcp_hosts" "dhcp_host" {
+						filters = {
+							"name" = "%s"
+						}
+					}
+					resource "b1ddi_subnet" "tf_acc_test_subnet_nas" {
+						next_available_id = b1ddi_address_block.tf_acc_test_address_block.id
+						cidr = 25
+						comment = "This Subnet is created by terraform provider acceptance test"
+						dhcp_host = data.b1ddi_dhcp_hosts.dhcp_host.results.0.id
+						name = "tf_acc_test_subnet"
+						space = b1ddi_ip_space.tf_acc_test_space.id
+					}`, testAccReadDhcpHost(t)),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testCheckSubnetExists("b1ddi_subnet.tf_acc_test_subnet_nas"),
+
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "cidr", "25"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "comment", "This Subnet is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttr("b1ddi_subnet.tf_acc_test_subnet_nas", "name", "tf_acc_test_subnet"),
+					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "dhcp_host"),
+					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "address"),
+					resource.TestCheckResourceAttrSet("b1ddi_subnet.tf_acc_test_subnet_nas", "parent"),
+				),
+			},
+		},
+	})
 }

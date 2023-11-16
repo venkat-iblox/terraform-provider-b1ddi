@@ -27,6 +27,11 @@ func dataSourceConfigAuthZone() *schema.Resource {
 				Elem:        dataSourceSchemaFromResource(resourceConfigAuthZone),
 				Description: "List of DNS Auth Zones matching filters. The schema of each element is identical to the b1ddi_dns_auth_zone resource schema.",
 			},
+			"tfilters": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of tag filters to be applied on the search result.",
+			},
 		},
 	}
 }
@@ -39,10 +44,14 @@ func dataSourceConfigAuthZoneRead(ctx context.Context, d *schema.ResourceData, m
 	filtersMap := d.Get("filters").(map[string]interface{})
 	filterStr := filterFromMap(filtersMap)
 
+	tfilterMap := d.Get("tfilters").(map[string]interface{})
+	tfilterStr := filterFromMap(tfilterMap)
+
 	is := "partial"
 
 	resp, err := c.DNSConfigurationAPI.AuthZone.AuthZoneList(&auth_zone.AuthZoneListParams{
 		Filter:  swag.String(filterStr),
+		Tfilter: swag.String(tfilterStr),
 		Inherit: &is,
 		Context: ctx,
 	}, nil)

@@ -38,6 +38,9 @@ func resourceDnsAuthNsgBasicTestStep(t *testing.T) resource.TestStep {
 			internal_secondaries {
 				host = data.b1ddi_dns_hosts.dns_host.results.0.id
 			}
+			tags = {
+				TestType = "Acceptance"
+				}
 		}`, testAccReadDnsHost(t)),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			testAccDnsAuthNsgExists("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg"),
@@ -47,7 +50,7 @@ func resourceDnsAuthNsgBasicTestStep(t *testing.T) resource.TestStep {
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg", "internal_secondaries.#", "1"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg", "name", "tf_acc_test_auth_nsg"),
 			resource.TestCheckResourceAttr("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg", "nsgs.#", "0"),
-			resource.TestCheckNoResourceAttr("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg", "tags"),
+			resource.TestCheckResourceAttr("b1ddi_dns_auth_nsg.tf_acc_test_auth_nsg", "tags.TestType", "Acceptance"),
 		),
 	}
 }
