@@ -21,6 +21,11 @@ func dataSourceIpamsvcFixedAddress() *schema.Resource {
 				Optional:    true,
 				Description: "Configure a map of filters to be applied on the search result.",
 			},
+			"tfilters": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map of tag filters to be applied on the search result.",
+			},
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -39,8 +44,12 @@ func dataSourceIpamsvcFixedAddressRead(ctx context.Context, d *schema.ResourceDa
 	filtersMap := d.Get("filters").(map[string]interface{})
 	filterStr := filterFromMap(filtersMap)
 
+	tfiltersMap := d.Get("tfilters").(map[string]interface{})
+	tfilterStr := filterFromMap(tfiltersMap)
+
 	resp, err := c.IPAddressManagementAPI.FixedAddress.FixedAddressList(&fixed_address.FixedAddressListParams{
 		Filter:  swag.String(filterStr),
+		Tfilter: swag.String(tfilterStr),
 		Context: ctx,
 	}, nil)
 	if err != nil {

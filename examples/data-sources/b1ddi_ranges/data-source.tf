@@ -24,3 +24,10 @@ data "b1ddi_ranges" "range_by_name" {
     "name" = "example_tf_range"
   }
 }
+
+# Get Range by tag
+data "b1ddi_ranges" "range_by_tag"{
+  tfilter = {
+    location = "site1"
+  }
+}

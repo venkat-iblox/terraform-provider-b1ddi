@@ -21,6 +21,11 @@ func dataSourceIpamsvcIPSpace() *schema.Resource {
 				Optional:    true,
 				Description: "Configure a map of filters to be applied on the search result.",
 			},
+			"tfilters": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Configure a map tag filters to be applied on the search result.",
+			},
 			"results": {
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -39,8 +44,12 @@ func dataSourceIpamsvcIPSpaceRead(ctx context.Context, d *schema.ResourceData, m
 	filtersMap := d.Get("filters").(map[string]interface{})
 	filterStr := filterFromMap(filtersMap)
 
+	tfiltersMap := d.Get("tfilters").(map[string]interface{})
+	tfilterStr := filterFromMap(tfiltersMap)
+
 	resp, err := c.IPAddressManagementAPI.IPSpace.IPSpaceList(&ip_space.IPSpaceListParams{
 		Filter:  swag.String(filterStr),
+		Tfilter: swag.String(tfilterStr),
 		Context: ctx,
 	}, nil)
 	if err != nil {
