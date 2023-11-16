@@ -56,12 +56,22 @@ func TestAccDataSourceIpamsvcIPSpace_FullConfig(t *testing.T) {
 							# Check bool filter
 							"hostname_rewrite_enabled" = true
 						}
+
+					}
+					data "b1ddi_ip_spaces" "tf_acc_spaces_by_tag" {
+						tfilters = {
+							# Search by Tag
+							"TestType" = "Acceptance"
+						}
 					}
 				`),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.b1ddi_ip_spaces.tf_acc_spaces", "results.#", "1"),
 					resource.TestCheckResourceAttrSet("data.b1ddi_ip_spaces.tf_acc_spaces", "results.0.id"),
 					resource.TestCheckResourceAttr("data.b1ddi_ip_spaces.tf_acc_spaces", "results.0.comment", "This IP Space is created by terraform provider acceptance test"),
+					resource.TestCheckResourceAttr("data.b1ddi_ip_spaces.tf_acc_spaces_by_tag", "results.#", "1"),
+					resource.TestCheckResourceAttrSet("data.b1ddi_ip_spaces.tf_acc_spaces_by_tag", "results.0.id"),
+					resource.TestCheckResourceAttr("data.b1ddi_ip_spaces.tf_acc_spaces_by_tag", "results.0.tags.TestType", "Acceptance"),
 				),
 			},
 		},

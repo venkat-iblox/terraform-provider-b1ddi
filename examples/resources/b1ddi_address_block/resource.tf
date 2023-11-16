@@ -9,6 +9,9 @@ terraform {
 
 resource "b1ddi_ip_space" "tf_example_space" {
   name = "tf_example_space"
+  tags = {
+    location   = "site1"
+  }
 }
 
 resource "b1ddi_address_block" "tf_example_address_block" {
